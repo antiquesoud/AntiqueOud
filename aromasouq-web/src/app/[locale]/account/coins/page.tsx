@@ -26,7 +26,7 @@ export default function CoinsHistoryPage() {
       case 'EXPIRED':
         return <History className="w-5 h-5 text-gray-500" />;
       default:
-        return <Coins className="w-5 h-5 text-yellow-500" />;
+        return <Coins className="w-5 h-5 text-[#B3967D]/500" />;
     }
   };
 
@@ -52,25 +52,25 @@ export default function CoinsHistoryPage() {
         <h1 className="text-3xl font-bold mb-8">{t('title')}</h1>
 
         {/* Balance Card */}
-        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg shadow-lg p-8 text-white mb-8">
+        <div className="bg-gradient-to-r from-[#B3967D]/400 to-[#B3967D]/500 rounded-lg shadow-lg p-8 text-white mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-yellow-100 text-sm mb-2">{t('yourCoinsBalance')}</p>
+              <p className="text-[#B3967D]/100 text-sm mb-2">{t('yourCoinsBalance')}</p>
               <p className="text-5xl font-bold">{data?.balance || 0}</p>
-              <p className="text-yellow-100 mt-2">
+              <p className="text-[#B3967D]/100 mt-2">
                 {t('aedValue', { value: (data?.balance || 0).toFixed(2) })}
               </p>
             </div>
-            <Coins className="w-24 h-24 text-yellow-200 opacity-50" />
+            <Coins className="w-24 h-24 text-[#B3967D]/200 opacity-50" />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-yellow-300">
+          <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-[#B3967D]/300">
             <div>
-              <p className="text-yellow-100 text-sm">{t('lifetimeEarned')}</p>
+              <p className="text-[#B3967D]/100 text-sm">{t('lifetimeEarned')}</p>
               <p className="text-2xl font-bold">{data?.lifetimeEarned || 0}</p>
             </div>
             <div>
-              <p className="text-yellow-100 text-sm">{t('lifetimeSpent')}</p>
+              <p className="text-[#B3967D]/100 text-sm">{t('lifetimeSpent')}</p>
               <p className="text-2xl font-bold">{data?.lifetimeSpent || 0}</p>
             </div>
           </div>
@@ -130,7 +130,7 @@ export default function CoinsHistoryPage() {
                   </div>
 
                   {txn.expiresAt && new Date(txn.expiresAt) > new Date() && (
-                    <p className="text-xs text-orange-600 mt-2">
+                    <p className="text-xs text-[#B3967D]/600 mt-2">
                       {t('expires', { date: new Date(txn.expiresAt).toLocaleDateString() })}
                     </p>
                   )}
@@ -158,15 +158,15 @@ export default function CoinsHistoryPage() {
             </div>
 
             {/* Product Review */}
-            <div className="bg-white border-2 border-yellow-200 rounded-lg p-6 hover:shadow-lg transition">
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-                <Star className="w-6 h-6 text-yellow-600" />
+            <div className="bg-white border-2 border-[#B3967D]/200 rounded-lg p-6 hover:shadow-lg transition">
+              <div className="w-12 h-12 bg-[#B3967D]/100 rounded-full flex items-center justify-center mb-4">
+                <Star className="w-6 h-6 text-[#B3967D]/600" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">{t('writeReviews')}</h3>
               <p className="text-sm text-gray-600 mb-3">
                 {t('writeReviewsDescription')}
               </p>
-              <div className="text-2xl font-bold text-yellow-600">+Coins</div>
+              <div className="text-2xl font-bold text-[#B3967D]/600">+Coins</div>
               <p className="text-xs text-gray-500 mt-1">{t('perReview')}</p>
             </div>
 
@@ -199,11 +199,11 @@ export default function CoinsHistoryPage() {
         </div>
 
         {/* How to Use Coins */}
-        <div className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-lg p-6">
+        <div className="mt-8 bg-gradient-to-r from-[#B3967D]/50 to-[#B3967D]/50 border-2 border-[#B3967D]/200 rounded-lg p-6">
           <h3 className="text-xl font-bold text-gray-900 mb-4">{t('howToUseCoins')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-[#B3967D]/500 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-sm">1</span>
               </div>
               <div>
@@ -212,7 +212,7 @@ export default function CoinsHistoryPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-[#B3967D]/500 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-sm">2</span>
               </div>
               <div>
@@ -221,7 +221,7 @@ export default function CoinsHistoryPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-[#B3967D]/500 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-sm">3</span>
               </div>
               <div>
@@ -230,7 +230,7 @@ export default function CoinsHistoryPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-[#B3967D]/500 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-sm">4</span>
               </div>
               <div>

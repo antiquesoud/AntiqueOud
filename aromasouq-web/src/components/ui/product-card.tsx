@@ -120,7 +120,7 @@ export function ProductCard({
               )}
               {isLowStock && (
                 <Badge className={cn(
-                  "bg-gradient-to-br from-[#8B3A3A] to-[#A94442] border-0 text-white font-bold",
+                  "bg-gradient-to-br from-[#550000] to-[#6b0000] border-0 text-white font-bold shadow-[0_2px_8px_rgba(85,0,0,0.3)]",
                   compact ? "text-[8px] py-0.5 px-1.5" : "text-[9px] py-0.5 px-2"
                 )}>
                   {stockQuantity} {t('left')}
@@ -128,7 +128,7 @@ export function ProductCard({
               )}
               {(product as any).salesCount && (product as any).salesCount > 0 && (
                 <Badge className={cn(
-                  "bg-gradient-to-br from-[#FFA726] to-[#FFB74D] border-0 text-white font-bold",
+                  "bg-gradient-to-br from-[#B3967D] to-[#B3967D] border-0 text-white font-bold shadow-[0_2px_8px_rgba(179,150,125,0.3)]",
                   compact ? "text-[8px] py-0.5 px-1.5" : "text-[9px] py-0.5 px-2"
                 )}>
                   🔥 {(product as any).salesCount}
@@ -162,7 +162,7 @@ export function ProductCard({
             {hasVideo && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                 <div className="p-3 rounded-full bg-white/90 shadow-lg">
-                  <Play className="w-5 h-5 text-[#C9A86A]" fill="currentColor" />
+                  <Play className="w-5 h-5 text-[#B3967D]" fill="currentColor" />
                 </div>
               </div>
             )}
@@ -196,7 +196,7 @@ export function ProductCard({
             <Link
               href={`/brands/${brandName.toLowerCase().replace(/\s+/g, '-')}`}
               className={cn(
-                "text-[#C9A86A] hover:text-[#B8975A] transition-colors font-semibold uppercase tracking-wide",
+                "text-[#B3967D] hover:text-[#B3967D] transition-colors font-semibold uppercase tracking-wide",
                 compact ? "text-[9px]" : "text-[10px]"
               )}
             >
@@ -206,7 +206,7 @@ export function ProductCard({
             {/* Product Name */}
             <Link href={`/products/${product.slug}`}>
               <h3 className={cn(
-                "font-bold truncate hover:text-[#C9A86A] transition-colors text-[#2D2D2D]",
+                "font-bold truncate hover:text-[#B3967D] transition-colors text-[#2D2D2D]",
                 compact ? "text-[12px] mt-0.5" : "text-[13px] mt-1"
               )}>
                 {productName}
@@ -260,7 +260,7 @@ export function ProductCard({
               <Button
                 variant="primary"
                 size="sm"
-                className="w-full mt-3 bg-gradient-to-r from-[#1A1F2E] to-[#2D3748] hover:from-[#C9A86A] hover:to-[#B8975A] text-[11px] py-1.5 font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+                className="w-full mt-3 bg-gradient-to-r from-[#550000] to-[#6b0000] hover:from-[#B3967D] hover:to-[#B3967D] text-[11px] py-1.5 font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
                 onClick={(e) => {
                   e.preventDefault()
                   onAddToCart(product)

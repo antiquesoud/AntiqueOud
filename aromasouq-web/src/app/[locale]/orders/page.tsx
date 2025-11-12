@@ -12,7 +12,7 @@ import Image from 'next/image'
 import { Package, Clock, CheckCircle, XCircle, Truck } from 'lucide-react'
 
 const statusConfig = {
-  PENDING: { label: 'Pending', icon: Clock, color: 'bg-yellow-100 text-yellow-800' },
+  PENDING: { label: 'Pending', icon: Clock, color: 'bg-[#B3967D]/100 text-[#B3967D]/800' },
   CONFIRMED: { label: 'Confirmed', icon: CheckCircle, color: 'bg-blue-100 text-blue-800' },
   PROCESSING: { label: 'Processing', icon: Package, color: 'bg-purple-100 text-purple-800' },
   SHIPPED: { label: 'Shipped', icon: Truck, color: 'bg-indigo-100 text-indigo-800' },

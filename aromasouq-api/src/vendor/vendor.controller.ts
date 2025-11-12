@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Req,
+  ForbiddenException,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { VendorService } from './vendor.service';
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
+import { isVendorRegistrationEnabled } from '../config/features.config';
 
 @Controller('vendor')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -29,9 +31,16 @@ export class VendorController {
   /**
    * Create vendor profile
    * POST /vendor/profile
+   * Blocked in single-vendor mode
    */
   @Post('profile')
   create(@Req() req: Request, @Body() createVendorDto: CreateVendorDto) {
+    // Block vendor profile creation in single-vendor mode
+    if (!isVendorRegistrationEnabled()) {
+      throw new ForbiddenException(
+        'Vendor registration is not available. This is a single-vendor store.'
+      );
+    }
     const userId = req.user!['sub'];
     return this.vendorService.create(userId, createVendorDto);
   }

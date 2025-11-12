@@ -30,11 +30,11 @@ export function CoinsWidget() {
       variant="ghost"
       size="sm"
       asChild
-      className="relative hover:bg-yellow-50 transition-colors"
+      className="relative hover:bg-[#B3967D]/50 transition-colors"
     >
       <Link href="/account/coins" className="flex items-center gap-2">
-        <Coins className="h-5 w-5 text-yellow-600" />
-        <span className="text-sm font-semibold text-yellow-700">
+        <Coins className="h-5 w-5 text-[#B3967D]/600" />
+        <span className="text-sm font-semibold text-[#B3967D]/700">
           {coinsBalance}
         </span>
       </Link>

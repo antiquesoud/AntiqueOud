@@ -41,7 +41,7 @@ export function Lens({ children, lensSize = 150, zoomFactor = 2, className }: Le
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute rounded-full border-2 border-[#C9A86A] pointer-events-none"
+          className="absolute rounded-full border-2 border-[#B3967D] pointer-events-none"
           style={{
             width: `${lensSize}px`,
             height: `${lensSize}px`,

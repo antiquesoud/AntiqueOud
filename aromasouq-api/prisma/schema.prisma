@@ -22,6 +22,7 @@ model User {
   updatedAt         DateTime       @updatedAt @map("updated_at")
   emailVerified     Boolean        @default(false) @map("email_verified")
   preferredLanguage String         @default("en") @map("preferred_language")
+  preferredCurrency String         @default("AED") @map("preferred_currency")
   coinsBalance      Int            @default(0) @map("coins_balance")
   addresses         Address[]
   cart              Cart?
@@ -278,6 +279,8 @@ model Order {
   shippingFee     Float         @map("shipping_fee")
   discount        Float         @default(0)
   total           Float
+  currency        String        @default("AED")
+  exchangeRate    Float         @default(1.0) @map("exchange_rate")
   orderStatus     OrderStatus   @default(PENDING) @map("order_status")
   paymentStatus   PaymentStatus @default(PENDING) @map("payment_status")
   paymentMethod   PaymentMethod @map("payment_method")
@@ -422,6 +425,21 @@ model Coupon {
   orders         Order[]
 
   @@map("coupons")
+}
+
+model CurrencyRate {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  name          String
+  symbol        String
+  nameAr        String   @map("name_ar")
+  rate          Float
+  decimalPlaces Int      @default(2) @map("decimal_places")
+  isActive      Boolean  @default(true) @map("is_active")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("currency_rates")
 }
 
 enum UserRole {

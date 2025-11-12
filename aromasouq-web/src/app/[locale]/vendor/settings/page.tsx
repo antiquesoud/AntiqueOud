@@ -116,9 +116,9 @@ export default function VendorSettingsPage() {
 
       {/* Account Status Notice */}
       {vendor?.status === 'PENDING' && (
-        <Card className="border-yellow-500 bg-yellow-50">
+        <Card className="border-yellow-500 bg-[#B3967D]/50">
           <CardContent className="p-4">
-            <p className="text-sm text-yellow-800">
+            <p className="text-sm text-[#B3967D]/800">
               <strong>{t('pendingApproval')}</strong> {t('pendingApprovalDesc')}
             </p>
           </CardContent>

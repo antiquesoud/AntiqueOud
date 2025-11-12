@@ -19,10 +19,11 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
 
-        // Custom luxury variants
-        primary: "bg-gradient-to-br from-[#C9A86A] to-[#D4A574] text-white shadow-[0_4px_12px_rgba(201,168,106,0.3)] hover:shadow-[0_6px_20px_rgba(201,168,106,0.4)] hover:-translate-y-0.5 transition-all duration-200",
+        // Custom luxury variants - Antique Oud Brand
+        primary: "bg-gradient-to-br from-[#B3967D] to-[#B3967D] text-[#2D2D2D] font-bold shadow-[0_4px_12px_rgba(179,150,125,0.3)] hover:shadow-[0_6px_20px_rgba(179,150,125,0.4)] hover:-translate-y-0.5 transition-all duration-200",
         whatsapp: "bg-[#25D366] text-white hover:bg-[#25D366]/90 shadow-md hover:shadow-lg transition-all",
-        burgundy: "bg-[#8B3A3A] text-white hover:bg-[#8B3A3A]/90",
+        burgundy: "bg-[#550000] text-white hover:bg-[#550000]/90",
+        maroon: "bg-gradient-to-br from-[#550000] to-[#6b0000] text-white shadow-[0_4px_12px_rgba(85,0,0,0.3)] hover:shadow-[0_6px_20px_rgba(85,0,0,0.4)] hover:-translate-y-0.5 transition-all duration-200",
       },
       size: {
         default: "h-10 px-4 py-2",

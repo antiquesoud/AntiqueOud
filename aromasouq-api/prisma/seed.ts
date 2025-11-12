@@ -38,16 +38,22 @@ async function main() {
     },
   });
 
-  // Vendor User
+  // ====================================
+  // DEFAULT VENDOR - ANTIQUE OUD
+  // For Single-Vendor Mode
+  // ====================================
+  console.log('🏪 Creating default vendor (Antique Oud)...\n');
+
+  // Vendor User (can also act as admin)
   const vendorUser = await prisma.user.upsert({
-    where: { email: 'vendor@aromasouq.ae' },
+    where: { email: 'admin@antiqueoud.com' },
     update: {},
     create: {
-      email: 'vendor@aromasouq.ae',
+      email: 'admin@antiqueoud.com',
       password: hashedPassword,
-      firstName: 'Vendor',
-      lastName: 'User',
-      role: UserRole.VENDOR,
+      firstName: 'Antique',
+      lastName: 'Oud',
+      role: UserRole.VENDOR, // Vendor role to access vendor dashboard
       status: 'ACTIVE',
       emailVerified: true,
     },
@@ -59,29 +65,146 @@ async function main() {
     update: {},
     create: {
       userId: vendorUser.id,
-      balance: 500,
-      lifetimeEarned: 500,
+      balance: 1000,
+      lifetimeEarned: 1000,
       lifetimeSpent: 0,
     },
   });
 
-  // Vendor Profile
+  // Vendor Profile - ANTIQUE OUD
   const vendor = await prisma.vendor.upsert({
     where: { userId: vendorUser.id },
-    update: {},
+    update: {
+      status: VendorStatus.APPROVED,
+      verifiedAt: new Date(),
+    },
     create: {
       userId: vendorUser.id,
-      businessName: 'AromaSouq Official',
-      businessNameAr: 'أروماسوق الرسمي',
-      businessEmail: 'vendor@aromasouq.ae',
-      businessPhone: '+971501234567',
-      description: 'Official AromaSouq fragrance vendor',
-      descriptionAr: 'بائع عطور أروماسوق الرسمي',
-      logo: 'https://logo.clearbit.com/aromasouq.ae',
+
+      // Business Information
+      businessName: 'Antique Oud',
+      businessNameAr: 'أنتيك العود',
+      businessEmail: 'contact@antiqueoud.com',
+      businessPhone: '+971-XX-XXXXXXX',
+
+      // Description
+      description: 'Premium Traditional Arabic Oud - Finest quality oud products inspired by rich Arab heritage',
+      descriptionAr: 'أنتيك العود - أرقى أنواع العود العربي الأصيل، المستوحى من تراثنا العريق وحضارتنا الأصيلة',
+
+      // Slug
+      slug: 'antique-oud',
+
+      // Legal Information (Update with real details)
+      tradeLicense: 'AO-2025-001',
+      taxNumber: 'TAX-AO-UAE-2025',
+
+      // Contact
+      whatsappEnabled: true,
+      whatsappNumber: '+971-XX-XXXXXXX',
+
+      // Branding
+      logo: '/images/antique-oud-logo.svg',
+
+      // Social Media
+      website: 'https://antiqueoud.com',
+      instagramUrl: 'https://instagram.com/antiqueoud',
+      facebookUrl: 'https://facebook.com/antiqueoud',
+
+      // Status
       status: VendorStatus.APPROVED,
+      verifiedAt: new Date(),
     },
   });
-  console.log('✅ Created vendor profile\n');
+
+  console.log('✅ Created default vendor profile: Antique Oud');
+  console.log('   Vendor ID:', vendor.id);
+  console.log('   Business Name:', vendor.businessName);
+  console.log('   Status:', vendor.status);
+
+  // Output for .env configuration
+  console.log('\n' + '='.repeat(70));
+  console.log('⚠️  IMPORTANT: Add this to your .env file');
+  console.log('='.repeat(70));
+  console.log(`DEFAULT_VENDOR_ID=${vendor.id}`);
+  console.log('='.repeat(70));
+  console.log('\n');
+
+  // ====================================
+  // CURRENCY RATES - GCC Countries
+  // ====================================
+  console.log('💱 Creating currency rates...');
+
+  const currencies = [
+    {
+      code: 'AED',
+      name: 'UAE Dirham',
+      nameAr: 'درهم إماراتي',
+      symbol: 'د.إ',
+      rate: 1.0, // Base currency
+      decimalPlaces: 2,
+      isActive: true,
+    },
+    {
+      code: 'SAR',
+      name: 'Saudi Riyal',
+      nameAr: 'ريال سعودي',
+      symbol: '﷼',
+      rate: 1.02, // 1 AED = 1.02 SAR (approximate fixed rate)
+      decimalPlaces: 2,
+      isActive: true,
+    },
+    {
+      code: 'KWD',
+      name: 'Kuwaiti Dinar',
+      nameAr: 'دينار كويتي',
+      symbol: 'د.ك',
+      rate: 0.083, // 1 AED = 0.083 KWD (KWD is the highest valued currency)
+      decimalPlaces: 3,
+      isActive: true,
+    },
+    {
+      code: 'BHD',
+      name: 'Bahraini Dinar',
+      nameAr: 'دينار بحريني',
+      symbol: 'د.ب',
+      rate: 0.103, // 1 AED = 0.103 BHD
+      decimalPlaces: 3,
+      isActive: true,
+    },
+    {
+      code: 'OMR',
+      name: 'Omani Rial',
+      nameAr: 'ريال عماني',
+      symbol: 'ر.ع',
+      rate: 0.105, // 1 AED = 0.105 OMR
+      decimalPlaces: 3,
+      isActive: true,
+    },
+    {
+      code: 'QAR',
+      name: 'Qatari Riyal',
+      nameAr: 'ريال قطري',
+      symbol: 'ر.ق',
+      rate: 0.99, // 1 AED = 0.99 QAR (approximately 1:1)
+      decimalPlaces: 2,
+      isActive: true,
+    },
+  ];
+
+  for (const currency of currencies) {
+    await prisma.currencyRate.upsert({
+      where: { code: currency.code },
+      update: {
+        rate: currency.rate,
+        isActive: currency.isActive,
+      },
+      create: currency,
+    });
+  }
+
+  console.log('✅ Created 6 GCC currency rates');
+  console.log('   Base Currency: AED (UAE Dirham)');
+  console.log('   Supported: SAR, KWD, BHD, OMR, QAR\n');
 
   // ====================================
   // CATEGORIES - New Structure
@@ -1105,13 +1228,14 @@ async function main() {
 
   console.log('🎉 Database seeding completed successfully!\n');
   console.log('📊 Summary:');
+  console.log('  - 6 GCC Currency Rates (AED, SAR, KWD, BHD, OMR, QAR)');
   console.log('  - 8 Categories (perfumes, oud, attars, bakhoor, home-fragrance, gift-sets, body-mist, our-brand)');
   console.log('  - 6 Brands (Dior, Chanel, Tom Ford, Versace, Ajmal, AromaSouq)');
   console.log(`  - ${products.length} Products (all with mandatory productType)`);
   console.log('  - 2 Users (admin, vendor) with wallets');
   console.log('\n🔑 Login credentials:');
   console.log('  Admin: admin@aromasouq.ae / Admin123!');
-  console.log('  Vendor: vendor@aromasouq.ae / Admin123!');
+  console.log('  Vendor: admin@antiqueoud.com / Admin123!');
 }
 
 main()

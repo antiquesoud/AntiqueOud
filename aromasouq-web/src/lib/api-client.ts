@@ -18,13 +18,39 @@ class ApiClient {
       (response) => response,
       (error: AxiosError) => {
         if (error.response?.status === 401) {
-          // Unauthorized - redirect to login only if not already on public/auth pages
+          // Unauthorized - clear auth state and optionally redirect
           if (typeof window !== 'undefined') {
+            // Clear auth from localStorage to prevent stale data
+            try {
+              const authStorage = localStorage.getItem('auth-storage')
+              if (authStorage) {
+                const parsed = JSON.parse(authStorage)
+                parsed.state.user = null
+                parsed.state.isAuthenticated = false
+                localStorage.setItem('auth-storage', JSON.stringify(parsed))
+              }
+            } catch (e) {
+              // If parsing fails, just clear it
+              localStorage.removeItem('auth-storage')
+            }
+
             const currentPath = window.location.pathname
-            const publicPaths = ['/login', '/register', '/become-vendor']
-            const isPublicPath = publicPaths.some(path => currentPath.startsWith(path))
-            if (!isPublicPath) {
-              window.location.href = '/login'
+            // Public paths that don't need authentication
+            const publicPaths = ['/', '/login', '/register', '/become-vendor', '/products', '/brands', '/categories']
+            const isPublicPath = publicPaths.some(path => {
+              // Exact match for homepage or starts with for other paths
+              if (path === '/') return currentPath === '/' || currentPath.match(/^\/[a-z]{2}$/)
+              return currentPath.includes(path)
+            })
+
+            // Only redirect if:
+            // 1. Not on a public path
+            // 2. Not already on login page (prevent loops)
+            if (!isPublicPath && !currentPath.includes('/login')) {
+              // Use timeout to prevent redirect loop
+              setTimeout(() => {
+                window.location.href = '/login'
+              }, 100)
             }
           }
         }

@@ -14,6 +14,8 @@ export function useCart() {
     queryFn: () => apiClient.get<Cart>('/cart'),
     enabled: isAuthenticated,
     refetchOnWindowFocus: false,
+    retry: false, // Don't retry on error to prevent multiple 401 redirects
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   })
 
   const addToCart = useMutation({

@@ -129,7 +129,7 @@ export default function VendorDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-orange-600" />
+              <AlertCircle className="h-5 w-5 text-[#B3967D]/600" />
               {t('lowStockAlerts')}
             </CardTitle>
             <Button variant="ghost" size="sm" asChild>

@@ -475,10 +475,10 @@ export default function CheckoutPage() {
 
                       {/* Coins Redemption */}
                       {wallet && wallet.balance > 0 && (
-                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-lg p-4">
+                        <div className="bg-gradient-to-br from-[#B3967D]/50 to-[#B3967D]/50 border-2 border-[#B3967D]/200 rounded-lg p-4">
                           <div className="flex items-center justify-between mb-3">
                             <h3 className="font-semibold">{t('useCoins')}</h3>
-                            <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold">
+                            <Badge className="bg-gradient-to-r from-[#B3967D]/500 to-[#B3967D]/500 text-white font-bold">
                               {wallet.balance} {t('coinsAvailable')}
                             </Badge>
                           </div>
@@ -515,14 +515,14 @@ export default function CheckoutPage() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => setCoinsToUse(maxCoinsAllowed)}
-                                className="border-amber-500 text-amber-700 hover:bg-amber-500 hover:text-white"
+                                className="border-[#B3967D]/500 text-[#B3967D]/700 hover:bg-[#B3967D]/500 hover:text-white"
                               >
                                 {t('useMaxCoins')}
                               </Button>
                             </div>
 
                             {coinsToUse > 0 && (
-                              <div className="flex justify-between text-sm pt-2 border-t border-amber-200">
+                              <div className="flex justify-between text-sm pt-2 border-t border-[#B3967D]/200">
                                 <span className="font-semibold text-gray-700">{t('coinDiscount')}:</span>
                                 <span className="font-bold text-green-600">
                                   - {formatCurrency(coinsDiscount)}

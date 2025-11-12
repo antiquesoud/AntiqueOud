@@ -31,6 +31,7 @@ const createProductSchema = z.object({
   descriptionAr: z.string().optional(),
   categoryId: z.string().min(1, "Category is required"),
   brandId: z.string().optional(),
+  customBrandName: z.string().optional(),
 
   // Pricing & Inventory
   price: z.number().min(1, "Price must be at least 1 AED"),
@@ -119,6 +120,7 @@ export default function NewProductPage() {
       descriptionAr: "",
       categoryId: "",
       brandId: "",
+      customBrandName: "",
       price: 0,
       compareAtPrice: 0,
       cost: 0,
@@ -408,32 +410,32 @@ export default function NewProductPage() {
                         )}
                       />
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="categoryId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('category')} <span className="text-red-500">*</span></FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder={t('selectCategory')} />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {categories?.map((category: any) => (
-                                    <SelectItem key={category.id} value={category.id}>
-                                      {category.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <FormField
+                        control={form.control}
+                        name="categoryId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('category')} <span className="text-red-500">*</span></FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder={t('selectCategory')} />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {categories?.map((category: any) => (
+                                  <SelectItem key={category.id} value={category.id}>
+                                    {category.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
+                      <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
                           name="brandId"
@@ -454,6 +456,29 @@ export default function NewProductPage() {
                                   ))}
                                 </SelectContent>
                               </Select>
+                              <FormDescription>
+                                Select from existing brands
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="customBrandName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Custom Brand Name</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Or enter your own brand name"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Use this if your brand is not in the list
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}

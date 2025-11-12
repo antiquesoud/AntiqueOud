@@ -77,6 +77,10 @@ export class CreateProductDto {
   brandId?: string;
 
   @IsOptional()
+  @IsString()
+  customBrandName?: string; // Vendor can provide custom brand name instead of selecting from dropdown
+
+  @IsOptional()
   @IsUUID()
   vendorId?: string; // Optional - auto-injected for vendors, required for admins
 

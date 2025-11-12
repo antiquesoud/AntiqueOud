@@ -61,9 +61,15 @@ export interface Region {
  */
 export async function getCategories(): Promise<Category[]> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     const res = await fetch(`${API_BASE_URL}/categories`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
+
     if (!res.ok) throw new Error('Failed to fetch categories');
     return res.json();
   } catch (error) {
@@ -89,18 +95,18 @@ export async function getBrands(): Promise<Brand[]> {
 }
 
 /**
- * Fetch AromaSouq brand products
+ * Fetch Antique Oud brand products
  */
 export async function getOurBrandProducts(): Promise<Product[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/products?brandSlug=aromasouq&limit=10`, {
+    const res = await fetch(`${API_BASE_URL}/products?brandSlug=antique-oud&limit=10`, {
       next: { revalidate: 1800 }, // Cache for 30 minutes
     });
-    if (!res.ok) throw new Error('Failed to fetch AromaSouq products');
+    if (!res.ok) throw new Error('Failed to fetch Antique Oud products');
     const data = await res.json();
     return data.products || [];
   } catch (error) {
-    console.error('Error fetching AromaSouq products:', error);
+    console.error('Error fetching Antique Oud products:', error);
     return [];
   }
 }

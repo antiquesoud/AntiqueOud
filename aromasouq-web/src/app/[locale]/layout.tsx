@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, Noto_Sans_Arabic } from "next/font/google";
+import { Changa, IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -10,13 +10,22 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import "../globals.css";
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-playfair",
+// Antique Oud Brand Fonts
+const changa = Changa({
+  subsets: ["latin", "arabic"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-changa",
   display: "swap",
 });
 
+const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-ibm-plex-arabic",
+  display: "swap",
+});
+
+// Fallback for English
 const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -24,12 +33,9 @@ const inter = Inter({
   display: "swap",
 });
 
-const notoArabic = Noto_Sans_Arabic({
-  subsets: ["arabic"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-arabic",
-  display: "swap",
-});
+// Keep for compatibility
+const notoArabic = ibmPlexArabic; // Alias for backward compatibility
+const arabic = ibmPlexArabic; // Alias
 
 export async function generateMetadata({
   params
@@ -39,11 +45,11 @@ export async function generateMetadata({
   const { locale } = await params;
   return {
     title: locale === 'ar'
-      ? "أروما سوق - عطور فاخرة في الإمارات ودول الخليج"
-      : "AromaSouq - Luxury Fragrances UAE & GCC",
+      ? "أنتيك العود - أرقى أنواع العود العربي الأصيل"
+      : "Antique Oud - Finest Traditional Arabic Oud",
     description: locale === 'ar'
-      ? "اكتشف العطور الفاخرة والأصلية في الإمارات. تسوق من أفضل العلامات التجارية مع توصيل سريع في دول الخليج."
-      : "Discover authentic luxury fragrances and premium perfumes in the UAE. Shop from top brands with fast delivery across the GCC.",
+      ? "اكتشف أرقى أنواع العود العربي الأصيل في الإمارات. تسوق من أنتيك العود - عطور تراثية فاخرة مستوحاة من التراث العربي الأصيل."
+      : "Discover the finest traditional Arabic oud in the UAE. Shop at Antique Oud - luxury heritage fragrances inspired by authentic Arab heritage.",
   };
 }
 
@@ -75,8 +81,8 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={direction}>
       <body
-        className={`${inter.variable} ${playfair.variable} ${notoArabic.variable} antialiased min-h-screen`}
-        style={{ fontFamily: locale === 'ar' ? 'var(--font-arabic)' : 'var(--font-inter)' }}
+        className={`${inter.variable} ${changa.variable} ${ibmPlexArabic.variable} antialiased min-h-screen`}
+        style={{ fontFamily: locale === 'ar' ? 'var(--font-ibm-plex-arabic)' : 'var(--font-inter)' }}
         suppressHydrationWarning
       >
         <NextIntlClientProvider messages={messages}>

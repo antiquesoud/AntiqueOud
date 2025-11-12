@@ -32,7 +32,7 @@ export function ScentPyramid({ topNotes, heartNotes, baseNotes, compact = false 
           <motion.path
             d={`M ${size.width / 2} 20 L ${size.width * 0.25} ${size.height * 0.35} L ${size.width * 0.75} ${size.height * 0.35} Z`}
             fill="url(#gradientTop)"
-            stroke="#C9A86A"
+            stroke="#B3967D"
             strokeWidth="2"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -43,7 +43,7 @@ export function ScentPyramid({ topNotes, heartNotes, baseNotes, compact = false 
           <motion.path
             d={`M ${size.width * 0.25} ${size.height * 0.35} L ${size.width * 0.75} ${size.height * 0.35} L ${size.width * 0.85} ${size.height * 0.65} L ${size.width * 0.15} ${size.height * 0.65} Z`}
             fill="url(#gradientHeart)"
-            stroke="#C9A86A"
+            stroke="#B3967D"
             strokeWidth="2"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -54,7 +54,7 @@ export function ScentPyramid({ topNotes, heartNotes, baseNotes, compact = false 
           <motion.path
             d={`M ${size.width * 0.15} ${size.height * 0.65} L ${size.width * 0.85} ${size.height * 0.65} L ${size.width * 0.95} ${size.height * 0.95} L ${size.width * 0.05} ${size.height * 0.95} Z`}
             fill="url(#gradientBase)"
-            stroke="#C9A86A"
+            stroke="#B3967D"
             strokeWidth="2"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -65,10 +65,10 @@ export function ScentPyramid({ topNotes, heartNotes, baseNotes, compact = false 
           <defs>
             <linearGradient id="gradientTop" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#E8DCC4" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#C9A86A" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#B3967D" stopOpacity="0.6" />
             </linearGradient>
             <linearGradient id="gradientHeart" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#C9A86A" stopOpacity="0.7" />
+              <stop offset="0%" stopColor="#B3967D" stopOpacity="0.7" />
               <stop offset="100%" stopColor="#B8946A" stopOpacity="0.5" />
             </linearGradient>
             <linearGradient id="gradientBase" x1="0%" y1="0%" x2="0%" y2="100%">

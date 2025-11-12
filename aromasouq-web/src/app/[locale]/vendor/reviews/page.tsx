@@ -73,7 +73,7 @@ export default function VendorReviewsPage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-sm text-gray-600">{t('pendingReplyCount')}</p>
-            <p className="text-2xl font-bold text-orange-600">
+            <p className="text-2xl font-bold text-[#B3967D]/600">
               {reviews.filter((r: any) => !r.vendorReply).length}
             </p>
           </CardContent>

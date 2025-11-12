@@ -15,7 +15,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="font-heading text-2xl text-oud-gold mb-4">AromaSouq</h3>
+            <h3 className="font-heading text-2xl text-oud-gold mb-4">Antique Oud</h3>
             <p className="text-sm text-gray-300 mb-4">
               {t('description')}
             </p>

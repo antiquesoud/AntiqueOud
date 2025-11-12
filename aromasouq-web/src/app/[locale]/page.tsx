@@ -1,5 +1,5 @@
 /**
- * Homepage - AromaSouq
+ * Homepage - Antique Oud
  * Main landing page with all featured sections
  */
 

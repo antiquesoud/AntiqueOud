@@ -16,7 +16,7 @@ import { Link } from "@/i18n/navigation"
 import { useTranslations } from "next-intl"
 
 const statusColors: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800",
+  PENDING: "bg-[#B3967D]/100 text-[#B3967D]/800",
   CONFIRMED: "bg-blue-100 text-blue-800",
   PROCESSING: "bg-purple-100 text-purple-800",
   SHIPPED: "bg-cyan-100 text-cyan-800",

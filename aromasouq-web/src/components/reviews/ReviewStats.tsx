@@ -38,12 +38,12 @@ export function ReviewStats({ stats }: ReviewStatsProps) {
             <div key={rating} className="flex items-center gap-3">
               <div className="flex items-center gap-1 w-12">
                 <span className="text-sm font-medium">{rating}</span>
-                <span className="text-yellow-400">★</span>
+                <span className="text-[#B3967D]/400">★</span>
               </div>
 
               <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-yellow-400 transition-all"
+                  className="h-full bg-[#B3967D]/400 transition-all"
                   style={{ width: `${percentage}%` }}
                 />
               </div>

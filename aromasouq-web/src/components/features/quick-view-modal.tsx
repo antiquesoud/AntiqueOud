@@ -157,7 +157,7 @@ export function QuickViewModal({ product, open, onClose }: QuickViewModalProps) 
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.floor(product.averageRating || 0)
-                              ? 'text-yellow-400 fill-yellow-400'
+                              ? 'text-[#B3967D]/400 fill-yellow-400'
                               : 'text-gray-300'
                           }`}
                         />
@@ -201,7 +201,7 @@ export function QuickViewModal({ product, open, onClose }: QuickViewModalProps) 
                           <SelectItem key={variant.id} value={variant.id}>
                             {variant.name} - {formatCurrency(variant.price)}
                             {variant.stock < 10 && variant.stock > 0 && (
-                              <span className="text-amber-600 ml-2">(Only {variant.stock} left)</span>
+                              <span className="text-[#B3967D]/600 ml-2">(Only {variant.stock} left)</span>
                             )}
                           </SelectItem>
                         ))}
@@ -225,7 +225,7 @@ export function QuickViewModal({ product, open, onClose }: QuickViewModalProps) 
 
                 {/* Stock Status */}
                 {finalStock > 0 && finalStock < 10 && (
-                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300">
+                  <Badge variant="outline" className="bg-[#B3967D]/50 text-[#B3967D]/700 border-[#B3967D]/300">
                     Only {finalStock} left in stock!
                   </Badge>
                 )}

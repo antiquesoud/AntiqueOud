@@ -83,7 +83,7 @@ export default function ProfilePage() {
                   <label className="text-sm text-gray-600 block">{t('email')}</label>
                   <p className="font-medium text-gray-900">{profile.email}</p>
                   {!profile.emailVerified && (
-                    <span className="inline-block mt-1 text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
+                    <span className="inline-block mt-1 text-xs bg-[#B3967D]/100 text-[#B3967D]/700 px-2 py-1 rounded">
                       {t('notVerified')}
                     </span>
                   )}
@@ -114,7 +114,7 @@ export default function ProfilePage() {
 
               {/* Coins Balance */}
               <div className="flex items-start gap-3">
-                <Coins className="w-5 h-5 text-yellow-500 mt-1" />
+                <Coins className="w-5 h-5 text-[#B3967D]/500 mt-1" />
                 <div className="flex-1">
                   <label className="text-sm text-gray-600 block">{t('coinsBalanceLabel')}</label>
                   <p className="font-medium text-gray-900">{profile.coinsBalance} {useTranslations('products')('coins')}</p>
@@ -143,7 +143,7 @@ export default function ProfilePage() {
 
             <Link
               href="/account/coins"
-              className="block w-full px-6 py-3 border border-yellow-500 bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition text-center font-medium"
+              className="block w-full px-6 py-3 border border-[#B3967D]/500 bg-[#B3967D]/50 text-[#B3967D]/700 rounded-lg hover:bg-[#B3967D]/100 transition text-center font-medium"
             >
               {t('viewCoinsHistory')}
             </Link>

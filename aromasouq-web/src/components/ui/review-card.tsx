@@ -110,7 +110,7 @@ export function ReviewCard({
               <button
                 key={index}
                 onClick={() => setSelectedImage(image)}
-                className="relative w-20 h-20 rounded-lg overflow-hidden hover:ring-2 hover:ring-[#C9A86A] transition-all"
+                className="relative w-20 h-20 rounded-lg overflow-hidden hover:ring-2 hover:ring-[#B3967D] transition-all"
               >
                 <Image
                   src={image}

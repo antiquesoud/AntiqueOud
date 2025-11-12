@@ -1,5 +1,6 @@
 {
   "common": {
+    "brandName": "Antique Oud",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
@@ -342,7 +343,7 @@
     "phoneNumber": "Phone Number",
     "loginDescription": "Enter your credentials to access your account",
     "createAccount": "Create Account",
-    "createAccountDescription": "Join AromaSouq and get 50 coins on signup!",
+    "createAccountDescription": "Join Antique Oud and get 50 coins on signup!",
     "firstNamePlaceholder": "John",
     "lastNamePlaceholder": "Doe",
     "phonePlaceholder": "+971 50 123 4567",
@@ -367,7 +368,7 @@
     "newsletterDescription": "Subscribe to get 50 coins and exclusive offers!",
     "yourEmail": "Your email",
     "subscribe": "Subscribe",
-    "copyright": "© 2025 AromaSouq. All rights reserved.",
+    "copyright": "© 2025 Antique Oud. All rights reserved.",
     "privacy": "Privacy Policy",
     "termsOfService": "Terms of Service",
     "terms": "Terms & Conditions",
@@ -1318,7 +1319,7 @@
       "userName": "User Name",
       "userEmail": "User Email",
       "needHelp": "Need Help?",
-      "needHelpDesc": "Contact our support team at support@aromasouq.com or call +971 4 123 4567",
+      "needHelpDesc": "Contact our support team at support@antiqueoud.com or call +971 4 123 4567",
       "saveChanges": "Save Changes",
       "saving": "Saving...",
       "profileUpdated": "Profile updated successfully!",
@@ -1328,7 +1329,7 @@
   },
   "admin": {
     "layout": {
-      "aromasouq": "AromaSouq",
+      "antiqueoud": "Antique Oud",
       "adminPanel": "Admin Panel",
       "backToHomepage": "Back to Homepage",
       "logout": "Logout",
@@ -1617,7 +1618,7 @@
     "collections": {
       "SIGNATURE": {
         "name": "Our Brand Signature Collection",
-        "desc": "Handcrafted with passion, exclusively by AromaSouq. Discover our finest creations that embody luxury and tradition.",
+        "desc": "Handcrafted with passion, exclusively by Antique Oud. Discover our finest creations that embody luxury and tradition.",
         "subtitle": "Curated with excellence"
       },
       "MOST_LOVED": {
@@ -1969,7 +1970,7 @@
     },
     "becomeVendorPage": {
       "title": "Become a Vendor",
-      "subtitle": "Join AromaSouq and start selling your fragrances to customers across the UAE",
+      "subtitle": "Join Antique Oud and start selling your fragrances to customers across the UAE",
       "step1Title": "Personal Info",
       "step2Title": "Business Info",
       "step3Title": "Documents",

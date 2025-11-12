@@ -221,7 +221,7 @@ export default function VendorCouponsPage() {
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
-                          usagePercentage >= 100 ? 'bg-red-600' : usagePercentage >= 75 ? 'bg-orange-500' : 'bg-purple-600'
+                          usagePercentage >= 100 ? 'bg-red-600' : usagePercentage >= 75 ? 'bg-[#B3967D]/500' : 'bg-purple-600'
                         }`}
                         style={{ width: `${Math.min(usagePercentage, 100)}%` }}
                       />

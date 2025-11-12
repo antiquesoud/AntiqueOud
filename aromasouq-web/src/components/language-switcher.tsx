@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="icon"
-          className="hover:bg-amber-50 rounded-full transition-colors"
+          className="hover:bg-[#B3967D]/50 rounded-full transition-colors"
           aria-label="Change language"
         >
           <Globe className="h-5 w-5 text-gray-700" />
@@ -39,7 +39,7 @@ export function LanguageSwitcher() {
       <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="min-w-[120px]">
         <DropdownMenuItem
           onClick={() => switchLocale('en')}
-          className={locale === 'en' ? 'bg-amber-50 font-bold text-[var(--color-oud-gold)]' : 'cursor-pointer'}
+          className={locale === 'en' ? 'bg-[#B3967D]/50 font-bold text-[var(--color-oud-gold)]' : 'cursor-pointer'}
         >
           <span className="flex items-center gap-2">
             {locale === 'en' && <span className="text-[var(--color-oud-gold)]">✓</span>}
@@ -48,7 +48,7 @@ export function LanguageSwitcher() {
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => switchLocale('ar')}
-          className={locale === 'ar' ? 'bg-amber-50 font-bold text-[var(--color-oud-gold)]' : 'cursor-pointer'}
+          className={locale === 'ar' ? 'bg-[#B3967D]/50 font-bold text-[var(--color-oud-gold)]' : 'cursor-pointer'}
         >
           <span className="flex items-center gap-2">
             {locale === 'ar' && <span className="text-[var(--color-oud-gold)]">✓</span>}

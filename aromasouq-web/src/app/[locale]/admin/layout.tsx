@@ -29,6 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, isAuthenticated, isAdmin, logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const t = useTranslations('admin.layout')
+  const tCommon = useTranslations('common')
 
   const navigation = [
     { name: t('dashboard'), href: '/admin', icon: LayoutDashboard },
@@ -175,7 +176,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Menu className="h-6 w-6" />
             </Button>
-            <h1 className="font-heading font-bold text-oud-gold">AromaSouq</h1>
+            <h1 className="font-heading font-bold text-oud-gold">{tCommon('brandName')}</h1>
             <div className="w-10" /> {/* Spacer for centering */}
           </div>
         </header>

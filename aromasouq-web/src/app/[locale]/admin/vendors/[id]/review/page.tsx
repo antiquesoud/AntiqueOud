@@ -214,7 +214,7 @@ export default function VendorReviewPage() {
               <div>
                 <Label className="text-muted-foreground">{t('status')}</Label>
                 <div className="mt-2">
-                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                  <Badge variant="outline" className="bg-[#B3967D]/100 text-[#B3967D]/800 border-yellow-200">
                     {vendor.status}
                   </Badge>
                 </div>

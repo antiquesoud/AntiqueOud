@@ -14,7 +14,7 @@ import { Package, ArrowLeft, MapPin, CreditCard, Truck, Star, MessageSquare } fr
 import toast from 'react-hot-toast'
 
 const statusConfig = {
-  PENDING: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+  PENDING: { label: 'Pending', color: 'bg-[#B3967D]/100 text-[#B3967D]/800' },
   CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-800' },
   PROCESSING: { label: 'Processing', color: 'bg-purple-100 text-purple-800' },
   SHIPPED: { label: 'Shipped', color: 'bg-indigo-100 text-indigo-800' },

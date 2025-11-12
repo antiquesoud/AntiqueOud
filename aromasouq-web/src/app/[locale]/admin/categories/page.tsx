@@ -149,7 +149,7 @@ export default function AdminCategoriesPage() {
             <div className="flex items-center gap-2" style={{ paddingLeft: `${level * 24}px` }}>
               {level > 0 && <ChevronRight className="h-4 w-4 text-gray-400" />}
               {category.children && category.children.length > 0 ? (
-                <FolderOpen className="h-4 w-4 text-yellow-600" />
+                <FolderOpen className="h-4 w-4 text-[#B3967D]/600" />
               ) : (
                 <Folder className="h-4 w-4 text-gray-400" />
               )}

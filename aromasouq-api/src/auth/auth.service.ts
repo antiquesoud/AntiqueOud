@@ -1,9 +1,10 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { isVendorRegistrationEnabled } from '../config/features.config';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,13 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const { email, password, firstName, lastName, phone, role } = registerDto;
+
+    // Block vendor registration in single-vendor mode
+    if (role === 'VENDOR' && !isVendorRegistrationEnabled()) {
+      throw new ForbiddenException(
+        'Vendor registration is not available. This is a single-vendor store.'
+      );
+    }
 
     // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({

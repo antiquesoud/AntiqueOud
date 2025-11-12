@@ -27,6 +27,7 @@ export default function VendorLayout({
   children: React.ReactNode
 }) {
   const t = useTranslations('vendor.layout')
+  const tCommon = useTranslations('common')
   const { user, isAuthenticated, isVendor, logout } = useAuth()
   const router = useRouter()
 
@@ -52,7 +53,7 @@ export default function VendorLayout({
         {/* Logo */}
         <div className="p-6">
           <Link href="/vendor" className="block">
-            <h2 className="text-2xl font-heading text-oud-gold">AromaSouq</h2>
+            <h2 className="text-2xl font-heading text-oud-gold">{tCommon('brandName')}</h2>
             <p className="text-sm text-gray-300 mt-1">{t('vendorPortal')}</p>
           </Link>
         </div>

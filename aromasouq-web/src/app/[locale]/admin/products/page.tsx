@@ -58,7 +58,7 @@ export default function ProductModerationPage() {
       case 'ACTIVE':
         return <Badge variant="outline" className="bg-green-100 text-green-800">{t('statusActive')}</Badge>
       case 'INACTIVE':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">{t('statusInactive')}</Badge>
+        return <Badge variant="outline" className="bg-[#B3967D]/100 text-[#B3967D]/800">{t('statusInactive')}</Badge>
       case 'OUT_OF_STOCK':
         return <Badge variant="outline" className="bg-red-100 text-red-800">{t('statusOutOfStock')}</Badge>
       default:

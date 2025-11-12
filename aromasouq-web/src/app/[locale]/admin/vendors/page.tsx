@@ -88,7 +88,7 @@ export default function VendorsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">{t('statusPending')}</Badge>
+        return <Badge variant="outline" className="bg-[#B3967D]/100 text-[#B3967D]/800 border-yellow-200">{t('statusPending')}</Badge>
       case 'APPROVED':
         return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">{t('statusApproved')}</Badge>
       case 'REJECTED':

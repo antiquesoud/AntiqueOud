@@ -27,7 +27,7 @@ export default function OrderDetailPage() {
   const tOrders = useTranslations('account.ordersPage')
 
   const statusConfig = {
-    PENDING: { label: tOrders('statuses.pending'), color: 'bg-yellow-100 text-yellow-800' },
+    PENDING: { label: tOrders('statuses.pending'), color: 'bg-[#B3967D]/100 text-[#B3967D]/800' },
     CONFIRMED: { label: tOrders('statuses.confirmed'), color: 'bg-blue-100 text-blue-800' },
     PROCESSING: { label: tOrders('statuses.processing'), color: 'bg-purple-100 text-purple-800' },
     SHIPPED: { label: tOrders('statuses.shipped'), color: 'bg-indigo-100 text-indigo-800' },

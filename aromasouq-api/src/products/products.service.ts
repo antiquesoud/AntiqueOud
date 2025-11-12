@@ -329,15 +329,42 @@ export class ProductsService {
       );
     }
 
-    // Verify brand exists if provided
-    if (createProductDto.brandId) {
+    // Handle brand: either verify existing brandId or create new brand from customBrandName
+    let brandId = createProductDto.brandId;
+
+    if (createProductDto.customBrandName && !brandId) {
+      // Create or find brand with custom name
+      const slug = createProductDto.customBrandName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+      // Check if brand already exists with this slug
+      let brand = await this.prisma.brand.findUnique({
+        where: { slug },
+      });
+
+      // Create brand if it doesn't exist
+      if (!brand) {
+        brand = await this.prisma.brand.create({
+          data: {
+            name: createProductDto.customBrandName,
+            slug,
+            isActive: true,
+          },
+        });
+      }
+
+      brandId = brand.id;
+    } else if (brandId) {
+      // Verify brand exists if brandId is provided
       const brand = await this.prisma.brand.findUnique({
-        where: { id: createProductDto.brandId },
+        where: { id: brandId },
       });
 
       if (!brand) {
         throw new BadRequestException(
-          `Brand with ID ${createProductDto.brandId} not found`,
+          `Brand with ID ${brandId} not found`,
         );
       }
     }
@@ -385,8 +412,8 @@ export class ProductsService {
       vendorId = vendor.id;
     }
 
-    // Remove vendorId from DTO to prevent client manipulation
-    const { vendorId: _, ...productData } = createProductDto;
+    // Remove vendorId and customBrandName from DTO to prevent client manipulation
+    const { vendorId: _, customBrandName: __, ...productData } = createProductDto;
 
     // Auto-activate products for approved vendors
     // Vendors who are APPROVED should have their products active by default
@@ -397,6 +424,7 @@ export class ProductsService {
         data: {
           ...productData,
           vendorId, // Use the auto-injected/validated vendorId
+          brandId, // Use the resolved brandId (from customBrandName or provided brandId)
           isActive: isActiveStatus, // Set active by default for approved vendors
         },
         include: {

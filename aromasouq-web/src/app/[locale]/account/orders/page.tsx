@@ -19,7 +19,7 @@ export default function OrdersPage() {
   const { data, isLoading } = useOrders(page, 10)
 
   const statusConfig = {
-    PENDING: { label: t('statuses.pending'), icon: Clock, color: 'bg-yellow-100 text-yellow-800' },
+    PENDING: { label: t('statuses.pending'), icon: Clock, color: 'bg-[#B3967D]/100 text-[#B3967D]/800' },
     CONFIRMED: { label: t('statuses.confirmed'), icon: CheckCircle, color: 'bg-blue-100 text-blue-800' },
     PROCESSING: { label: t('statuses.processing'), icon: Package, color: 'bg-purple-100 text-purple-800' },
     SHIPPED: { label: t('statuses.shipped'), icon: Truck, color: 'bg-indigo-100 text-indigo-800' },

@@ -41,7 +41,7 @@ export function WhatsAppButton({
       return `Hi! I have a question about my order #${orderId}.`
     }
 
-    return 'Hi! I need assistance with AromaSouq.'
+    return 'Hi! I need assistance with Antique Oud.'
   }
 
   const handleClick = () => {

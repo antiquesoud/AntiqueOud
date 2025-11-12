@@ -209,7 +209,7 @@ export default function CartPage() {
 
                         {/* Stock Warning */}
                         {item.product?.stockQuantity < 5 && (
-                          <p className="text-xs text-orange-600 mt-1">
+                          <p className="text-xs text-[#B3967D]/600 mt-1">
                             {t('onlyLeftInStock', { count: item.product.stockQuantity })}
                           </p>
                         )}

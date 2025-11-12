@@ -64,8 +64,8 @@ export function StatsCard({
               )}
             </div>
             {Icon && (
-              <div className="p-3 rounded-lg bg-[#C9A86A]/10">
-                <Icon className="w-6 h-6 text-[#C9A86A]" />
+              <div className="p-3 rounded-lg bg-[#B3967D]/10">
+                <Icon className="w-6 h-6 text-[#B3967D]" />
               </div>
             )}
           </div>
