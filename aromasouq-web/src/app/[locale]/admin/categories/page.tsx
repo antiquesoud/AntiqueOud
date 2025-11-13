@@ -399,7 +399,7 @@ export default function AdminCategoriesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('deleteCategory')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteConfirm', { name: categoryToDelete?.name })}
+              {t('deleteConfirm', { name: categoryToDelete?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -7,6 +7,7 @@ import { useRouter } from '@/i18n/navigation';
 import { Upload, Save, X } from 'lucide-react';
 import axios from 'axios';
 import { useTranslations } from 'next-intl';
+import { User } from '@/types/user';
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function EditProfilePage() {
   const t = useTranslations('account.editProfilePage');
   const tCommon = useTranslations('common');
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading } = useQuery<User>({
     queryKey: ['profile'],
     queryFn: async () => {
       return await apiClient.get('/users/profile');
@@ -134,7 +135,7 @@ export default function EditProfilePage() {
               <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200">
                 {previewUrl || profile?.avatar ? (
                   <img
-                    src={previewUrl || profile.avatar}
+                    src={previewUrl || profile?.avatar}
                     alt="Avatar"
                     className="w-full h-full object-cover"
                   />

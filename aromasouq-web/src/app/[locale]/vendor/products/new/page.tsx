@@ -49,39 +49,26 @@ const createProductSchema = z.object({
   // Specifications
   size: z.string().optional(),
   concentration: z.string().optional(),
-  gender: z.enum(["men", "women", "unisex"], {
-    required_error: "Gender is required",
-    invalid_type_error: "Gender must be men, women, or unisex",
-  }),
+  gender: z.enum(["men", "women", "unisex"]).optional(),
 
   // Scent Profile
   topNotes: z.string().optional(),
   heartNotes: z.string().optional(),
   baseNotes: z.string().optional(),
   notes: z.string().optional(),
-  scentFamily: z.enum(["floral", "oriental", "woody", "fresh", "citrus", "fruity", "spicy", "aquatic", "green", "gourmand", "musky", "leather"], {
-    required_error: "Scent family is required",
-    invalid_type_error: "Invalid scent family",
-  }),
+  scentFamily: z.enum(["floral", "oriental", "woody", "fresh", "citrus", "fruity", "spicy", "aquatic", "green", "gourmand", "musky", "leather"]).optional(),
   longevity: z.string().optional(),
   sillage: z.string().optional(),
   season: z.string().optional(),
 
   // Classification (NOW MANDATORY)
-  productType: z.enum(["ORIGINAL", "CLONE", "SIMILAR_DNA", "NICHE", "ATTAR", "BODY_SPRAY", "BAKHOOR", "HOME_FRAGRANCE", "GIFT_SET", "OUR_BRAND"], {
-    required_error: "Product type is required",
-    invalid_type_error: "Invalid product type",
-  }),
+  productType: z.enum(["ORIGINAL", "CLONE", "SIMILAR_DNA", "NICHE", "ATTAR", "BODY_SPRAY", "BAKHOOR", "HOME_FRAGRANCE", "GIFT_SET", "OUR_BRAND"]).optional(),
   region: z.string().optional(),
   occasion: z.string().optional(),
   oudType: z.string().optional(),
   collection: z.string().optional(),
-  format: z.enum(["SPRAY", "OIL", "ROLLON", "SAMPLE", "GIFT_SET"], {
-    required_error: "Format is required",
-  }),
-  priceSegment: z.enum(["BUDGET", "MID", "PREMIUM", "LUXURY", "ULTRA_LUXURY"], {
-    required_error: "Price segment is required",
-  }),
+  format: z.enum(["SPRAY", "OIL", "ROLLON", "SAMPLE", "GIFT_SET"]).optional(),
+  priceSegment: z.enum(["BUDGET", "MID", "PREMIUM", "LUXURY", "ULTRA_LUXURY"]).optional(),
 
   // Advanced
   enableWhatsapp: z.boolean().optional(),
@@ -132,12 +119,12 @@ export default function NewProductPage() {
       video: "",
       size: "",
       concentration: "",
-      gender: "",
+      gender: undefined,
       topNotes: "",
       heartNotes: "",
       baseNotes: "",
       notes: "",
-      scentFamily: "",
+      scentFamily: undefined,
       longevity: "",
       sillage: "",
       season: "",
@@ -146,8 +133,8 @@ export default function NewProductPage() {
       occasion: "",
       oudType: "",
       collection: "",
-      format: "",
-      priceSegment: "",
+      format: undefined,
+      priceSegment: undefined,
       enableWhatsapp: false,
       whatsappNumber: "",
       coinsToAward: 0,

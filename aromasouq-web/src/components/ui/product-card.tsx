@@ -54,11 +54,11 @@ export function ProductCard({
   // Get product image (null if no image available)
   const productImage = getFirstProductImage(product)
 
-  const brandName = product.brand?.name || (product as any).vendor?.businessName || 'Premium Brand'
+  const brandName = (product.brand as any)?.name || product.brand?.nameEn || (product as any).vendor?.businessName || 'Premium Brand'
   // Use Arabic name if locale is 'ar' and nameAr exists, otherwise use English name
   const productName = (locale === 'ar' && (product as any).nameAr)
     ? (product as any).nameAr
-    : (product.name || product.nameEn || 'Product')
+    : ((product as any).name || product.nameEn || 'Product')
 
   // Handle rating - check multiple possible field names
   const rating = product.rating || (product as any).averageRating || 0

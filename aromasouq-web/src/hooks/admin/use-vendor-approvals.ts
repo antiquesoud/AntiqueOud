@@ -6,7 +6,8 @@ import { User } from '@/types'
 import { VendorStatus } from '@/lib/constants'
 import toast from 'react-hot-toast'
 
-interface VendorApplication extends User {
+interface VendorApplication {
+  id: string
   businessName?: string
   businessLicense?: string
   taxDocument?: string
@@ -17,8 +18,14 @@ interface VendorApplication extends User {
     iban: string
   }
   appliedAt: string
+  createdAt: string
   reviewedAt?: string
   rejectionReason?: string
+  user?: {
+    firstName: string
+    lastName: string
+    email: string
+  }
 }
 
 interface VendorFilters {

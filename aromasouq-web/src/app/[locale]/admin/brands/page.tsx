@@ -369,7 +369,7 @@ export default function AdminBrandsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('deleteBrand')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteConfirm', { name: brandToDelete?.name })}
+              {t('deleteConfirm', { name: brandToDelete?.name || '' })}
               {(brandToDelete?._count?.products || 0) > 0 && (
                 <span className="block mt-2 text-red-600">
                   {t('deleteWithProducts', { count: brandToDelete?._count?.products || 0 })}

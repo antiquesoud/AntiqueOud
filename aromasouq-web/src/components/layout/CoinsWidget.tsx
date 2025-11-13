@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 export function CoinsWidget() {
   const { isAuthenticated } = useAuth();
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading } = useQuery<{ coinsBalance: number }>({
     queryKey: ['profile'],
     queryFn: async () => {
       return await apiClient.get('/users/profile');

@@ -9,8 +9,18 @@ interface ReviewsParams {
   limit?: number;
 }
 
+interface ReviewsResponse {
+  data: Review[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export function useReviews(params: ReviewsParams) {
-  return useQuery({
+  return useQuery<ReviewsResponse>({
     queryKey: ['reviews', params],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
@@ -20,7 +30,7 @@ export function useReviews(params: ReviewsParams) {
       if (params.limit) queryParams.append('limit', params.limit.toString());
 
       const res = await apiClient.get(`/reviews?${queryParams.toString()}`);
-      return res;
+      return res as ReviewsResponse;
     },
   });
 }
@@ -28,16 +38,16 @@ export function useReviews(params: ReviewsParams) {
 export function useCreateReview() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (data: {
-      productId: string;
-      rating: number;
-      title?: string;
-      comment?: string;
-      images?: string[];
-    }) => {
+  return useMutation<Review, Error, {
+    productId: string;
+    rating: number;
+    title?: string;
+    comment?: string;
+    images?: string[];
+  }>({
+    mutationFn: async (data) => {
       const res = await apiClient.post('/reviews', data);
-      return res;
+      return res as Review;
     },
     onSuccess: (data, variables) => {
       // Invalidate reviews list
@@ -143,20 +153,7 @@ export function useUploadReviewImages() {
       reviewId: string;
       files: File[];
     }) => {
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append('files', file);
-      });
-
-      const res = await apiClient.post(
-        `/uploads/reviews/${reviewId}/images`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const res = await apiClient.uploadFiles(`/uploads/reviews/${reviewId}/images`, files);
       return res;
     },
   });
@@ -167,7 +164,7 @@ export function useReviewStats(productId: string) {
     queryKey: ['reviewStats', productId],
     queryFn: async () => {
       const res = await apiClient.get(`/reviews/stats/${productId}`);
-      return res;
+      return res as ReviewStats;
     },
   });
 }

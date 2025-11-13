@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useComparison } from '@/hooks/useComparison'
 import { formatCurrency } from '@/lib/utils'
+import { getFirstProductImage } from '@/lib/image-utils'
 
 export default function ComparePage() {
   const { products, removeProduct, clear } = useComparison()

@@ -6,6 +6,7 @@ export interface User {
   firstName: string
   lastName: string
   phone: string
+  avatar?: string
   role: UserRole
   status: UserStatus
   emailVerified: boolean

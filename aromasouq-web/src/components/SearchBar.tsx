@@ -35,7 +35,7 @@ export function SearchBar() {
   }, []);
 
   // Fetch autocomplete results
-  const { data: results } = useQuery({
+  const { data: results } = useQuery<{ data: any[]; pagination?: { total: number } } | null>({
     queryKey: ['search-autocomplete', debouncedQuery],
     queryFn: async () => {
       if (!debouncedQuery || debouncedQuery.length < 2) return null;
@@ -43,7 +43,7 @@ export function SearchBar() {
       const res = await apiClient.get(
         `/products?search=${encodeURIComponent(debouncedQuery)}&limit=5`
       );
-      return res;
+      return res as { data: any[]; pagination?: { total: number } };
     },
     enabled: debouncedQuery.length >= 2,
     refetchOnWindowFocus: false,

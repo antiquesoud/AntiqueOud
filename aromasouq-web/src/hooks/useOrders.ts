@@ -1,18 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
+import { OrderStatus, PaymentStatus, PaymentMethod } from '@/lib/constants'
 
 interface Order {
   id: string
   orderNumber: string
-  orderStatus: string
-  paymentStatus: string
-  paymentMethod: string
+  orderStatus: OrderStatus
+  paymentStatus: PaymentStatus
+  paymentMethod: PaymentMethod
   subtotal: number
   tax: number
   shippingFee: number
   discount: number
   total: number
   createdAt: string
+  updatedAt: string
   trackingNumber?: string
   items: {
     id: string
@@ -30,6 +32,10 @@ interface Order {
       nameAr: string
       slug?: string
       images: { url: string }[]
+      brand?: {
+        name: string
+        nameAr: string
+      }
     }
   }[]
   address: {

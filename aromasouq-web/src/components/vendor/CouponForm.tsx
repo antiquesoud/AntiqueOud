@@ -43,7 +43,7 @@ export function CouponForm({ initialData, onSubmit, onCancel, isSubmitting = fal
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: value,
     }));

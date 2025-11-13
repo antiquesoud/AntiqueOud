@@ -69,7 +69,7 @@ export default function WalletPage() {
   })
 
   // Fetch transactions
-  const { data: transactionsData } = useQuery({
+  const { data: transactionsData } = useQuery<{ data: Transaction[], meta: { total: number, page: number, limit: number, totalPages: number } }>({
     queryKey: ['wallet-transactions', transactionPage],
     queryFn: () => apiClient.get(`/wallet/transactions?page=${transactionPage}&limit=10`),
   })
@@ -81,7 +81,7 @@ export default function WalletPage() {
   })
 
   // Redeem coins mutation
-  const redeemMutation = useMutation({
+  const redeemMutation = useMutation<{ coupon: { code: string } }, Error, number>({
     mutationFn: (amount: number) => apiClient.post('/wallet/redeem', { amount }),
     onSuccess: (data) => {
       toast.success(t('redeemSuccess', { count: coinsToRedeem }))

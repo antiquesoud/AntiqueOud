@@ -47,6 +47,8 @@ export default function OrderDetailPage() {
   }
 
   const handleDownloadInvoice = async () => {
+    if (!order) return
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/invoice`, {
         credentials: 'include',
@@ -234,7 +236,7 @@ export default function OrderDetailPage() {
                                   {t('reviewed')}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">
-                                  {t('starsRating', { rating: item.review?.rating })}
+                                  {t('starsRating', { rating: item.review?.rating || 0 })}
                                 </span>
                               </div>
                             ) : (

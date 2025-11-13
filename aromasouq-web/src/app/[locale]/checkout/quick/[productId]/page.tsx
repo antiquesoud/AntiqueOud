@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { apiClient } from '@/lib/api-client'
 import { useQuickCheckout } from '@/hooks/useQuickCheckout'
 import { formatCurrency } from '@/lib/utils'
+import { getFirstProductImage } from '@/lib/image-utils'
 import { GiftOptionsModal } from '@/components/features/gift-options-modal'
 
 interface Product {

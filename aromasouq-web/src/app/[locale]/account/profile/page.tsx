@@ -3,12 +3,28 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { Link } from '@/i18n/navigation';
-import { User, Mail, Phone, Globe, Coins } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, Globe, Coins } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+
+interface ProfileData {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  avatar?: string;
+  role: string;
+  status: string;
+  emailVerified: boolean;
+  preferredLanguage: 'en' | 'ar';
+  coinsBalance: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export default function ProfilePage() {
   const t = useTranslations('account.profilePage');
-  const { data: profile, isLoading, error } = useQuery({
+  const { data: profile, isLoading, error} = useQuery<ProfileData>({
     queryKey: ['profile'],
     queryFn: async () => {
       return await apiClient.get('/users/profile');
@@ -41,6 +57,10 @@ export default function ProfilePage() {
     );
   }
 
+  if (!profile) {
+    return null;
+  }
+
   return (
     <div className="container mx-auto py-12 px-4">
       <div className="max-w-2xl mx-auto">
@@ -51,7 +71,7 @@ export default function ProfilePage() {
           {/* Header Section with Avatar */}
           <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-8 text-white">
             <div className="flex items-center gap-6">
-              {profile.avatar ? (
+              {profile?.avatar ? (
                 <img
                   src={profile.avatar}
                   alt="Profile"
@@ -59,7 +79,7 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full border-4 border-white bg-white/20 flex items-center justify-center">
-                  <User className="w-12 h-12 text-white" />
+                  <UserIcon className="w-12 h-12 text-white" />
                 </div>
               )}
               <div>

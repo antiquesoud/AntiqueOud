@@ -62,7 +62,7 @@ export function ProductCarousel({ products, className = '', compact = false }: P
       >
         {products.map((product) => (
           <div key={product.id} className={`flex-shrink-0 ${compact ? 'w-[220px]' : 'w-[260px]'}`}>
-            <ProductCard product={product} compact={compact} />
+            <ProductCard product={product as any} compact={compact} />
           </div>
         ))}
       </div>

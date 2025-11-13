@@ -5,10 +5,24 @@ import { apiClient } from '@/lib/api-client';
 import { Coins, TrendingUp, TrendingDown, History, ShoppingBag, Star, Gift, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+interface CoinsHistoryData {
+  balance: number;
+  lifetimeEarned: number;
+  lifetimeSpent: number;
+  transactions: Array<{
+    id: string;
+    type: string;
+    amount: number;
+    source: string;
+    description: string;
+    createdAt: string;
+  }>;
+}
+
 export default function CoinsHistoryPage() {
   const t = useTranslations('account.coinsHistoryPage');
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<CoinsHistoryData>({
     queryKey: ['coins-history'],
     queryFn: async () => {
       return await apiClient.get('/users/coins-history?limit=50');

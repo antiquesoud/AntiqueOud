@@ -25,6 +25,16 @@ export interface Product {
   coinsToAward: number
   whatsappNumber?: string
   isNew: boolean
+  size?: string
+  concentration?: string
+  gender?: string
+  scentFamily?: string
+  longevity?: string
+  sillage?: string
+  season?: string
+  topNotes?: string
+  heartNotes?: string
+  baseNotes?: string
   createdAt: Date
 
   // Relations
@@ -42,6 +52,7 @@ export interface Product {
     id: string
     nameEn: string
     nameAr: string
+    slug: string
   }
 }
 

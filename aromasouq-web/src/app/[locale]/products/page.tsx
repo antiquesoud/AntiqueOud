@@ -238,7 +238,7 @@ function getPageContext(filters: any, t: any): PageContext {
 
   // Category context
   if (filters.categorySlug) {
-    const categoryTitle = filters.categorySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const categoryTitle = filters.categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
     return {
       title: categoryTitle,
@@ -351,7 +351,15 @@ export default function ProductsPage() {
   const limit = 20;
 
   // Fetch products with filters
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<{
+    data: any[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }>({
     queryKey: ['products', filters, page],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -365,12 +373,12 @@ export default function ProductsPage() {
       params.append('limit', limit.toString());
 
       const res = await apiClient.get(`/products?${params.toString()}`);
-      return res;
+      return res as { data: any[]; pagination: { total: number; page: number; limit: number; totalPages: number; } };
     },
   });
 
   // Fetch categories for filter options
-  const { data: categories } = useQuery({
+  const { data: categories } = useQuery<Array<{ id: string; name: string; slug: string }>>({
     queryKey: ['categories'],
     queryFn: async () => {
       return await apiClient.get('/categories');
@@ -378,7 +386,7 @@ export default function ProductsPage() {
   });
 
   // Fetch brands for filter options
-  const { data: brands } = useQuery({
+  const { data: brands } = useQuery<Array<{ id: string; name: string; slug: string }>>({
     queryKey: ['brands'],
     queryFn: async () => {
       return await apiClient.get('/brands');
@@ -943,7 +951,7 @@ export default function ProductsPage() {
             )}
 
             {/* Products Grid */}
-            {!isLoading && !error && data?.data.length > 0 && (
+            {!isLoading && !error && data?.data && data.data.length > 0 && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {data.data.map((product: any) => (

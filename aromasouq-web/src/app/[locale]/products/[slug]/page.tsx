@@ -35,6 +35,9 @@ export default function ProductDetailPage() {
   const { wallet } = useWallet()
   const { data: reviewStats } = useReviewStats(product?.id || '')
 
+  // Type guard to ensure reviewStats has required fields
+  const hasValidStats = reviewStats && typeof reviewStats === 'object' && 'averageRating' in reviewStats && 'totalReviews' in reviewStats && 'ratingDistribution' in reviewStats
+
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
@@ -45,7 +48,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
-        const response = await apiClient.get('/products/featured')
+        const response = await apiClient.get<any[]>('/products/featured')
         setRelatedProducts(response.slice(0, 6)) // Get 6 best sellers
       } catch (error) {
         console.error('Failed to fetch related products:', error)
@@ -598,7 +601,7 @@ export default function ProductDetailPage() {
               </Link>
             </div>
 
-            {reviewStats && <ReviewStats stats={reviewStats} />}
+            {hasValidStats && <ReviewStats stats={reviewStats as any} />}
             <ReviewList productId={product.id} />
           </TabsContent>
         </Tabs>
