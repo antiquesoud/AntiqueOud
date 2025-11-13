@@ -1,4 +1,0 @@
-@echo off
-set SUPABASE_URL=https://fmmgmpepfnpicedzupqa.supabase.co
-set SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtbWdtcGVwZm5waWNlZHp1cHFhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Mjk1MDU4MiwiZXhwIjoyMDc4NTI2NTgyfQ.CkoVvmKdwybDaiV8xr8JSgLVSYAEl6P8NA3-pBtQcls
-node create-buckets.js

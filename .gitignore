@@ -167,3 +167,18 @@ FEATURE-MATRIX-BY-USER-TYPE.md
 UIthemeandfontexpectationscookies.txt
 nul
 aromasouq-api/temp_migration.sql
+
+# Bucket creation scripts with credentials
+create-buckets.bat
+create-buckets.js
+
+# ============================================
+# Sensitive Files - Cookies, Setup Guides, Tests
+# ============================================
+*cookies.txt
+*_cookies.txt
+SETUP_GUIDE.md
+test-phase-*.js
+test-phase-*.sh
+docs/*Supabase*.md
+backend/PHASE-*-*.md
