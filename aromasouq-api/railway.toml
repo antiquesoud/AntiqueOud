@@ -4,5 +4,3 @@ buildCommand = "pnpm install && pnpm run build && npx prisma generate"
 
 [deploy]
 startCommand = "pnpm run start:prod"
-restartPolicyType = "on-failure"
-restartPolicyMaxRetries = 10
