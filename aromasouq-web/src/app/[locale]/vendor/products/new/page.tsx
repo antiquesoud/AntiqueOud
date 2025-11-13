@@ -235,8 +235,22 @@ export default function NewProductPage() {
     console.log('Form submitted with data:', data)
     setIsLoading(true)
     try {
+      // Clean up empty optional fields (convert empty strings to undefined)
+      const cleanedData = Object.fromEntries(
+        Object.entries(data).filter(([_, value]) => {
+          // Remove empty strings, null, and undefined
+          if (value === '' || value === null || value === undefined) return false
+          // Keep arrays even if empty
+          if (Array.isArray(value)) return true
+          // Keep all other values
+          return true
+        })
+      ) as CreateProductInput
+
+      console.log('Cleaned data:', cleanedData)
+
       // Step 1: Create the product
-      const response = await apiClient.post<any>('/products', data)
+      const response = await apiClient.post<any>('/products', cleanedData)
       const productId = response.id
 
       // Step 2: Upload images if any

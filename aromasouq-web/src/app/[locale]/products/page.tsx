@@ -880,10 +880,7 @@ export default function ProductsPage() {
                 </button>
 
                 <p className="text-gray-700 font-semibold">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D] to-[#B3967D] font-black text-lg">
-                    {data?.pagination?.total || 0}
-                  </span>
-                  {' '}{t('ui.productsFound', { count: data?.pagination?.total || 0, plural: data?.pagination?.total !== 1 ? 's' : '' })}
+                  {t('ui.productsFound', { count: data?.pagination?.total || 0, plural: data?.pagination?.total !== 1 ? 's' : '' })}
                   {hasActiveFilters && (
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D] to-[#B3967D] ml-2 font-black">
                       {t('ui.filtered')}

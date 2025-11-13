@@ -65,9 +65,14 @@ export default function ProductDetailPage() {
     )
   }
 
-  const discount = product.salePrice ? calculateDiscount(product.regularPrice, product.salePrice) : 0
-  const currentPrice = product.salePrice || product.regularPrice
-  const savings = product.salePrice ? product.regularPrice - product.salePrice : 0
+  // Calculate discount: if compareAtPrice exists, calculate percentage difference
+  const discount = product.compareAtPrice && product.compareAtPrice > product.price
+    ? calculateDiscount(product.compareAtPrice, product.price)
+    : 0
+  const currentPrice = product.price
+  const savings = product.compareAtPrice && product.compareAtPrice > product.price
+    ? product.compareAtPrice - product.price
+    : 0
   const currentImageUrl = getProductImageUrl(product, selectedImage)
   const productHasImages = hasProductImages(product)
 
@@ -117,7 +122,7 @@ export default function ProductDetailPage() {
                   ) : (
                     <ProductImagePlaceholder className="w-full h-full" />
                   )}
-                  {product.salePrice && (
+                  {discount > 0 && (
                     <div className="absolute top-5 left-5 bg-gradient-to-r from-red-600 to-[#B3967D]/600 text-white px-5 py-2.5 rounded-full text-sm font-black shadow-xl border-2 border-red-400/30">
                       🔥 -{discount}% {t('offBadge')}
                     </div>
@@ -127,7 +132,7 @@ export default function ProductDetailPage() {
             ) : (
               <div className="relative w-full h-[550px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#B3967D]/100 via-orange-100 to-yellow-100 mb-4 shadow-2xl border-4 border-white">
                 <ProductImagePlaceholder className="w-full h-full" />
-                {product.salePrice && (
+                {discount > 0 && (
                   <div className="absolute top-5 left-5 bg-gradient-to-r from-red-600 to-[#B3967D]/600 text-white px-5 py-2.5 rounded-full text-sm font-black shadow-xl border-2 border-red-400/30">
                     🔥 -{discount}% {t('offBadge')}
                   </div>
@@ -212,10 +217,10 @@ export default function ProductDetailPage() {
                 <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D]/600 to-[#B3967D]/600">
                   {formatCurrency(currentPrice)}
                 </span>
-                {product.salePrice && (
+                {discount > 0 && (
                   <>
                     <span className="text-2xl text-gray-400 line-through font-bold">
-                      {formatCurrency(product.regularPrice)}
+                      {formatCurrency(product.compareAtPrice!)}
                     </span>
                     <Badge className="bg-gradient-to-r from-red-600 to-[#B3967D]/600 text-white text-sm px-4 py-1.5 font-black shadow-lg border-2 border-red-400/30">
                       -{discount}% {t('offBadge')}
