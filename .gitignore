@@ -89,6 +89,12 @@ desktop.ini
 *.temp
 temp-*.json
 test-*.json
+test-*.bat
+test-*.ps1
+*-login.json
+update-*.json
+vendor-session.xml
+test-product.json
 
 # ============================================
 # Database
