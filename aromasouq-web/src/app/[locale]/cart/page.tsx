@@ -208,9 +208,9 @@ export default function CartPage() {
                         </div>
 
                         {/* Stock Warning */}
-                        {item.product?.stockQuantity < 5 && (
+                        {(item.product?.stockQuantity || item.product?.stock || 0) < 5 && (item.product?.stockQuantity || item.product?.stock || 0) > 0 && (
                           <p className="text-xs text-[#B3967D]/600 mt-1">
-                            {t('onlyLeftInStock', { count: item.product.stockQuantity })}
+                            {t('onlyLeftInStock', { count: item.product?.stockQuantity || item.product?.stock || 0 })}
                           </p>
                         )}
                       </div>
@@ -256,7 +256,6 @@ export default function CartPage() {
                               itemId: item.id,
                               quantity: item.quantity + 1
                             })}
-                            disabled={item.quantity >= (item.product?.stockQuantity || 0)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>

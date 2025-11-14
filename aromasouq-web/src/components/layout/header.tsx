@@ -263,7 +263,7 @@ export function Header() {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/account" className="font-semibold">{tUser('myAccount')}</Link>
+                    <Link href="/account/profile" className="font-semibold">{tUser('myAccount')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/account/orders" className="font-semibold">{tUser('orders')}</Link>

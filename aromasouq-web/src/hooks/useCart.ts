@@ -43,6 +43,10 @@ export function useCart() {
       apiClient.patch<Cart>(`/cart/items/${itemId}`, { quantity }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
+      toast.success('Cart updated')
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Failed to update cart')
     },
   })
 

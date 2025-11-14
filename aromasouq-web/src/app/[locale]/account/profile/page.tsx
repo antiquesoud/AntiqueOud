@@ -1,10 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { User as UserIcon, Mail, Phone, Globe, Coins } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProfileData {
   id: string;
@@ -23,13 +25,24 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const t = useTranslations('account.profilePage');
+  const tProducts = useTranslations('products');
+  const tAccount = useTranslations('account');
   const { data: profile, isLoading, error} = useQuery<ProfileData>({
     queryKey: ['profile'],
     queryFn: async () => {
       return await apiClient.get('/users/profile');
     },
   });
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -69,7 +82,7 @@ export default function ProfilePage() {
         {/* Profile Card */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Header Section with Avatar */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-8 text-white">
+          <div className="bg-gradient-to-r from-[#550000] via-[#6b0000] to-[#550000] p-8 text-white">
             <div className="flex items-center gap-6">
               {profile?.avatar ? (
                 <img
@@ -86,7 +99,7 @@ export default function ProfilePage() {
                 <h2 className="text-2xl font-bold">
                   {profile.firstName} {profile.lastName}
                 </h2>
-                <p className="text-purple-100 capitalize mt-1">
+                <p className="text-[#ECDBC7] capitalize mt-1">
                   {profile.role.toLowerCase()}
                 </p>
               </div>
@@ -137,7 +150,7 @@ export default function ProfilePage() {
                 <Coins className="w-5 h-5 text-[#B3967D]/500 mt-1" />
                 <div className="flex-1">
                   <label className="text-sm text-gray-600 block">{t('coinsBalanceLabel')}</label>
-                  <p className="font-medium text-gray-900">{profile.coinsBalance} {useTranslations('products')('coins')}</p>
+                  <p className="font-medium text-gray-900">{profile.coinsBalance} {tProducts('coins')}</p>
                   <p className="text-xs text-gray-500 mt-1">
                     {t('coinsValue', { value: profile.coinsBalance.toFixed(2) })}
                   </p>
@@ -149,15 +162,15 @@ export default function ProfilePage() {
             <div className="pt-6 border-t border-gray-200 flex gap-4">
               <Link
                 href="/account/edit"
-                className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-center font-medium"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-[#B3967D] to-[#B3967D] text-[#2D2D2D] font-bold rounded-lg hover:shadow-lg transition text-center"
               >
-                {useTranslations('account')('editProfile')}
+                {tAccount('editProfile')}
               </Link>
               <Link
                 href="/account/change-password"
-                className="flex-1 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-center font-medium"
+                className="flex-1 px-6 py-3 border border-[#B3967D] rounded-lg hover:bg-[#ECDBC7] transition text-center font-medium"
               >
-                {useTranslations('account')('changePassword')}
+                {tAccount('changePassword')}
               </Link>
             </div>
 

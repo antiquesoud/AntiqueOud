@@ -87,13 +87,13 @@ export default function ProductDetailPage() {
       {/* Breadcrumb */}
       <div className="container mx-auto px-[5%] py-6">
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <Link href="/" className="text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D]/600 to-[#B3967D]/600 hover:from-[#B3967D]/700 hover:to-[#B3967D]/700 transition-all">
+          <Link href="/" className="text-[#8B7355] hover:text-[#6b0000] transition-all">
             🏠 {t('home')}
           </Link>
           <span className="text-[#B3967D]/400">→</span>
           {product.category?.nameEn && (
             <>
-              <Link href={`/products?categorySlug=${product.category.slug}`} className="text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D]/600 to-[#B3967D]/600 hover:from-[#B3967D]/700 hover:to-[#B3967D]/700 transition-all">
+              <Link href={`/products?categorySlug=${product.category.slug}`} className="text-[#8B7355] hover:text-[#6b0000] transition-all">
                 {product.category.nameEn}
               </Link>
               <span className="text-[#B3967D]/400">→</span>
@@ -171,7 +171,7 @@ export default function ProductDetailPage() {
           <div className="py-3">
             {/* Brand */}
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#B3967D]/100 to-[#B3967D]/100 px-4 py-2 rounded-full mb-3 border-2 border-[#B3967D]/200 shadow-md">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D]/700 to-[#B3967D]/700 text-sm font-black uppercase tracking-wider">
+              <span className="text-[#6b0000] text-sm font-black uppercase tracking-wider">
                 ✨ {product.brand?.nameEn || t('premiumBrand')}
               </span>
             </div>
@@ -206,7 +206,7 @@ export default function ProductDetailPage() {
                 </div>
                 <span className="text-base font-black text-gray-700">{(product.rating || 0).toFixed(1)}</span>
               </div>
-              <a href="#reviews" className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D]/600 to-[#B3967D]/600 hover:from-[#B3967D]/700 hover:to-[#B3967D]/700 transition-all">
+              <a href="#reviews" className="text-sm font-bold text-[#8B7355] hover:text-[#6b0000] transition-all">
                 📝 {product.reviewCount || 0} {tProducts('reviews')}
               </a>
             </div>
@@ -214,7 +214,7 @@ export default function ProductDetailPage() {
             {/* Price */}
             <div className="mb-8 pb-8 border-b-2 border-[#B3967D]/200">
               <div className="flex items-baseline gap-4 mb-3">
-                <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D]/600 to-[#B3967D]/600">
+                <span className="text-5xl font-black text-[#6b0000]">
                   {formatCurrency(currentPrice)}
                 </span>
                 {discount > 0 && (
@@ -455,25 +455,25 @@ export default function ProductDetailPage() {
           <TabsList className="w-full justify-start border-b-2 border-[#B3967D]/200 bg-gradient-to-r from-white to-amber-50 h-auto p-0 rounded-none shadow-md">
             <TabsTrigger
               value="description"
-              className="data-[state=active]:border-b-4 data-[state=active]:border-[#B3967D]/500 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#B3967D]/600 data-[state=active]:to-[#B3967D]/600 data-[state=active]:font-black rounded-none px-8 py-4 font-bold text-gray-600 hover:text-gray-800 transition-all"
+              className="data-[state=active]:border-b-4 data-[state=active]:border-[#B3967D]/500 data-[state=active]:text-[#6b0000] data-[state=active]:font-black rounded-none px-8 py-4 font-bold text-gray-600 hover:text-gray-800 transition-all"
             >
               📝 {t('tabs.description')}
             </TabsTrigger>
             <TabsTrigger
               value="specifications"
-              className="data-[state=active]:border-b-4 data-[state=active]:border-[#B3967D]/500 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#B3967D]/600 data-[state=active]:to-[#B3967D]/600 data-[state=active]:font-black rounded-none px-8 py-4 font-bold text-gray-600 hover:text-gray-800 transition-all"
+              className="data-[state=active]:border-b-4 data-[state=active]:border-[#B3967D]/500 data-[state=active]:text-[#6b0000] data-[state=active]:font-black rounded-none px-8 py-4 font-bold text-gray-600 hover:text-gray-800 transition-all"
             >
               📊 {t('tabs.specifications')}
             </TabsTrigger>
             <TabsTrigger
               value="notes"
-              className="data-[state=active]:border-b-4 data-[state=active]:border-[#B3967D]/500 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#B3967D]/600 data-[state=active]:to-[#B3967D]/600 data-[state=active]:font-black rounded-none px-8 py-4 font-bold text-gray-600 hover:text-gray-800 transition-all"
+              className="data-[state=active]:border-b-4 data-[state=active]:border-[#B3967D]/500 data-[state=active]:text-[#6b0000] data-[state=active]:font-black rounded-none px-8 py-4 font-bold text-gray-600 hover:text-gray-800 transition-all"
             >
               🌸 {t('tabs.fragranceNotes')}
             </TabsTrigger>
             <TabsTrigger
               value="reviews"
-              className="data-[state=active]:border-b-4 data-[state=active]:border-[#B3967D]/500 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#B3967D]/600 data-[state=active]:to-[#B3967D]/600 data-[state=active]:font-black rounded-none px-8 py-4 font-bold text-gray-600 hover:text-gray-800 transition-all"
+              className="data-[state=active]:border-b-4 data-[state=active]:border-[#B3967D]/500 data-[state=active]:text-[#6b0000] data-[state=active]:font-black rounded-none px-8 py-4 font-bold text-gray-600 hover:text-gray-800 transition-all"
             >
               ⭐ {t('tabs.reviews')} ({product.reviewCount || 0})
             </TabsTrigger>

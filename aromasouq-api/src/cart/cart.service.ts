@@ -201,7 +201,11 @@ export class CartService {
     // Verify cart item belongs to user
     const cartItem = await this.prisma.cartItem.findUnique({
       where: { id: itemId },
-      include: { cart: true },
+      include: {
+        cart: true,
+        product: true,
+        variant: true,
+      },
     });
 
     if (!cartItem) {
@@ -210,6 +214,21 @@ export class CartService {
 
     if (cartItem.cart.userId !== userId) {
       throw new BadRequestException('Cart item does not belong to user');
+    }
+
+    // Validate stock if quantity is being updated
+    if (updateCartItemDto.quantity !== undefined) {
+      const availableStock = cartItem.variant?.stock || cartItem.product.stock;
+
+      if (updateCartItemDto.quantity > availableStock) {
+        throw new BadRequestException(
+          `Only ${availableStock} units available in stock`
+        );
+      }
+
+      if (updateCartItemDto.quantity < 1) {
+        throw new BadRequestException('Quantity must be at least 1');
+      }
     }
 
     const updatedItem = await this.prisma.cartItem.update({

@@ -22,8 +22,8 @@ model User {
   updatedAt         DateTime       @updatedAt @map("updated_at")
   emailVerified     Boolean        @default(false) @map("email_verified")
   preferredLanguage String         @default("en") @map("preferred_language")
-  preferredCurrency String         @default("AED") @map("preferred_currency")
   coinsBalance      Int            @default(0) @map("coins_balance")
+  preferredCurrency String         @default("AED") @map("preferred_currency")
   addresses         Address[]
   cart              Cart?
   orders            Order[]
@@ -131,7 +131,7 @@ model Product {
   vendorId        String           @map("vendor_id")
   size            String?
   concentration   String?
-  gender          String           // TIER 1 MANDATORY
+  gender          String
   notes           String?
   metaTitle       String?          @map("meta_title")
   metaDescription String?          @map("meta_description")
@@ -147,25 +147,23 @@ model Product {
   heartNotes      String?          @map("heart_notes")
   longevity       String?
   salesCount      Int              @default(0) @map("sales_count")
-  scentFamily     String           @map("scent_family") // TIER 1 MANDATORY
+  scentFamily     String           @map("scent_family")
   season          String?
   sillage         String?
   topNotes        String?          @map("top_notes")
   viewCount       Int              @default(0) @map("view_count")
   whatsappNumber  String?          @map("whatsapp_number")
   collection      String?          @map("collection")
+  discountPercent Int?             @map("discount_percent")
+  format          String?          @map("format")
+  isOnSale        Boolean          @default(false) @map("is_on_sale")
   occasion        String?          @map("occasion")
   oudType         String?          @map("oud_type")
-  productType     String           @map("product_type") // NOW MANDATORY
+  priceSegment    String?          @map("price_segment")
+  productType     String           @map("product_type")
   region          String?          @map("region")
-  // NEW FIELDS
-  format          String?          @map("format") // SPRAY, OIL, ROLLON, SAMPLE, GIFT_SET
-  priceSegment    String?          @map("price_segment") // BUDGET, MID, PREMIUM, LUXURY, ULTRA_LUXURY
-  // Flash Sale Fields
-  isOnSale        Boolean          @default(false) @map("is_on_sale")
-  salePrice       Float?           @map("sale_price")
   saleEndDate     DateTime?        @map("sale_end_date")
-  discountPercent Int?             @map("discount_percent")
+  salePrice       Float?           @map("sale_price")
   cartItems       CartItem[]
   orderItems      OrderItem[]
   variants        ProductVariant[]
@@ -279,8 +277,6 @@ model Order {
   shippingFee     Float         @map("shipping_fee")
   discount        Float         @default(0)
   total           Float
-  currency        String        @default("AED")
-  exchangeRate    Float         @default(1.0) @map("exchange_rate")
   orderStatus     OrderStatus   @default(PENDING) @map("order_status")
   paymentStatus   PaymentStatus @default(PENDING) @map("payment_status")
   paymentMethod   PaymentMethod @map("payment_method")
@@ -295,6 +291,8 @@ model Order {
   coinsEarned     Int           @default(0) @map("coins_earned")
   coinsUsed       Int           @default(0) @map("coins_used")
   couponId        String?       @map("coupon_id")
+  currency        String        @default("AED")
+  exchangeRate    Float         @default(1.0) @map("exchange_rate")
   giftWrappingFee Float         @default(0) @map("gift_wrapping_fee")
   items           OrderItem[]
   address         Address       @relation(fields: [addressId], references: [id])
