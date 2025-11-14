@@ -28,10 +28,13 @@ export class AuthController {
     const result = await this.authService.register(registerDto);
 
     // Set httpOnly cookie
+    const isProduction = process.env.NODE_ENV === 'production';
+    const allowLocalhost = process.env.FRONTEND_URL?.includes('localhost');
+
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: isProduction && !allowLocalhost,
+      sameSite: (isProduction && !allowLocalhost) ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -51,10 +54,13 @@ export class AuthController {
     const result = await this.authService.login(loginDto);
 
     // Set httpOnly cookie
+    const isProduction = process.env.NODE_ENV === 'production';
+    const allowLocalhost = process.env.FRONTEND_URL?.includes('localhost');
+
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: isProduction && !allowLocalhost,
+      sameSite: (isProduction && !allowLocalhost) ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
