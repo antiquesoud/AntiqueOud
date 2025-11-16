@@ -6,7 +6,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useRef } from 'react';
 import { Link } from '@/i18n/navigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const oudTypes = [
   {
@@ -33,115 +35,100 @@ const oudTypes = [
 
 export function OudCollection() {
   const t = useTranslations('homepage.oudCollection');
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (!trackRef.current) return;
+    const scrollAmount = 300; // Adjust based on card width
+    trackRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  };
+
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-[#1a0f0a] via-[#3d2817] to-[#5c3a1f] py-20 mb-0">
-      {/* Artistic decorative elements - Arabian patterns and premium accents */}
+    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000]/5 via-white to-[#ECDBC7]/10 py-16 mb-0">
+      {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Arabian geometric patterns */}
-        <svg className="absolute top-16 left-[8%] w-32 h-32 opacity-15" viewBox="0 0 100 100" fill="none">
-          <path d="M50 10 L65 35 L90 35 L70 52 L78 77 L50 60 L22 77 L30 52 L10 35 L35 35 Z" fill="url(#oud-star-gradient)" stroke="#B3967D" strokeWidth="1" />
-          <circle cx="50" cy="50" r="15" fill="none" stroke="#B3967D" strokeWidth="1" opacity="0.6" />
-          <defs>
-            <linearGradient id="oud-star-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#B3967D" opacity="0.3" />
-              <stop offset="100%" stopColor="#B3967D" opacity="0.1" />
-            </linearGradient>
-          </defs>
-        </svg>
+        {/* Subtle glowing orbs */}
+        <div className="absolute top-20 right-[20%] w-64 h-64 bg-[#ECDBC7]/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-[15%] w-72 h-72 bg-[#B3967D]/15 rounded-full blur-3xl"></div>
 
-        <svg className="absolute bottom-24 right-[10%] w-28 h-28 opacity-15 animate-pulse" viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="30" fill="none" stroke="#B3967D" strokeWidth="2" opacity="0.6" />
-          <circle cx="50" cy="50" r="20" fill="none" stroke="#B3967D" strokeWidth="1.5" opacity="0.5" />
-          <circle cx="50" cy="50" r="10" fill="url(#oud-circle-gradient)" opacity="0.7" />
-          <defs>
-            <radialGradient id="oud-circle-gradient">
-              <stop offset="0%" stopColor="#B3967D" opacity="0.5" />
-              <stop offset="100%" stopColor="#B3967D" opacity="0.1" />
-            </radialGradient>
-          </defs>
-        </svg>
-
-        {/* Oud incense smoke effect - wavy lines */}
-        <svg className="absolute top-1/4 right-[15%] w-20 h-40 opacity-20 animate-pulse" style={{ animationDelay: '0.5s' }} viewBox="0 0 50 100" fill="none">
-          <path d="M 25,100 Q 15,75 25,50 Q 35,25 25,0" stroke="#B3967D" strokeWidth="2" fill="none" opacity="0.5" strokeLinecap="round"/>
-          <path d="M 30,100 Q 20,75 30,50 Q 40,25 30,0" stroke="#B3967D" strokeWidth="1.5" fill="none" opacity="0.4" strokeLinecap="round"/>
-        </svg>
-
-        <svg className="absolute bottom-1/3 left-[12%] w-16 h-32 opacity-20 animate-pulse" style={{ animationDelay: '1s' }} viewBox="0 0 50 100" fill="none">
-          <path d="M 25,100 Q 35,75 25,50 Q 15,25 25,0" stroke="#ECDBC7" strokeWidth="2" fill="none" opacity="0.5" strokeLinecap="round"/>
-          <path d="M 20,100 Q 30,75 20,50 Q 10,25 20,0" stroke="#B3967D" strokeWidth="1.5" fill="none" opacity="0.4" strokeLinecap="round"/>
-        </svg>
-
-        {/* Premium glowing orbs */}
-        <div className="absolute top-28 right-[25%] w-96 h-96 bg-[#B3967D]/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-32 left-[20%] w-80 h-80 bg-[#B3967D]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#8b0000]/15 rounded-full blur-3xl"></div>
-
-        {/* Golden sparkles */}
-        <div className="absolute top-32 left-[28%] w-3 h-3 bg-[#B3967D] rounded-full shadow-[0_0_25px_10px_rgba(250,204,21,0.7)] animate-pulse"></div>
-        <div className="absolute top-52 right-[32%] w-2 h-2 bg-[#B3967D] rounded-full shadow-[0_0_20px_8px_rgba(251,191,36,0.6)] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-        <div className="absolute bottom-44 left-[22%] w-2 h-2 bg-[#B3967D] rounded-full shadow-[0_0_20px_8px_rgba(234,179,8,0.6)] animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-2/3 right-[18%] w-3 h-3 bg-[#B3967D] rounded-full shadow-[0_0_25px_10px_rgba(245,158,11,0.7)] animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-
-        {/* Arabian arch patterns */}
-        <svg className="absolute top-0 left-0 w-full h-full opacity-5" viewBox="0 0 1000 1000" fill="none">
-          <path d="M 200,400 Q 200,300 250,250 Q 300,200 350,250 Q 400,300 400,400" stroke="#B3967D" strokeWidth="3" fill="none" opacity="0.3" />
-          <path d="M 600,600 Q 600,500 650,450 Q 700,400 750,450 Q 800,500 800,600" stroke="#B3967D" strokeWidth="3" fill="none" opacity="0.25" />
-        </svg>
+        {/* Decorative pattern */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-5">
+          <div style={{
+            backgroundImage: `repeating-linear-gradient(45deg, #550000 0px, #550000 1px, transparent 1px, transparent 20px)`,
+            opacity: 0.03,
+            width: '100%',
+            height: '100%'
+          }}></div>
+        </div>
       </div>
 
       <div className="container mx-auto px-[5%] relative z-10">
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#B3967D] via-[#B3967D] to-[#B3967D] text-[#2D2D2D] font-bold px-6 py-2.5 rounded-full mb-5 shadow-2xl text-sm font-black tracking-wider border-2 border-[#B3967D]/40 animate-pulse">
-            <span className="text-xl">🪔</span>
-            <span>{t('badge').toUpperCase()}</span>
-            <span className="text-xl">💎</span>
-          </div>
-
-          <h2 className="text-6xl md:text-7xl font-black mb-4 drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)]">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D] via-[#B3967D] to-[#ECDBC7]">
+        <div className="flex justify-between items-center mb-12">
+          <div className="text-center flex-1">
+            <div className="inline-flex items-center gap-2 bg-[#ECDBC7] text-[#550000] px-5 py-2 rounded-full mb-4 shadow-lg text-sm font-bold tracking-wide">
+              <span className="text-lg">💎</span>
+              <span>PREMIUM OUD COLLECTION</span>
+              <span className="text-lg">💎</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl text-[#550000] font-black mb-3">
               {t('title')}
-            </span>
-          </h2>
-
-          <p className="text-xl md:text-2xl text-[#ECDBC7] font-semibold max-w-3xl mx-auto drop-shadow-lg">
-            ✨ {t('description')}
-          </p>
+            </h2>
+            <p className="text-base text-gray-700 max-w-2xl mx-auto">
+              {t('description')}
+            </p>
+          </div>
+          <div className="hidden md:flex gap-2 ml-4">
+            <button
+              onClick={() => scroll('left')}
+              className="w-9 h-9 rounded-full border-2 border-[#550000]/30 bg-white flex items-center justify-center transition-all duration-300 hover:bg-[#550000] hover:border-[#550000] hover:text-white shadow-sm"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              className="w-9 h-9 rounded-full border-2 border-[#550000]/30 bg-white flex items-center justify-center transition-all duration-300 hover:bg-[#550000] hover:border-[#550000] hover:text-white shadow-sm"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          ref={trackRef}
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4 md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible"
+        >
           {oudTypes.map((oud) => (
             <Link
               key={oud.slug}
               href={`/products?oudType=${oud.slug}`}
-              className="rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:-translate-y-3 hover:shadow-[0_30px_80px_rgba(255,215,0,0.4)] cursor-pointer border-2 border-[#B3967D]/30 group bg-gradient-to-br from-[#ECDBC7] to-[#ECDBC7]"
+              className="flex-shrink-0 w-[280px] md:w-auto rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer border-2 border-[#ECDBC7] group bg-white"
             >
-              <div className="h-[280px] bg-gradient-to-br from-[#B3967D] via-[#B3967D] to-[#B3967D] flex items-center justify-center text-9xl relative overflow-hidden">
-                {/* Animated glow */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,215,0,0.3),transparent_50%)]"></div>
-                {/* Icon with animation */}
-                <span className="relative z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)] transform group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 filter brightness-110">{oud.icon}</span>
+              <div className="h-[180px] bg-gradient-to-br from-[#ECDBC7]/30 via-white to-[#B3967D]/20 flex items-center justify-center text-7xl relative overflow-hidden">
+                {/* Subtle glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#550000]/5 to-transparent"></div>
+                <span className="relative z-10 drop-shadow-lg transform group-hover:scale-125 group-hover:rotate-6 transition-all duration-500">{oud.icon}</span>
               </div>
-              <div className="p-6 text-center bg-gradient-to-br from-white to-[#ECDBC7]">
-                <div className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#8b0000] to-[#550000] mb-2">
+              <div className="p-5 text-center bg-gradient-to-br from-white to-[#ECDBC7]/10">
+                <div className="text-lg font-black text-[#550000] mb-2">
                   {t(`oudTypes.${oud.translationKey}.name`)}
                 </div>
-                <div className="text-sm text-gray-700 font-medium mb-5">
+                <div className="text-sm text-gray-700 mb-4 font-medium">
                   {t(`oudTypes.${oud.translationKey}.description`)}
                 </div>
-                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#B3967D] via-[#B3967D] to-[#B3967D] text-[#2D2D2D] font-bold px-6 py-3 rounded-full font-black text-sm transition-all duration-300 hover:shadow-[0_8px_24px_rgba(245,158,11,0.5)] hover:scale-105 border-2 border-[#B3967D]/30">
+                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white px-5 py-2.5 rounded-full font-bold text-xs transition-all duration-300 hover:shadow-lg hover:scale-105 border-2 border-[#ECDBC7]/30">
                   <span>{t('exploreCollection')}</span>
-                  <span>→</span>
+                  <span className="text-sm">→</span>
                 </span>
               </div>
             </Link>
           ))}
         </div>
       </div>
-
-      {/* Bottom decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-white"></div>
     </div>
   );
 }

@@ -54,95 +54,76 @@ export function FlashSale({ products }: FlashSaleProps) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000] via-[#6b0000] to-[#8b0000] py-20 mb-0">
-      {/* Lightning bolt artwork with glowing edges */}
+    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000] py-12 mb-0">
+      {/* Decorative elements - stars and glaze effect */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Animated lightning bolts */}
-        <svg className="absolute top-10 left-[15%] w-32 h-48 opacity-20 animate-pulse" viewBox="0 0 100 200" fill="none">
-          <path d="M50 0L30 80H60L40 200L90 80H60L80 0Z" fill="url(#lightning-gradient)" className="drop-shadow-[0_0_15px_rgba(179,150,125,0.8)]"/>
-          <defs>
-            <linearGradient id="lightning-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#B3967D" />
-              <stop offset="100%" stopColor="#B3967D" />
-            </linearGradient>
-          </defs>
-        </svg>
+        {/* Glowing orbs */}
+        <div className="absolute top-20 right-[25%] w-64 h-64 bg-[#ECDBC7]/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-40 left-[20%] w-80 h-80 bg-[#B3967D]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-        <svg className="absolute top-32 right-[10%] w-24 h-36 opacity-15 animate-pulse" style={{ animationDelay: '0.5s' }} viewBox="0 0 100 200" fill="none">
-          <path d="M50 0L30 80H60L40 200L90 80H60L80 0Z" fill="url(#lightning-gradient-2)" className="drop-shadow-[0_0_12px_rgba(179,150,125,0.6)]"/>
-          <defs>
-            <linearGradient id="lightning-gradient-2" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#B3967D" />
-              <stop offset="100%" stopColor="#ECDBC7" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* Glowing orbs and energy effects */}
-        <div className="absolute top-20 right-[25%] w-64 h-64 bg-[#B3967D]/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-40 left-[20%] w-80 h-80 bg-[#ECDBC7]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#550000]/15 rounded-full blur-3xl"></div>
-
-        {/* Sparkle effects */}
-        <div className="absolute top-24 left-[40%] w-2 h-2 bg-[#B3967D] rounded-full shadow-[0_0_20px_8px_rgba(179,150,125,0.6)] animate-pulse"></div>
-        <div className="absolute top-48 right-[35%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse" style={{ animationDelay: '0.3s' }}></div>
-        <div className="absolute bottom-32 left-[30%] w-2 h-2 bg-[#B3967D] rounded-full shadow-[0_0_20px_8px_rgba(179,150,125,0.6)] animate-pulse" style={{ animationDelay: '0.7s' }}></div>
+        {/* Sparkle stars */}
+        <div className="absolute top-24 left-[30%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse"></div>
+        <div className="absolute top-48 right-[35%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute bottom-32 left-[25%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 right-[20%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute top-36 left-[15%] w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_15px_6px_rgba(255,255,255,0.5)] animate-pulse" style={{ animationDelay: '0.8s' }}></div>
+        <div className="absolute bottom-48 right-[15%] w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_15px_6px_rgba(255,255,255,0.5)] animate-pulse" style={{ animationDelay: '0.3s' }}></div>
       </div>
 
       <div className="container mx-auto px-[5%] relative z-10">
-        {/* Header with centered countdown */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#B3967D] via-[#B3967D] to-[#550000] text-white px-5 py-2 rounded-full mb-4 shadow-2xl text-sm font-black tracking-wider border-2 border-[#ECDBC7]/30">
-            <span className="text-xl animate-pulse">⚡</span>
-            <span>{t('badge').toUpperCase()}</span>
-            <span className="text-xl animate-pulse">⚡</span>
+        {/* Header with countdown */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-[#ECDBC7] text-[#550000] px-4 py-1.5 rounded-full mb-3 shadow-lg text-xs font-bold tracking-wide">
+              <span className="text-base">⚡</span>
+              <span>LIMITED TIME OFFER</span>
+              <span className="text-base">⚡</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl text-white font-bold mb-2">
+              {t('title')}
+            </h2>
+            <p className="text-base text-[#ECDBC7]">
+              {t('hurry')}
+            </p>
           </div>
 
-          <h2 className="text-5xl md:text-6xl text-white font-black mb-3 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
-            {t('title')}
-          </h2>
-
-          <p className="text-lg text-[#ECDBC7] mb-6 font-semibold">
-            ⏰ {t('hurry')}
-          </p>
-
-          {/* Elegant countdown timer */}
-          <div className="flex justify-center gap-4 mb-2">
+          {/* Stylish countdown timer */}
+          <div className="flex gap-2">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#B3967D] to-[#B3967D] rounded-2xl blur-lg opacity-60"></div>
-              <div className="relative text-center bg-gradient-to-br from-white to-[#ECDBC7]/20 px-6 py-4 rounded-2xl border-4 border-[#B3967D]/50 shadow-2xl transform hover:scale-105 transition-transform">
-                <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-[#B3967D] to-[#B3967D] leading-none">
+              <div className="absolute inset-0 bg-[#ECDBC7]/30 rounded-lg blur-md"></div>
+              <div className="relative text-center bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg border-2 border-[#ECDBC7] shadow-xl">
+                <div className="text-2xl font-bold text-[#550000]">
                   {String(timeLeft.hours).padStart(2, '0')}
                 </div>
-                <div className="text-xs text-gray-600 uppercase tracking-widest font-bold mt-2">
+                <div className="text-[10px] text-gray-600 uppercase font-semibold">
                   {t('hours')}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center text-5xl font-black text-[#B3967D] drop-shadow-lg">:</div>
+            <div className="flex items-center text-2xl font-bold text-white">:</div>
 
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#B3967D] to-[#8b0000] rounded-2xl blur-lg opacity-60"></div>
-              <div className="relative text-center bg-gradient-to-br from-white to-[#ECDBC7]/30 px-6 py-4 rounded-2xl border-4 border-[#B3967D]/50 shadow-2xl transform hover:scale-105 transition-transform">
-                <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-[#B3967D] to-[#8b0000] leading-none">
+              <div className="absolute inset-0 bg-[#ECDBC7]/30 rounded-lg blur-md"></div>
+              <div className="relative text-center bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg border-2 border-[#ECDBC7] shadow-xl">
+                <div className="text-2xl font-bold text-[#550000]">
                   {String(timeLeft.minutes).padStart(2, '0')}
                 </div>
-                <div className="text-xs text-gray-600 uppercase tracking-widest font-bold mt-2">
+                <div className="text-[10px] text-gray-600 uppercase font-semibold">
                   {t('minutes')}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center text-5xl font-black text-[#B3967D] drop-shadow-lg">:</div>
+            <div className="flex items-center text-2xl font-bold text-white">:</div>
 
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#8b0000] to-[#550000] rounded-2xl blur-lg opacity-60"></div>
-              <div className="relative text-center bg-gradient-to-br from-white to-[#ECDBC7]/40 px-6 py-4 rounded-2xl border-4 border-[#8b0000]/50 shadow-2xl transform hover:scale-105 transition-transform animate-pulse">
-                <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-[#8b0000] to-[#550000] leading-none">
+              <div className="absolute inset-0 bg-[#ECDBC7]/30 rounded-lg blur-md"></div>
+              <div className="relative text-center bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg border-2 border-[#ECDBC7] shadow-xl">
+                <div className="text-2xl font-bold text-[#550000]">
                   {String(timeLeft.seconds).padStart(2, '0')}
                 </div>
-                <div className="text-xs text-gray-600 uppercase tracking-widest font-bold mt-2">
+                <div className="text-[10px] text-gray-600 uppercase font-semibold">
                   {t('seconds')}
                 </div>
               </div>
@@ -150,11 +131,8 @@ export function FlashSale({ products }: FlashSaleProps) {
           </div>
         </div>
 
-        <ProductCarousel products={products} compact={false} />
+        <ProductCarousel products={products} compact={true} />
       </div>
-
-      {/* Bottom decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-white"></div>
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { GlareCard } from "@/components/aceternity/glare-card"
 import { ProductImagePlaceholder } from "@/components/ui/product-image-placeholder"
+import { ArabicBorderSmall } from "@/components/ui/arabic-border-small"
 import { cn, formatCurrency, calculateDiscount } from "@/lib/utils"
 import { getFirstProductImage } from "@/lib/image-utils"
 import { Product } from "@/types"
@@ -51,7 +52,7 @@ export function ProductCard({
   const stockQuantity = (product as any).stockQuantity || (product as any).stock || 0
   const isLowStock = stockQuantity > 0 && stockQuantity < 5
 
-  // Get product image (null if no image available)
+  // Get product image (returns placeholder if no image available)
   const productImage = getFirstProductImage(product)
 
   const brandName = (product.brand as any)?.name || product.brand?.nameEn || (product as any).vendor?.businessName || 'Premium Brand'
@@ -81,19 +82,15 @@ export function ProductCard({
           {/* Image Container */}
           <div className={cn(
             "relative overflow-hidden bg-gradient-to-br from-[#f8f8f8] via-[#f0f0f0] to-[#e8e8e8]",
-            compact ? "aspect-[3/4]" : "aspect-[4/5]"
+            "aspect-square"
           )}>
             <Link href={`/products/${product.slug}`}>
-              {productImage ? (
-                <Image
-                  src={productImage}
-                  alt={productName}
-                  fill
-                  className="object-cover transition-transform duration-500 hover:scale-110"
-                />
-              ) : (
-                <ProductImagePlaceholder className="w-full h-full" size="lg" />
-              )}
+              <Image
+                src={productImage}
+                alt={productName}
+                fill
+                className="object-cover transition-transform duration-500 hover:scale-110"
+              />
             </Link>
 
             {/* Badges */}
@@ -189,6 +186,9 @@ export function ProductCard({
               </motion.div>
             )}
           </div>
+
+          {/* Arabic Border Decoration */}
+          <ArabicBorderSmall />
 
           {/* Content */}
           <CardContent className={compact ? "p-2.5" : "p-3"}>

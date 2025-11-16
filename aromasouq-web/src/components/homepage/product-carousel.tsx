@@ -41,14 +41,14 @@ export function ProductCarousel({ products, className = '', compact = false }: P
         <div className="flex gap-2">
           <button
             onClick={() => scroll('left')}
-            className="w-9 h-9 rounded-full border-2 border-gray-300 bg-white/90 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-[var(--color-oud-gold)] hover:border-[var(--color-oud-gold)] hover:text-white text-gray-700 shadow-sm hover:shadow-md"
+            className="w-9 h-9 rounded-full border-2 border-gray-300 bg-white/90 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-[#550000] hover:border-[#550000] hover:text-white text-gray-700 shadow-sm hover:shadow-md"
             aria-label="Previous"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-9 h-9 rounded-full border-2 border-gray-300 bg-white/90 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-[var(--color-oud-gold)] hover:border-[var(--color-oud-gold)] hover:text-white text-gray-700 shadow-sm hover:shadow-md"
+            className="w-9 h-9 rounded-full border-2 border-gray-300 bg-white/90 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:bg-[#550000] hover:border-[#550000] hover:text-white text-gray-700 shadow-sm hover:shadow-md"
             aria-label="Next"
           >
             <ChevronRight className="w-4 h-4" />
