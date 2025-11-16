@@ -1347,6 +1347,7 @@
       "showHideFilters": "{action} التصفية",
       "hide": "إخفاء",
       "show": "عرض",
+      "apply": "تطبيق الفلاتر",
       "productsFound": "تم العثور على {count} منتج{plural}",
       "filtered": "(مفلتر)",
       "noProducts": "لم يتم العثور على منتجات",

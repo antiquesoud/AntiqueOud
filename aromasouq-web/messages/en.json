@@ -1916,6 +1916,7 @@
       "showHideFilters": "{action} Filters",
       "hide": "Hide",
       "show": "Show",
+      "apply": "Apply Filters",
       "productsFound": "{count} product{plural} found",
       "filtered": "(filtered)",
       "noProducts": "No products found",
