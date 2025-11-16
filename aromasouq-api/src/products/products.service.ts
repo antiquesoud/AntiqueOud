@@ -94,13 +94,11 @@ export class ProductsService {
 
     // Phase 3: New classification filters
     if (productType) where.productType = productType;
+    if (region) where.region = region;
     if (oudType) where.oudType = oudType;
     if (collection) where.collection = collection;
 
-    // Special handling for region and occasion (use contains for flexible matching)
-    if (region) {
-      where.region = { contains: region, mode: 'insensitive' };
-    }
+    // Special handling for occasion (comma-separated field)
     if (occasion) {
       where.occasion = { contains: occasion, mode: 'insensitive' };
     }
