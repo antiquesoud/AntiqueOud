@@ -245,7 +245,7 @@ function getPageContext(filters: any, t: any): PageContext {
 
   // Category context
   if (filters.categorySlug) {
-    const categoryTitle = filters.categorySlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const categoryTitle = filters.categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
     return {
       title: categoryTitle,
@@ -550,7 +550,7 @@ export default function ProductsPage() {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C9A86A] focus:border-transparent"
                   >
                     <option value="">{t('ui.allCategories')}</option>
-                    {categories?.map((cat: any) => (
+                    {Array.isArray(categories) && categories.map((cat: any) => (
                       <option key={cat.id} value={cat.slug}>
                         {cat.name}
                       </option>
@@ -567,7 +567,7 @@ export default function ProductsPage() {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C9A86A] focus:border-transparent"
                   >
                     <option value="">{t('ui.allBrands')}</option>
-                    {brands?.map((brand: any) => (
+                    {Array.isArray(brands) && brands.map((brand: any) => (
                       <option key={brand.id} value={brand.id}>
                         {brand.name}
                       </option>
@@ -916,7 +916,7 @@ export default function ProductsPage() {
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C9A86A] focus:border-transparent"
                           >
                             <option value="">{t('ui.allCategories')}</option>
-                            {categories?.map((cat: any) => (
+                            {Array.isArray(categories) && categories.map((cat: any) => (
                               <option key={cat.id} value={cat.slug}>{cat.name}</option>
                             ))}
                           </select>
@@ -931,7 +931,7 @@ export default function ProductsPage() {
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C9A86A] focus:border-transparent"
                           >
                             <option value="">{t('ui.allBrands')}</option>
-                            {brands?.map((brand: any) => (
+                            {Array.isArray(brands) && brands.map((brand: any) => (
                               <option key={brand.id} value={brand.id}>{brand.name}</option>
                             ))}
                           </select>
@@ -1130,9 +1130,9 @@ export default function ProductsPage() {
 
                   <p className="text-gray-700 font-semibold text-xs sm:text-sm">
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 font-black text-sm sm:text-lg">
-                      {data?.pagination?.total || 0}
+                      {(data as any)?.pagination?.total || 0}
                     </span>
-                    {' '}{t('ui.productsFound', { count: data?.pagination?.total || 0, plural: data?.pagination?.total !== 1 ? 's' : '' })}
+                    {' '}{t('ui.productsFound', { count: (data as any)?.pagination?.total || 0, plural: (data as any)?.pagination?.total !== 1 ? 's' : '' })}
                     {hasActiveFilters && (
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 ml-2 font-black">
                         {t('ui.filtered')}
@@ -1189,7 +1189,7 @@ export default function ProductsPage() {
             )}
 
             {/* Empty State */}
-            {!isLoading && !error && data?.data.length === 0 && (
+            {!isLoading && !error && (data as any)?.data?.length === 0 && (
               <div className="bg-gradient-to-br from-white to-amber-50 rounded-2xl shadow-2xl p-8 sm:p-12 md:p-16 text-center border-2 border-amber-200">
                 <div className="bg-gradient-to-br from-amber-100 to-orange-100 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5 md:mb-6 shadow-lg">
                   <Filter className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-amber-600" />
@@ -1210,16 +1210,16 @@ export default function ProductsPage() {
             )}
 
             {/* Products Grid */}
-            {!isLoading && !error && data?.data.length > 0 && (
+            {!isLoading && !error && (data as any)?.data?.length > 0 && (
               <>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-                  {data.data.map((product: any) => (
+                  {(data as any).data.map((product: any) => (
                     <ProductCard key={product.id} product={product} compact={true} />
                   ))}
                 </div>
 
                 {/* Pagination */}
-                {data && data.pagination && data.pagination.totalPages > 1 && (
+                {(data as any)?.pagination?.totalPages > 1 && (
                   <div className="mt-8 sm:mt-10 md:mt-12 flex justify-center items-center gap-1.5 sm:gap-2 md:gap-3">
                     <button
                       onClick={() => setPage(page - 1)}
@@ -1230,11 +1230,11 @@ export default function ProductsPage() {
                     </button>
 
                     <div className="flex gap-1 sm:gap-1.5 md:gap-2">
-                      {[...Array(data.pagination.totalPages)].map((_, i) => {
+                      {[...Array((data as any).pagination.totalPages)].map((_, i) => {
                         const pageNum = i + 1;
                         if (
                           pageNum === 1 ||
-                          pageNum === data.pagination.totalPages ||
+                          pageNum === (data as any).pagination.totalPages ||
                           (pageNum >= page - 1 && pageNum <= page + 1)
                         ) {
                           return (
@@ -1262,7 +1262,7 @@ export default function ProductsPage() {
 
                     <button
                       onClick={() => setPage(page + 1)}
-                      disabled={page === data.pagination.totalPages}
+                      disabled={page === (data as any).pagination.totalPages}
                       className="px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border-2 border-amber-300 rounded-xl bg-gradient-to-r from-white to-amber-50 hover:from-amber-50 hover:to-orange-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-gray-700 hover:shadow-lg transition-all disabled:hover:shadow-none text-xs sm:text-sm md:text-base"
                     >
                       {t('pagination.next')}
