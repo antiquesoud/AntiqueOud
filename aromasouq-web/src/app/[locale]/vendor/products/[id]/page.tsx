@@ -659,18 +659,23 @@ export default function EditProductPage() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="UAE">UAE</SelectItem>
-                                <SelectItem value="SAUDI">Saudi Arabia</SelectItem>
-                                <SelectItem value="KUWAIT">Kuwait</SelectItem>
-                                <SelectItem value="QATAR">Qatar</SelectItem>
-                                <SelectItem value="OMAN">Oman</SelectItem>
-                                <SelectItem value="BAHRAIN">Bahrain</SelectItem>
-                                <SelectItem value="FRANCE">France</SelectItem>
-                                <SelectItem value="ITALY">Italy</SelectItem>
-                                <SelectItem value="UK">United Kingdom</SelectItem>
-                                <SelectItem value="USA">United States</SelectItem>
-                                <SelectItem value="INDIA">India</SelectItem>
-                                <SelectItem value="THAILAND">Thailand</SelectItem>
+                                <SelectItem value="HINDI">🇮🇳 Hindi Oud</SelectItem>
+                                <SelectItem value="SILANI">🇱🇰 Silani Oud</SelectItem>
+                                <SelectItem value="CAMBODI">🇰🇭 Cambodi Oud</SelectItem>
+                                <SelectItem value="PHILIPINI">🇵🇭 Philipini Oud</SelectItem>
+                                <SelectItem value="MERUKE">🇮🇩 Meruke Oud</SelectItem>
+                                <SelectItem value="UAE">🇦🇪 UAE</SelectItem>
+                                <SelectItem value="SAUDI">🇸🇦 Saudi Arabia</SelectItem>
+                                <SelectItem value="KUWAIT">🇰🇼 Kuwait</SelectItem>
+                                <SelectItem value="QATAR">🇶🇦 Qatar</SelectItem>
+                                <SelectItem value="OMAN">🇴🇲 Oman</SelectItem>
+                                <SelectItem value="BAHRAIN">🇧🇭 Bahrain</SelectItem>
+                                <SelectItem value="FRANCE">🇫🇷 France</SelectItem>
+                                <SelectItem value="ITALY">🇮🇹 Italy</SelectItem>
+                                <SelectItem value="UK">🇬🇧 United Kingdom</SelectItem>
+                                <SelectItem value="USA">🇺🇸 United States</SelectItem>
+                                <SelectItem value="INDIA">🇮🇳 India</SelectItem>
+                                <SelectItem value="THAILAND">🇹🇭 Thailand</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormDescription>

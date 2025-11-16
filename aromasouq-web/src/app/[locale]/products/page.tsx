@@ -36,7 +36,12 @@ const regionFlags: Record<string, string> = {
   UK: "🇬🇧",
   USA: "🇺🇸",
   INDIA: "🇮🇳",
-  THAILAND: "🇹🇭"
+  THAILAND: "🇹🇭",
+  HINDI: "🇮🇳",
+  SILANI: "🇱🇰",
+  CAMBODI: "🇰🇭",
+  PHILIPINI: "🇵🇭",
+  MERUKE: "🇮🇩"
 };
 
 const occasionIcons: Record<string, string> = {
@@ -769,6 +774,11 @@ export default function ProductsPage() {
                       <option value="USA">{t('ui.usa')}</option>
                       <option value="INDIA">{t('ui.india')}</option>
                       <option value="THAILAND">{t('ui.thailand')}</option>
+                      <option value="HINDI">{t('ui.hindi')}</option>
+                      <option value="SILANI">{t('ui.silani')}</option>
+                      <option value="CAMBODI">{t('ui.cambodi')}</option>
+                      <option value="PHILIPINI">{t('ui.philipini')}</option>
+                      <option value="MERUKE">{t('ui.meruke')}</option>
                     </select>
                   )}
                 </div>

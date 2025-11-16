@@ -157,7 +157,7 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['UAE', 'SAUDI', 'KUWAIT', 'QATAR', 'OMAN', 'BAHRAIN', 'FRANCE', 'ITALY', 'UK', 'USA', 'INDIA', 'THAILAND'])
+  @IsIn(['UAE', 'SAUDI', 'KUWAIT', 'QATAR', 'OMAN', 'BAHRAIN', 'FRANCE', 'ITALY', 'UK', 'USA', 'INDIA', 'THAILAND', 'HINDI', 'SILANI', 'CAMBODI', 'PHILIPINI', 'MERUKE'])
   region?: string;
 
   @IsOptional()

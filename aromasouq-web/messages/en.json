@@ -43,7 +43,12 @@
     "JAPAN": "Japan",
     "CHINA": "China",
     "RUSSIA": "Russia",
-    "TURKEY": "Turkey"
+    "TURKEY": "Turkey",
+    "HINDI": "Hindi Oud",
+    "SILANI": "Silani Oud",
+    "CAMBODI": "Cambodi Oud",
+    "PHILIPINI": "Philipini Oud",
+    "MERUKE": "Meruke Oud"
   },
   "occasions": {
     "RAMADAN": "Ramadan",
@@ -1793,6 +1798,26 @@
       "THAILAND": {
         "name": "Thailand",
         "description": "Exotic fragrances from Thailand. Sweet and tropical scents infused with Thai heritage."
+      },
+      "HINDI": {
+        "name": "Hindi Oud",
+        "description": "Premium Hindi oud fragrances from India. Rich, bold, and intensely aromatic with deep, resinous character."
+      },
+      "SILANI": {
+        "name": "Silani Oud",
+        "description": "Authentic Silani oud from Sri Lanka. Unique and exotic with distinctive sweet and woody notes."
+      },
+      "CAMBODI": {
+        "name": "Cambodi Oud",
+        "description": "Rare Cambodi oud from Cambodia. Exquisite and complex with deep woody notes and unmatched richness."
+      },
+      "PHILIPINI": {
+        "name": "Philipini Oud",
+        "description": "Exotic Philipini oud from the Philippines. Unique tropical oud with sweet and smooth characteristics."
+      },
+      "MERUKE": {
+        "name": "Meruke Oud",
+        "description": "Premium Meruke oud from Indonesia. Bold and aromatic with rich, earthy undertones."
       }
     },
     "occasions": {
@@ -1951,6 +1976,11 @@
       "usa": "United States",
       "india": "India",
       "thailand": "Thailand",
+      "hindi": "Hindi Oud",
+      "silani": "Silani Oud",
+      "cambodi": "Cambodi Oud",
+      "philipini": "Philipini Oud",
+      "meruke": "Meruke Oud",
       "occasion": "Occasion",
       "allOccasions": "All Occasions",
       "office": "Office",
