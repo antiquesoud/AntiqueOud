@@ -203,37 +203,75 @@ export class VendorService {
 
     const productIds = products.map((p) => p.id);
 
-    // Get orders containing vendor's products
-    const orders = await this.prisma.order.findMany({
-      where: {
-        items: {
-          some: {
-            productId: { in: productIds },
+    // Get both user orders and guest orders containing vendor's products
+    const [userOrders, guestOrders] = await Promise.all([
+      this.prisma.order.findMany({
+        where: {
+          items: {
+            some: {
+              productId: { in: productIds },
+            },
           },
         },
-      },
-      include: {
-        items: {
-          where: {
-            productId: { in: productIds },
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
+            include: {
+              product: true,
+            },
           },
-          include: {
-            product: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
           },
         },
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            email: true,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 100, // Get last 100 orders for calculations
+      }),
+      this.prisma.guestOrder.findMany({
+        where: {
+          items: {
+            some: {
+              productId: { in: productIds },
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 100, // Get last 100 orders for calculations
-    });
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
+            include: {
+              product: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 100, // Get last 100 orders for calculations
+      }),
+    ]);
+
+    // Merge both order types
+    const orders = [
+      ...userOrders.map((order) => ({
+        ...order,
+        isGuestOrder: false,
+      })),
+      ...guestOrders.map((order) => ({
+        ...order,
+        isGuestOrder: true,
+        user: null, // Guest orders don't have user
+      })),
+    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     // Calculate statistics
     const totalProducts = products.length;
@@ -272,16 +310,38 @@ export class VendorService {
         stockQuantity: p.stock,
       }));
 
-    // Recent orders mapped to vendor's items
-    const recentOrders = orders.slice(0, 5).map((order) => ({
-      id: order.id,
-      orderNumber: order.orderNumber,
-      customerName: `${order.user.firstName} ${order.user.lastName}`,
-      customerEmail: order.user.email,
-      total: order.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
-      status: order.orderStatus,
-      createdAt: order.createdAt,
-    }));
+    // Recent orders mapped to vendor's items (handle both user and guest orders)
+    const recentOrders = orders.slice(0, 5).map((order: any) => {
+      let customerName = 'Guest Customer';
+      let customerEmail = '';
+
+      if (order.isGuestOrder) {
+        // Guest order - extract from shippingAddress or use guest fields
+        customerEmail = (order as any).guestEmail || '';
+        try {
+          const shippingAddress = (order as any).shippingAddress as any;
+          if (shippingAddress && (shippingAddress.firstName || shippingAddress.lastName)) {
+            customerName = `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim();
+          }
+        } catch (e) {
+          // Keep default
+        }
+      } else {
+        // Authenticated user order
+        customerName = `${order.user.firstName} ${order.user.lastName}`;
+        customerEmail = order.user.email;
+      }
+
+      return {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        customerName,
+        customerEmail,
+        total: order.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        status: order.orderStatus,
+        createdAt: order.createdAt,
+      };
+    });
 
     // Calculate sales growth (current month vs previous month)
     // Get start of current month
@@ -432,7 +492,7 @@ export class VendorService {
   }
 
   /**
-   * Get vendor's orders
+   * Get vendor's orders (includes both authenticated user orders and guest orders)
    */
   async getOrders(userId: string, params?: {
     search?: string;
@@ -459,7 +519,8 @@ export class VendorService {
     const { search, status, page = 1, limit = 20 } = params || {};
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    // Build where clause for authenticated user orders
+    const whereUser: any = {
       items: {
         some: {
           productId: { in: productIds },
@@ -468,12 +529,26 @@ export class VendorService {
     };
 
     if (status && status !== 'all') {
-      where.orderStatus = status;
+      whereUser.orderStatus = status;
     }
 
-    const [orders, total] = await Promise.all([
+    // Build where clause for guest orders
+    const whereGuest: any = {
+      items: {
+        some: {
+          productId: { in: productIds },
+        },
+      },
+    };
+
+    if (status && status !== 'all') {
+      whereGuest.orderStatus = status;
+    }
+
+    // Query both authenticated user orders and guest orders in parallel
+    const [userOrders, guestOrders, totalUser, totalGuest] = await Promise.all([
       this.prisma.order.findMany({
-        where,
+        where: whereUser,
         include: {
           items: {
             where: {
@@ -497,17 +572,38 @@ export class VendorService {
             },
           },
         },
-        skip,
-        take: limit,
         orderBy: {
           createdAt: 'desc',
         },
       }),
-      this.prisma.order.count({ where }),
+      this.prisma.guestOrder.findMany({
+        where: whereGuest,
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  images: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prisma.order.count({ where: whereUser }),
+      this.prisma.guestOrder.count({ where: whereGuest }),
     ]);
 
-    // Calculate vendor-specific totals for each order
-    const ordersWithVendorTotal = orders.map((order) => ({
+    // Map authenticated user orders
+    const mappedUserOrders = userOrders.map((order) => ({
       id: order.id,
       orderNumber: order.orderNumber,
       customerName: `${order.user.firstName} ${order.user.lastName}`,
@@ -517,15 +613,50 @@ export class VendorService {
       status: order.orderStatus,
       createdAt: order.createdAt,
       items: order.items,
+      isGuestOrder: false,
     }));
 
+    // Map guest orders - extract name from shipping address if available
+    const mappedGuestOrders = guestOrders.map((order) => {
+      // Try to extract name from shippingAddress JSON
+      let guestName = 'Guest Customer';
+      try {
+        const shippingAddress = order.shippingAddress as any;
+        if (shippingAddress && (shippingAddress.firstName || shippingAddress.lastName)) {
+          guestName = `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim();
+        }
+      } catch (e) {
+        // If parsing fails, keep default
+      }
+
+      return {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        customerName: guestName,
+        customerEmail: order.guestEmail,
+        itemCount: order.items.length,
+        total: order.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        status: order.orderStatus,
+        createdAt: order.createdAt,
+        items: order.items,
+        isGuestOrder: true,
+      };
+    });
+
+    // Merge both order types and sort by createdAt descending
+    const allOrders = [...mappedUserOrders, ...mappedGuestOrders]
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(skip, skip + limit);
+
+    const totalOrders = totalUser + totalGuest;
+
     return {
-      data: ordersWithVendorTotal,
+      data: allOrders,
       pagination: {
-        total,
+        total: totalOrders,
         page,
         limit,
-        pages: Math.ceil(total / limit),
+        pages: Math.ceil(totalOrders / limit),
       },
     };
   }
@@ -551,38 +682,64 @@ export class VendorService {
 
     const productIds = products.map((p) => p.id);
 
-    // Get the order and verify it contains vendor's products
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        items: {
-          where: {
-            productId: { in: productIds },
+    // Try to find the order in both user orders and guest orders
+    const [userOrder, guestOrder] = await Promise.all([
+      this.prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  images: true,
+                },
+              },
+            },
           },
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                images: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          address: true,
+        },
+      }),
+      this.prisma.guestOrder.findUnique({
+        where: { id: orderId },
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  images: true,
+                },
               },
             },
           },
         },
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            email: true,
-          },
-        },
-        address: true,
-      },
-    });
+      }),
+    ]);
 
-    if (!order) {
+    // Check if order exists in either table
+    if (!userOrder && !guestOrder) {
       throw new NotFoundException(`Order with ID ${orderId} not found`);
     }
+
+    // Use whichever order was found
+    const order = userOrder || guestOrder;
+    const isGuestOrder = !!guestOrder;
 
     if (order.items.length === 0) {
       throw new ForbiddenException(
@@ -590,11 +747,37 @@ export class VendorService {
       );
     }
 
+    // Extract customer information
+    let customerName = 'Guest Customer';
+    let customerEmail = '';
+    let address: any = null;
+
+    if (isGuestOrder && guestOrder) {
+      // Guest order
+      customerEmail = guestOrder.guestEmail;
+      try {
+        const shippingAddress = guestOrder.shippingAddress as any;
+        if (shippingAddress) {
+          address = shippingAddress;
+          if (shippingAddress.firstName || shippingAddress.lastName) {
+            customerName = `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim();
+          }
+        }
+      } catch (e) {
+        // Keep default
+      }
+    } else if (userOrder) {
+      // Authenticated user order
+      customerName = `${userOrder.user.firstName} ${userOrder.user.lastName}`;
+      customerEmail = userOrder.user.email;
+      address = userOrder.address;
+    }
+
     return {
       id: order.id,
       orderNumber: order.orderNumber,
-      customerName: `${order.user.firstName} ${order.user.lastName}`,
-      customerEmail: order.user.email,
+      customerName,
+      customerEmail,
       itemCount: order.items.length,
       total: order.items.reduce(
         (sum, item) => sum + item.price * item.quantity,
@@ -603,8 +786,9 @@ export class VendorService {
       status: order.orderStatus,
       createdAt: order.createdAt,
       items: order.items,
-      address: order.address,
+      address,
       trackingNumber: order.trackingNumber,
+      isGuestOrder,
     };
   }
 

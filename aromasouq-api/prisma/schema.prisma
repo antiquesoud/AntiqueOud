@@ -164,15 +164,17 @@ model Product {
   region          String?          @map("region")
   saleEndDate     DateTime?        @map("sale_end_date")
   salePrice       Float?           @map("sale_price")
-  cartItems       CartItem[]
-  orderItems      OrderItem[]
-  variants        ProductVariant[]
-  videos          ProductVideo[]
-  brand           Brand?           @relation(fields: [brandId], references: [id])
-  category        Category         @relation(fields: [categoryId], references: [id])
-  vendor          Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  reviews         Review[]
-  wishlistItems   WishlistItem[]
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  variants         ProductVariant[]
+  videos           ProductVideo[]
+  guestCartItems   GuestCartItem[]
+  guestOrderItems  GuestOrderItem[]
+  brand            Brand?           @relation(fields: [brandId], references: [id])
+  category         Category         @relation(fields: [categoryId], references: [id])
+  vendor           Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  reviews          Review[]
+  wishlistItems    WishlistItem[]
 
   @@map("products")
 }
@@ -189,10 +191,12 @@ model ProductVariant {
   compareAtPrice Float?     @map("compare_at_price")
   isActive       Boolean    @default(true) @map("is_active")
   sortOrder      Int        @default(0) @map("sort_order")
-  createdAt      DateTime   @default(now()) @map("created_at")
-  updatedAt      DateTime   @updatedAt @map("updated_at")
-  cartItems      CartItem[]
-  product        Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  cartItems        CartItem[]
+  guestCartItems   GuestCartItem[]
+  guestOrderItems  GuestOrderItem[]
+  product          Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("product_variants")
 }
@@ -508,4 +512,98 @@ enum VoteType {
 enum DiscountType {
   PERCENTAGE
   FIXED
+}
+
+// ============================================
+// GUEST CHECKOUT MODELS (Separate Tables)
+// Zero risk to existing tables
+// ============================================
+
+model GuestCart {
+  id           String          @id @default(uuid())
+  sessionToken String          @unique @map("session_token")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  deletedAt    DateTime?       @map("deleted_at")
+  userAgent    String?         @map("user_agent")
+  ipAddress    String?         @map("ip_address")
+  items        GuestCartItem[]
+
+  @@index([sessionToken])
+  @@index([createdAt])
+  @@map("guest_carts")
+}
+
+model GuestCartItem {
+  id          String          @id @default(uuid())
+  guestCartId String          @map("guest_cart_id")
+  productId   String          @map("product_id")
+  variantId   String?         @map("variant_id")
+  quantity    Int             @default(1)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  guestCart   GuestCart       @relation(fields: [guestCartId], references: [id], onDelete: Cascade)
+  product     Product         @relation(fields: [productId], references: [id])
+  variant     ProductVariant? @relation(fields: [variantId], references: [id])
+
+  @@unique([guestCartId, productId, variantId])
+  @@index([guestCartId])
+  @@index([productId])
+  @@map("guest_cart_items")
+}
+
+model GuestOrder {
+  id              String           @id @default(uuid())
+  orderNumber     String           @unique @map("order_number")
+  sessionToken    String?          @map("session_token")
+  guestEmail      String           @map("guest_email")
+  guestPhone      String           @map("guest_phone")
+  shippingAddress Json             @map("shipping_address")
+  subtotal        Float
+  tax             Float            @default(0)
+  shippingFee     Float            @default(0) @map("shipping_fee")
+  discount        Float            @default(0)
+  total           Float
+  orderStatus     String           @map("order_status")
+  paymentMethod   String           @map("payment_method")
+  paymentStatus   String           @default("PENDING") @map("payment_status")
+  trackingNumber  String?          @map("tracking_number")
+  trackingUrl     String?          @map("tracking_url")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  confirmedAt     DateTime?        @map("confirmed_at")
+  shippedAt       DateTime?        @map("shipped_at")
+  deliveredAt     DateTime?        @map("delivered_at")
+  cancelledAt     DateTime?        @map("cancelled_at")
+  userAgent       String?          @map("user_agent")
+  ipAddress       String?          @map("ip_address")
+  items           GuestOrderItem[]
+
+  @@index([orderNumber])
+  @@index([guestEmail])
+  @@index([sessionToken])
+  @@index([orderStatus])
+  @@index([createdAt(sort: Desc)])
+  @@map("guest_orders")
+}
+
+model GuestOrderItem {
+  id            String          @id @default(uuid())
+  guestOrderId  String          @map("guest_order_id")
+  productId     String          @map("product_id")
+  variantId     String?         @map("variant_id")
+  productName   String          @map("product_name")
+  productNameAr String?         @map("product_name_ar")
+  variantName   String?         @map("variant_name")
+  variantNameAr String?         @map("variant_name_ar")
+  quantity      Int
+  price         Float
+  createdAt     DateTime        @default(now()) @map("created_at")
+  guestOrder    GuestOrder      @relation(fields: [guestOrderId], references: [id], onDelete: Cascade)
+  product       Product         @relation(fields: [productId], references: [id])
+  variant       ProductVariant? @relation(fields: [variantId], references: [id])
+
+  @@index([guestOrderId])
+  @@index([productId])
+  @@map("guest_order_items")
 }

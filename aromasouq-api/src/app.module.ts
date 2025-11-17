@@ -19,10 +19,14 @@ import { UploadsModule } from './uploads/uploads.module';
 import { VendorModule } from './vendor/vendor.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { CheckoutModule } from './checkout/checkout.module';
-import { WalletModule } from './wallet/wallet.module';
+import { WalletModule} from './wallet/wallet.module';
+import { SessionModule } from './session/session.module';
+import { GuestCartModule } from './guest-cart/guest-cart.module';
+import { GuestOrdersModule } from './guest-orders/guest-orders.module';
 
 // Phase 5: File uploads & media management modules loaded
 // Phase 6: Wallet & Coins system integrated
+// Phase 7: Guest checkout system with session management
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,14 +34,17 @@ import { WalletModule } from './wallet/wallet.module';
       envFilePath: '.env',
     }),
     PrismaModule,
+    SessionModule, // Global session management for guests
     AuthModule,
     CategoriesModule,
     BrandsModule,
     ProductsModule,
     CartModule,
+    GuestCartModule, // Guest cart for unauthenticated users
     WishlistModule,
     WalletModule,
     OrdersModule,
+    GuestOrdersModule, // Guest orders for unauthenticated users
     ReviewsModule,
     AddressesModule,
     UsersModule,

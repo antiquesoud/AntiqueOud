@@ -96,6 +96,7 @@
       "giftSets": "Gift Sets",
       "about": "About",
       "contact": "Contact",
+      "trackOrder": "Track Order",
       "navigationMenu": "Navigation Menu"
     },
     "search": {
@@ -2123,6 +2124,41 @@
       "luxuryOudFragrances": "Luxury Oud Fragrances",
       "premiumOudDescription": "Discover our collection of premium oud fragrances.",
       "scents": "Scents"
+    }
+  },
+  "track": {
+    "title": "Track Your Order",
+    "subtitle": "Enter your order number and email to track your order",
+    "enterDetails": "Enter Order Details",
+    "orderNumber": "Order Number",
+    "orderNumberPlaceholder": "ORD-1234567890-ABCDEF",
+    "email": "Email Address",
+    "emailPlaceholder": "your@email.com",
+    "trackButton": "Track Order",
+    "searching": "Searching...",
+    "fillAllFields": "Please fill in all fields",
+    "orderFound": "Order found!",
+    "orderNotFound": "Order not found. Please check your order number and email.",
+    "orderDetails": "Order Details",
+    "orderNumberLabel": "Order Number",
+    "orderDate": "Order Date",
+    "trackingNumber": "Tracking Number",
+    "items": "Items",
+    "quantity": "Qty",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "discount": "Discount",
+    "total": "Total",
+    "shippingAddress": "Shipping Address",
+    "phone": "Phone",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
     }
   }
 }

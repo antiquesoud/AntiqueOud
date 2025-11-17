@@ -537,4 +537,81 @@ export class OrdersService {
       return cancelledOrder;
     });
   }
+
+  /**
+   * Track an order using order number and email/phone
+   * Works for both registered users and guests
+   */
+  async trackOrder(orderNumber: string, email: string) {
+    // First try to find a registered user order
+    const userOrder = await this.prisma.order.findFirst({
+      where: {
+        orderNumber,
+        user: {
+          email: {
+            equals: email,
+            mode: 'insensitive',
+          },
+        },
+      },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                nameAr: true,
+                images: true,
+              },
+            },
+          },
+        },
+        address: true,
+      },
+    });
+
+    if (userOrder) {
+      return {
+        type: 'user',
+        order: userOrder,
+      };
+    }
+
+    // If not found, try to find a guest order
+    const guestOrder = await this.prisma.guestOrder.findFirst({
+      where: {
+        orderNumber,
+        guestEmail: {
+          equals: email,
+          mode: 'insensitive',
+        },
+      },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                nameAr: true,
+                images: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (guestOrder) {
+      return {
+        type: 'guest',
+        order: guestOrder,
+      };
+    }
+
+    throw new NotFoundException(
+      'Order not found. Please check your order number and email address.',
+    );
+  }
 }

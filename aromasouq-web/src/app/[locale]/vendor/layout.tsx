@@ -49,7 +49,7 @@ export default function VendorLayout({
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 bg-deep-navy text-white flex flex-col fixed h-screen">
+      <aside className="w-64 bg-deep-navy text-white flex flex-col fixed h-screen overflow-y-auto">
         {/* Logo */}
         <div className="p-6">
           <Link href="/vendor" className="block">
@@ -118,7 +118,7 @@ export default function VendorLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-gray-50 ml-64">
+      <main className="flex-1 bg-gray-50 ml-64 min-h-screen">
         <div className="p-8">
           {children}
         </div>

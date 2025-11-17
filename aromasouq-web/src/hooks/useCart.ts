@@ -4,15 +4,17 @@ import { Cart } from '@/types'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/stores/authStore'
 
-// Hook for cart management
+// Hook for cart management (supports both authenticated and guest users)
 export function useCart() {
   const queryClient = useQueryClient()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
+  // Use different endpoints based on authentication status
+  const cartEndpoint = isAuthenticated ? '/cart' : '/guest-cart'
+
   const { data: cart, isLoading } = useQuery({
-    queryKey: ['cart'],
-    queryFn: () => apiClient.get<Cart>('/cart'),
-    enabled: isAuthenticated,
+    queryKey: ['cart', isAuthenticated ? 'user' : 'guest'],
+    queryFn: () => apiClient.get<Cart>(cartEndpoint),
     refetchOnWindowFocus: false,
     retry: false, // Don't retry on error to prevent multiple 401 redirects
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
@@ -20,7 +22,7 @@ export function useCart() {
 
   const addToCart = useMutation({
     mutationFn: (data: { productId: string; variantId?: string; quantity: number }) =>
-      apiClient.post<Cart>('/cart/items', data),
+      apiClient.post<Cart>(`${cartEndpoint}/items`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
       toast.success('Added to cart')
@@ -32,7 +34,7 @@ export function useCart() {
 
   const updateQuantity = useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
-      apiClient.patch<Cart>(`/cart/items/${itemId}`, { quantity }),
+      apiClient.patch<Cart>(`${cartEndpoint}/items/${itemId}`, { quantity }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
     },
@@ -40,7 +42,7 @@ export function useCart() {
 
   const updateCartItem = useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
-      apiClient.patch<Cart>(`/cart/items/${itemId}`, { quantity }),
+      apiClient.patch<Cart>(`${cartEndpoint}/items/${itemId}`, { quantity }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
       toast.success('Cart updated')
@@ -51,7 +53,7 @@ export function useCart() {
   })
 
   const removeFromCart = useMutation({
-    mutationFn: (itemId: string) => apiClient.delete(`/cart/items/${itemId}`),
+    mutationFn: (itemId: string) => apiClient.delete(`${cartEndpoint}/items/${itemId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
       toast.success('Removed from cart')
@@ -59,7 +61,7 @@ export function useCart() {
   })
 
   const clearCart = useMutation({
-    mutationFn: () => apiClient.delete('/cart'),
+    mutationFn: () => apiClient.delete(cartEndpoint),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
     },
@@ -69,6 +71,7 @@ export function useCart() {
     cart,
     isLoading,
     addToCart: addToCart.mutate,
+    addToCartAsync: addToCart.mutateAsync,
     updateQuantity: updateQuantity.mutate,
     updateCartItem: updateCartItem.mutate,
     removeFromCart: removeFromCart.mutate,

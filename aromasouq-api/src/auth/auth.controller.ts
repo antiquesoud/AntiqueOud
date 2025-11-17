@@ -23,28 +23,35 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(
     @Body() registerDto: RegisterDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.authService.register(registerDto);
+    const result = await this.authService.register(registerDto, req.cookies);
 
     // Set httpOnly cookie
     const isProduction = process.env.NODE_ENV === 'production';
     const frontendUrl = process.env.FRONTEND_URL || '';
     const isLocalhostFrontend = frontendUrl.includes('localhost');
 
-    // For cross-origin localhost development (localhost → Railway), use None without Secure
-    // For production HTTPS, use None with Secure
+    // Localhost development: use 'lax' (both frontend and backend are on localhost, same-site)
+    // Production: use 'none' with secure for cross-origin support
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
-      secure: isProduction && !isLocalhostFrontend,
-      sameSite: 'none',
+      secure: isProduction,
+      sameSite: isLocalhostFrontend ? 'lax' : 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
+
+    // Clear guest session cookie if it exists
+    if (req.cookies?.guest_session) {
+      res.clearCookie('guest_session');
+    }
 
     // Return user data without token
     return {
       message: 'Registration successful',
       user: result.user,
+      cartMerged: result.cartMerged || false,
     };
   }
 
@@ -52,37 +59,52 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() loginDto: LoginDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.authService.login(loginDto);
+    const result = await this.authService.login(loginDto, req.cookies);
 
     // Set httpOnly cookie
     const isProduction = process.env.NODE_ENV === 'production';
     const frontendUrl = process.env.FRONTEND_URL || '';
     const isLocalhostFrontend = frontendUrl.includes('localhost');
 
-    // For cross-origin localhost development (localhost → Railway), use None without Secure
-    // For production HTTPS, use None with Secure
+    // Localhost development: use 'lax' (both frontend and backend are on localhost, same-site)
+    // Production: use 'none' with secure for cross-origin support
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
-      secure: isProduction && !isLocalhostFrontend,
-      sameSite: 'none',
+      secure: isProduction,
+      sameSite: isLocalhostFrontend ? 'lax' : 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
+
+    // Clear guest session cookie if it exists
+    if (req.cookies?.guest_session) {
+      res.clearCookie('guest_session');
+    }
 
     // Return user data without token
     return {
       message: 'Login successful',
       user: result.user,
+      cartMerged: result.cartMerged || false,
     };
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   async logout(@Res({ passthrough: true }) res: Response) {
-    // Clear the cookie
-    res.clearCookie('access_token');
+    const isProduction = process.env.NODE_ENV === 'production';
+    const frontendUrl = process.env.FRONTEND_URL || '';
+    const isLocalhostFrontend = frontendUrl.includes('localhost');
+
+    // Clear the cookie with same settings as when it was set
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isLocalhostFrontend ? 'lax' : 'none',
+      path: '/',
+    });
 
     return {
       message: 'Logout successful',

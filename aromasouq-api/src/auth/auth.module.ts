@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaService } from '../prisma/prisma.service';
+import { GuestCartModule } from '../guest-cart/guest-cart.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PrismaService } from '../prisma/prisma.service';
         },
       }),
     }),
+    GuestCartModule, // Import to access GuestCartService
   ],
   providers: [AuthService, JwtStrategy, PrismaService],
   controllers: [AuthController],

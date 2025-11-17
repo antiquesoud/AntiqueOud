@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { Heart, Minus, Plus, Share2, Package, Truck, CheckCircle, RotateCcw, Lock, Coins } from "lucide-react"
 import { Lens } from "@/components/aceternity/lens"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ import { ProductImagePlaceholder } from "@/components/ui/product-image-placehold
 import { ProductCard } from "@/components/ui/product-card"
 import { useProduct } from "@/hooks/useProducts"
 import { useCart } from "@/hooks/useCart"
+import { useAuth } from "@/hooks/useAuth"
 import { useWishlist } from "@/hooks/useWishlist"
 import { useWallet } from "@/hooks/useWallet"
 import { formatCurrency, calculateDiscount } from "@/lib/utils"
@@ -27,10 +28,12 @@ import { useTranslations } from "next-intl"
 
 export default function ProductDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const t = useTranslations('productDetail')
   const tProducts = useTranslations('products')
   const { data: product, isLoading } = useProduct(params.slug as string)
-  const { addToCart } = useCart()
+  const { addToCart, addToCartAsync } = useCart()
+  const { isAuthenticated } = useAuth()
   const { toggleWishlist, isWishlisted } = useWishlist()
   const { wallet } = useWallet()
   const { data: reviewStats } = useReviewStats(product?.id || '')
@@ -41,12 +44,24 @@ export default function ProductDetailPage() {
   const [relatedProducts, setRelatedProducts] = useState<any[]>([])
   const [coinsToUse, setCoinsToUse] = useState(0)
 
+  // Handle Buy Now - Add to cart and redirect to checkout
+  const handleBuyNow = async () => {
+    try {
+      await addToCartAsync({ productId: product.id, variantId: selectedVariant || undefined, quantity })
+      // Route to appropriate checkout page based on auth status
+      router.push(isAuthenticated ? '/checkout' : '/guest-checkout')
+    } catch (error) {
+      // Error is already handled by the mutation's onError callback
+      console.error('Failed to add to cart:', error)
+    }
+  }
+
   // Fetch best sellers for "You may also like" section
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
         const response = await apiClient.get('/products/featured')
-        setRelatedProducts(response.slice(0, 6)) // Get 6 best sellers
+        setRelatedProducts(Array.isArray(response) ? response.slice(0, 6) : []) // Get 6 best sellers
       } catch (error) {
         console.error('Failed to fetch related products:', error)
       }
@@ -383,6 +398,8 @@ export default function ProductDetailPage() {
               <Button
                 variant="outline"
                 className="flex-1 h-12 sm:h-16 border-2 border-amber-500 text-gray-800 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white font-black text-base sm:text-lg transition-all rounded-lg sm:rounded-xl hover:shadow-2xl hover:scale-105"
+                onClick={handleBuyNow}
+                disabled={product.stockQuantity === 0}
               >
                 ⚡ {tProducts('buyNow')}
               </Button>

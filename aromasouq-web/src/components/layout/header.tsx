@@ -44,6 +44,7 @@ export function Header() {
         <div className="container mx-auto px-4 py-2.5 flex justify-between items-center text-xs md:text-sm">
           <p className="font-semibold">⚡ Free shipping on orders over 300 AED</p>
           <div className="hidden md:flex gap-4 font-medium">
+            <Link href="/track-order" className="hover:text-[#ECDBC7] transition-colors">{tNav('trackOrder')}</Link>
             <Link href="/about" className="hover:text-[#ECDBC7] transition-colors">{tNav('about')}</Link>
             <Link href="/contact" className="hover:text-[#ECDBC7] transition-colors">{tNav('contact')}</Link>
           </div>
@@ -65,6 +66,17 @@ export function Header() {
               <SheetContent side={isRTL ? "right" : "left"} className="w-[280px]">
                 <SheetTitle className="sr-only">{tNav('navigationMenu')}</SheetTitle>
                 <nav className="flex flex-col gap-4 mt-8">
+                  <Link
+                    href="/track-order"
+                    className={cn(
+                      "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
+                      pathname === '/track-order'
+                        ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
+                        : "hover:bg-gray-50"
+                    )}
+                  >
+                    {tNav('trackOrder')}
+                  </Link>
                   <Link
                     href="/products"
                     className={cn(

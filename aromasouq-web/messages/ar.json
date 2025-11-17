@@ -96,6 +96,7 @@
       "giftSets": "مجموعات هدايا",
       "about": "من نحن",
       "contact": "اتصل بنا",
+      "trackOrder": "تتبع الطلب",
       "navigationMenu": "قائمة التنقل"
     },
     "search": {
@@ -1844,6 +1845,41 @@
       "profileUpdated": "تم تحديث الملف الشخصي بنجاح!",
       "failedToUpdate": "فشل تحديث الملف الشخصي",
       "loading": "جارٍ التحميل..."
+    }
+  },
+  "track": {
+    "title": "تتبع طلبك",
+    "subtitle": "أدخل رقم الطلب والبريد الإلكتروني لتتبع طلبك",
+    "enterDetails": "أدخل تفاصيل الطلب",
+    "orderNumber": "رقم الطلب",
+    "orderNumberPlaceholder": "ORD-1234567890-ABCDEF",
+    "email": "عنوان البريد الإلكتروني",
+    "emailPlaceholder": "your@email.com",
+    "trackButton": "تتبع الطلب",
+    "searching": "جارٍ البحث...",
+    "fillAllFields": "يرجى ملء جميع الحقول",
+    "orderFound": "تم العثور على الطلب!",
+    "orderNotFound": "لم يتم العثور على الطلب. يرجى التحقق من رقم الطلب والبريد الإلكتروني.",
+    "orderDetails": "تفاصيل الطلب",
+    "orderNumberLabel": "رقم الطلب",
+    "orderDate": "تاريخ الطلب",
+    "trackingNumber": "رقم التتبع",
+    "items": "المنتجات",
+    "quantity": "الكمية",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "tax": "الضريبة",
+    "discount": "الخصم",
+    "total": "المجموع",
+    "shippingAddress": "عنوان الشحن",
+    "phone": "الهاتف",
+    "status": {
+      "pending": "قيد الانتظار",
+      "confirmed": "مؤكد",
+      "processing": "قيد المعالجة",
+      "shipped": "تم الشحن",
+      "delivered": "تم التوصيل",
+      "cancelled": "ملغى"
     }
   }
 }

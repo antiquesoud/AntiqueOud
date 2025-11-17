@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { ProductImagePlaceholder } from "@/components/ui/product-image-placeholder"
 import { useCart } from "@/hooks/useCart"
+import { useAuth } from "@/hooks/useAuth"
 import { formatCurrency } from "@/lib/utils"
 import toast from "react-hot-toast"
 import { useMutation } from "@tanstack/react-query"
@@ -23,6 +24,7 @@ export default function CartPage() {
   const t = useTranslations('cart')
   const tProducts = useTranslations('products')
   const { cart, updateCartItem, removeFromCart, isLoading } = useCart()
+  const { isAuthenticated } = useAuth()
   const [promoCode, setPromoCode] = useState("")
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
   const [couponError, setCouponError] = useState("")
@@ -72,7 +74,8 @@ export default function CartPage() {
     if (appliedCoupon) {
       sessionStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon))
     }
-    router.push('/checkout')
+    // Route to appropriate checkout page based on auth status
+    router.push(isAuthenticated ? '/checkout' : '/guest-checkout')
   }
 
   // Calculate totals with discount

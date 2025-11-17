@@ -2,6 +2,7 @@ import { Injectable, ConflictException, UnauthorizedException, ForbiddenExceptio
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { GuestCartService } from '../guest-cart/guest-cart.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { isVendorRegistrationEnabled } from '../config/features.config';
@@ -11,9 +12,10 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private guestCartService: GuestCartService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto, cookies?: any) {
     const { email, password, firstName, lastName, phone, role } = registerDto;
 
     // Block vendor registration in single-vendor mode
@@ -67,6 +69,21 @@ export class AuthService {
       },
     });
 
+    // Merge guest cart if session exists
+    let cartMerged = false;
+    if (cookies?.guest_session) {
+      try {
+        const mergeResult = await this.guestCartService.mergeIntoUserCart(
+          cookies.guest_session,
+          user.id,
+        );
+        cartMerged = (mergeResult?.itemsMerged || 0) > 0;
+      } catch (error) {
+        // Log error but don't fail registration
+        console.error('Failed to merge guest cart:', error);
+      }
+    }
+
     // Generate JWT token
     const access_token = this.jwtService.sign({
       sub: user.id,
@@ -77,10 +94,11 @@ export class AuthService {
     return {
       access_token,
       user,
+      cartMerged,
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, cookies?: any) {
     const { email, password } = loginDto;
 
     // Find user
@@ -104,6 +122,21 @@ export class AuthService {
       throw new UnauthorizedException('Account is not active');
     }
 
+    // Merge guest cart if session exists
+    let cartMerged = false;
+    if (cookies?.guest_session) {
+      try {
+        const mergeResult = await this.guestCartService.mergeIntoUserCart(
+          cookies.guest_session,
+          user.id,
+        );
+        cartMerged = (mergeResult?.itemsMerged || 0) > 0;
+      } catch (error) {
+        // Log error but don't fail login
+        console.error('Failed to merge guest cart:', error);
+      }
+    }
+
     // Generate JWT token
     const access_token = this.jwtService.sign({
       sub: user.id,
@@ -117,6 +150,7 @@ export class AuthService {
     return {
       access_token,
       user: userWithoutPassword,
+      cartMerged,
     };
   }
 
