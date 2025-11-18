@@ -9,11 +9,19 @@ export class CreateVariantDto {
   nameAr?: string;
 
   @IsString()
+  size: string;
+
+  @IsString()
   sku: string;
 
   @IsNumber()
   @Min(0)
   price: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  salePrice?: number;
 
   @IsNumber()
   @Min(0)

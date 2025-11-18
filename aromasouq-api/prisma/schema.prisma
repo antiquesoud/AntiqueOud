@@ -164,39 +164,42 @@ model Product {
   region          String?          @map("region")
   saleEndDate     DateTime?        @map("sale_end_date")
   salePrice       Float?           @map("sale_price")
-  cartItems        CartItem[]
-  orderItems       OrderItem[]
-  variants         ProductVariant[]
-  videos           ProductVideo[]
-  guestCartItems   GuestCartItem[]
-  guestOrderItems  GuestOrderItem[]
-  brand            Brand?           @relation(fields: [brandId], references: [id])
-  category         Category         @relation(fields: [categoryId], references: [id])
-  vendor           Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  reviews          Review[]
-  wishlistItems    WishlistItem[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  variants        ProductVariant[]
+  videos          ProductVideo[]
+  guestCartItems  GuestCartItem[]
+  guestOrderItems GuestOrderItem[]
+  brand           Brand?           @relation(fields: [brandId], references: [id])
+  category        Category         @relation(fields: [categoryId], references: [id])
+  vendor          Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  reviews         Review[]
+  wishlistItems   WishlistItem[]
 
   @@map("products")
 }
 
 model ProductVariant {
-  id             String     @id @default(uuid())
-  productId      String     @map("product_id")
-  name           String
-  nameAr         String?    @map("name_ar")
-  sku            String     @unique
-  price          Float
-  stock          Int        @default(0)
-  image          String?
-  compareAtPrice Float?     @map("compare_at_price")
-  isActive       Boolean    @default(true) @map("is_active")
-  sortOrder      Int        @default(0) @map("sort_order")
-  createdAt        DateTime        @default(now()) @map("created_at")
-  updatedAt        DateTime        @updatedAt @map("updated_at")
-  cartItems        CartItem[]
-  guestCartItems   GuestCartItem[]
-  guestOrderItems  GuestOrderItem[]
-  product          Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id              String           @id @default(uuid())
+  productId       String           @map("product_id")
+  name            String
+  nameAr          String?          @map("name_ar")
+  size            String
+  sku             String           @unique
+  price           Float
+  salePrice       Float?           @map("sale_price")
+  stock           Int              @default(0)
+  image           String?
+  compareAtPrice  Float?           @map("compare_at_price")
+  isActive        Boolean          @default(true) @map("is_active")
+  sortOrder       Int              @default(0) @map("sort_order")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  cartItems       CartItem[]
+  guestCartItems  GuestCartItem[]
+  guestOrderItems GuestOrderItem[]
+  product         Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  OrderItem       OrderItem[]
 
   @@map("product_variants")
 }
@@ -307,14 +310,16 @@ model Order {
 }
 
 model OrderItem {
-  id        String   @id @default(uuid())
-  orderId   String   @map("order_id")
-  productId String   @map("product_id")
+  id        String          @id @default(uuid())
+  orderId   String          @map("order_id")
+  productId String          @map("product_id")
+  variantId String?         @map("variant_id")
   quantity  Int
   price     Float
-  createdAt DateTime @default(now()) @map("created_at")
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime        @default(now()) @map("created_at")
+  order     Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id])
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
 
   @@map("order_items")
 }

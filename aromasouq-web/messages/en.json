@@ -147,7 +147,9 @@
     "shareProduct": "Share Product",
     "youllEarn": "You'll earn",
     "coins": "coins",
-    "soldByVendor": "Sold by"
+    "soldByVendor": "Sold by",
+    "selectSize": "Select Size",
+    "selected": "Selected"
   },
   "productDetail": {
     "loading": "Loading product...",
@@ -915,7 +917,39 @@
       "deleteConfirmMessage": "This action cannot be undone. This will permanently delete the product and all associated data.",
       "cancel": "Cancel",
       "productDeleted": "Product deleted successfully",
-      "failedToDelete": "Failed to delete product"
+      "failedToDelete": "Failed to delete product",
+      "variants": {
+        "title": "Product Variants",
+        "description": "Manage different sizes and configurations",
+        "addVariant": "Add Variant",
+        "editVariant": "Edit Variant",
+        "loadPresets": "Load Standard Sizes",
+        "loadingPresets": "Loading...",
+        "noVariants": "No variants added yet",
+        "noVariantsHint": "Click 'Add Variant' or 'Load Standard Sizes' to get started",
+        "variantFormDescription": "Enter the details for this product variant",
+        "nameLabel": "Name (English)",
+        "nameArLabel": "Name (Arabic)",
+        "sizeLabel": "Size",
+        "skuLabel": "SKU",
+        "priceLabel": "Price (AED)",
+        "salePriceLabel": "Sale Price (AED)",
+        "compareAtPriceLabel": "Compare at Price (AED)",
+        "stockLabel": "Stock Quantity",
+        "cancel": "Cancel",
+        "updateVariant": "Update Variant",
+        "duplicateSku": "This SKU is already in use",
+        "size": "Size",
+        "name": "Name",
+        "sku": "SKU",
+        "price": "Price",
+        "stock": "Stock",
+        "status": "Status",
+        "actions": "Actions",
+        "units": "units",
+        "active": "Active",
+        "inactive": "Inactive"
+      }
     },
     "newProduct": {
       "title": "Add New Product",

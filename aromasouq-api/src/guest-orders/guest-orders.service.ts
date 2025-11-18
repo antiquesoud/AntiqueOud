@@ -71,11 +71,11 @@ export class GuestOrdersService {
           guestPhone,
           shippingAddress: shippingAddress as any, // Type cast for JSON field
           paymentMethod,
-          subtotal: cart.subtotal,
-          tax: cart.tax,
-          shippingFee: cart.shippingFee,
+          subtotal: cart.summary.subtotal,
+          tax: cart.summary.tax,
+          shippingFee: cart.summary.shipping,
           discount: 0, // Guest orders don't support coupons for now
-          total: cart.total,
+          total: cart.summary.total,
           orderStatus: 'PENDING',
           paymentStatus: 'PENDING',
           items: {

@@ -205,6 +205,12 @@ export class ProductsController {
   // PRODUCT VARIANTS
   // ============================================================================
 
+  // Get variant presets for a product type (public endpoint)
+  @Get('variant-presets/:productType')
+  getVariantPresets(@Param('productType') productType: string) {
+    return this.productsService.getVariantPresets(productType);
+  }
+
   @Post(':id/variants')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.VENDOR)

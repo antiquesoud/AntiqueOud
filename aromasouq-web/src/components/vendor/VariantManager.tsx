@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   useProductVariants,
   useCreateVariant,
@@ -24,6 +24,7 @@ export function VariantManager({ productId }: VariantManagerProps) {
 
   const [showForm, setShowForm] = useState(false);
   const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
+  const [productSku, setProductSku] = useState<string>('');
 
   const [formData, setFormData] = useState<CreateVariantDto>({
     name: '',
@@ -37,12 +38,44 @@ export function VariantManager({ productId }: VariantManagerProps) {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Fetch product SKU to auto-generate variant SKUs
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const product = await response.json();
+          setProductSku(product.sku || '');
+        }
+      } catch (error) {
+        console.error('Failed to fetch product SKU:', error);
+      }
+    };
+    fetchProduct();
+  }, [productId]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'number' ? parseFloat(value) || 0 : value,
-    }));
+
+    const newValue = type === 'number' ? parseFloat(value) || 0 : value;
+
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: newValue,
+      };
+
+      // Auto-generate SKU when variant name changes (only for new variants)
+      if (name === 'name' && !editingVariant && productSku && value) {
+        // Create SKU suffix from variant name (e.g., "50ml" -> "50ML")
+        const suffix = value.trim().toUpperCase().replace(/\s+/g, '-').substring(0, 20);
+        updated.sku = `${productSku}-${suffix}`;
+      }
+
+      return updated;
+    });
 
     // Clear error for this field
     if (errors[name]) {
@@ -254,11 +287,16 @@ export function VariantManager({ productId }: VariantManagerProps) {
                     className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
                       errors.sku ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    placeholder="e.g., PROD-50ML"
+                    placeholder={productSku ? `${productSku}-50ML` : "e.g., PROD-50ML"}
                   />
                 </div>
                 {errors.sku && (
                   <p className="mt-1 text-sm text-red-600">{errors.sku}</p>
+                )}
+                {!editingVariant && productSku && (
+                  <p className="mt-1 text-xs text-blue-600">
+                    ✓ Auto-generated from variant name. Product SKU: {productSku}
+                  </p>
                 )}
               </div>
 

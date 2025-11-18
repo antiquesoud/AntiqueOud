@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Plus, Search, MoreVertical, Edit, Trash2, Eye } from "lucide-react"
 import { useTranslations } from 'next-intl'
@@ -40,13 +40,22 @@ export default function VendorProductsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null)
+  const [expandedProducts, setExpandedProducts] = useState<string[]>([])
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['vendor-products', searchQuery, statusFilter],
-    queryFn: () => apiClient.get<{ data: any[] }>('/vendor/products', {
-      search: searchQuery,
-      status: statusFilter !== 'all' ? statusFilter : undefined,
-    }),
+    queryFn: async () => {
+      const result = await apiClient.get<{ data: any[] }>('/vendor/products', {
+        search: searchQuery,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+      })
+      console.log('Vendor products:', result)
+      if (result.data && result.data.length > 0) {
+        console.log('First product:', result.data[0])
+        console.log('First product variants:', result.data[0].variants)
+      }
+      return result
+    },
   })
 
   const deleteMutation = useMutation({
@@ -60,6 +69,14 @@ export default function VendorProductsPage() {
       toast.error(t('failedToDelete'))
     },
   })
+
+  const toggleVariantsExpanded = (productId: string) => {
+    setExpandedProducts(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -139,46 +156,63 @@ export default function VendorProductsPage() {
               </TableRow>
             ) : (
               products?.data?.map((product: any) => (
-                <TableRow key={product.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                        {getFirstProductImage(product) ? (
-                          <Image
-                            src={getFirstProductImage(product)!}
-                            alt={product.name || product.nameEn || 'Product image'}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <ProductImagePlaceholder className="w-full h-full" size="sm" />
-                        )}
+                <React.Fragment key={product.id}>
+                  <TableRow>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+                          {getFirstProductImage(product) ? (
+                            <Image
+                              src={getFirstProductImage(product)!}
+                              alt={product.name || product.nameEn || 'Product image'}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <ProductImagePlaceholder className="w-full h-full" size="sm" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">{product.nameEn}</p>
+                          <p className="text-sm text-muted-foreground">{product.category?.nameEn}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{product.nameEn}</p>
-                        <p className="text-sm text-muted-foreground">{product.category?.nameEn}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">{product.sku}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-semibold">{formatCurrency(product.price || 0)}</p>
-                      {product.compareAtPrice && product.compareAtPrice > product.price && (
-                        <p className="text-xs text-muted-foreground line-through">
-                          {formatCurrency(product.compareAtPrice)}
-                        </p>
+                    </TableCell>
+                    <TableCell className="font-mono text-sm">{product.sku}</TableCell>
+                    <TableCell>
+                      {product.variants && product.variants.length > 0 ? (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">
+                            {product.variants.length} Variants
+                          </p>
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="h-auto p-0 text-xs"
+                            onClick={() => toggleVariantsExpanded(product.id)}
+                          >
+                            {expandedProducts.includes(product.id) ? 'Hide' : 'Show'} Details
+                          </Button>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="font-semibold">{formatCurrency(product.price || 0)}</p>
+                          {product.compareAtPrice && product.compareAtPrice > product.price && (
+                            <p className="text-xs text-muted-foreground line-through">
+                              {formatCurrency(product.compareAtPrice)}
+                            </p>
+                          )}
+                        </div>
                       )}
-                    </div>
-                  </TableCell>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={product.stock < 10 ? 'destructive' : 'secondary'}>
+                        {product.stock}
+                      </Badge>
+                    </TableCell>
                   <TableCell>
-                    <Badge variant={product.stockQuantity < 10 ? 'destructive' : 'secondary'}>
-                      {product.stockQuantity}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
-                      {product.status}
+                    <Badge variant={product.isActive ? 'default' : 'secondary'}>
+                      {product.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </TableCell>
                   <TableCell>{product.salesCount || 0}</TableCell>
@@ -213,6 +247,50 @@ export default function VendorProductsPage() {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
+
+                {/* Variant rows (expandable) */}
+                {expandedProducts.includes(product.id) && product.variants?.map((variant: any) => (
+                  <TableRow key={variant.id} className="bg-muted/30">
+                    <TableCell className="pl-16">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {variant.size}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">{variant.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-muted-foreground">{variant.sku}</TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-semibold text-sm">{formatCurrency(variant.price)}</p>
+                        {variant.salePrice && (
+                          <p className="text-xs text-green-600">
+                            Sale: {formatCurrency(variant.salePrice)}
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={variant.stock < 10 ? 'destructive' : 'secondary'} className="text-xs">
+                        {variant.stock}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="text-xs">
+                        {variant.isActive ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">-</span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm" className="h-8 text-xs">
+                        Edit Variant
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </React.Fragment>
               ))
             )}
           </TableBody>

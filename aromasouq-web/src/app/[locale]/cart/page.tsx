@@ -196,9 +196,11 @@ export default function CartPage() {
                         </Link>
 
                         {item.variant && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {tProducts('size')}: {item.variant.name}
-                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-medium">
+                              {item.variant.name}
+                            </span>
+                          </div>
                         )}
 
                         <div className="flex items-baseline gap-2 mt-2">
@@ -211,11 +213,14 @@ export default function CartPage() {
                         </div>
 
                         {/* Stock Warning */}
-                        {(item.product?.stockQuantity || 0) < 5 && (item.product?.stockQuantity || 0) > 0 && (
-                          <p className="text-xs text-[#B3967D]/600 mt-1">
-                            {t('onlyLeftInStock', { count: item.product?.stockQuantity || 0 })}
-                          </p>
-                        )}
+                        {(() => {
+                          const stock = item.variant?.stock ?? item.product?.stockQuantity ?? 0
+                          return stock < 5 && stock > 0 && (
+                            <p className="text-xs text-[#B3967D]/600 mt-1">
+                              {t('onlyLeftInStock', { count: stock })}
+                            </p>
+                          )
+                        })()}
                       </div>
 
                       {/* Quantity Controls */}

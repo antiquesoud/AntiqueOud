@@ -147,7 +147,9 @@
     "shareProduct": "مشاركة المنتج",
     "youllEarn": "ستربح",
     "coins": "نقاط",
-    "soldByVendor": "يباع بواسطة"
+    "soldByVendor": "يباع بواسطة",
+    "selectSize": "اختر الحجم",
+    "selected": "المحدد"
   },
   "productDetail": {
     "loading": "جارٍ تحميل المنتج...",
@@ -1630,7 +1632,39 @@
       "deleteConfirmMessage": "لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف المنتج بشكل دائم وجميع البيانات المرتبطة به.",
       "cancel": "إلغاء",
       "productDeleted": "تم حذف المنتج بنجاح",
-      "failedToDelete": "فشل حذف المنتج"
+      "failedToDelete": "فشل حذف المنتج",
+      "variants": {
+        "title": "أنواع المنتج",
+        "description": "إدارة الأحجام والتكوينات المختلفة",
+        "addVariant": "إضافة نوع",
+        "editVariant": "تعديل النوع",
+        "loadPresets": "تحميل الأحجام القياسية",
+        "loadingPresets": "جارٍ التحميل...",
+        "noVariants": "لم تتم إضافة أي أنواع بعد",
+        "noVariantsHint": "انقر على 'إضافة نوع' أو 'تحميل الأحجام القياسية' للبدء",
+        "variantFormDescription": "أدخل تفاصيل هذا النوع من المنتج",
+        "nameLabel": "الاسم (بالإنجليزية)",
+        "nameArLabel": "الاسم (بالعربية)",
+        "sizeLabel": "الحجم",
+        "skuLabel": "رمز المنتج",
+        "priceLabel": "السعر (درهم)",
+        "salePriceLabel": "سعر التخفيض (درهم)",
+        "compareAtPriceLabel": "السعر المقارن (درهم)",
+        "stockLabel": "كمية المخزون",
+        "cancel": "إلغاء",
+        "updateVariant": "تحديث النوع",
+        "duplicateSku": "رمز المنتج هذا مستخدم بالفعل",
+        "size": "الحجم",
+        "name": "الاسم",
+        "sku": "رمز المنتج",
+        "price": "السعر",
+        "stock": "المخزون",
+        "status": "الحالة",
+        "actions": "الإجراءات",
+        "units": "وحدات",
+        "active": "نشط",
+        "inactive": "غير نشط"
+      }
     },
     "orders": {
       "title": "الطلبات",

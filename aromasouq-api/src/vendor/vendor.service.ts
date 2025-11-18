@@ -470,6 +470,22 @@ export class VendorService {
               nameAr: true,
             },
           },
+          variants: {
+            where: { isActive: true },
+            select: {
+              id: true,
+              name: true,
+              nameAr: true,
+              size: true,
+              sku: true,
+              price: true,
+              salePrice: true,
+              stock: true,
+              isActive: true,
+              sortOrder: true,
+            },
+            orderBy: { sortOrder: 'asc' },
+          },
         },
         skip,
         take: limit,
@@ -696,7 +712,19 @@ export class VendorService {
                 select: {
                   id: true,
                   name: true,
+                  nameAr: true,
+                  slug: true,
                   images: true,
+                },
+              },
+              variant: {
+                select: {
+                  id: true,
+                  name: true,
+                  nameAr: true,
+                  size: true,
+                  sku: true,
+                  price: true,
                 },
               },
             },
@@ -723,7 +751,19 @@ export class VendorService {
                 select: {
                   id: true,
                   name: true,
+                  nameAr: true,
+                  slug: true,
                   images: true,
+                },
+              },
+              variant: {
+                select: {
+                  id: true,
+                  name: true,
+                  nameAr: true,
+                  size: true,
+                  sku: true,
+                  price: true,
                 },
               },
             },
@@ -740,6 +780,10 @@ export class VendorService {
     // Use whichever order was found
     const order = userOrder || guestOrder;
     const isGuestOrder = !!guestOrder;
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
 
     if (order.items.length === 0) {
       throw new ForbiddenException(

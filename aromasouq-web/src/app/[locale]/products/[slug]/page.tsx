@@ -25,6 +25,7 @@ import { useReviewStats } from "@/hooks/useReviews"
 import { apiClient } from "@/lib/api-client"
 import { Link } from "@/i18n/navigation"
 import { useTranslations } from "next-intl"
+import { VariantSelector } from "@/components/product/VariantSelector"
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -40,12 +41,22 @@ export default function ProductDetailPage() {
 
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null)
+  const [selectedVariantData, setSelectedVariantData] = useState<any>(null)
   const [quantity, setQuantity] = useState(1)
   const [relatedProducts, setRelatedProducts] = useState<any[]>([])
   const [coinsToUse, setCoinsToUse] = useState(0)
 
+  // Handler for variant selection
+  const handleVariantChange = (variantId: string | null, variantData: any) => {
+    setSelectedVariant(variantId)
+    setSelectedVariantData(variantData)
+    // Reset quantity when variant changes
+    setQuantity(1)
+  }
+
   // Handle Buy Now - Add to cart and redirect to checkout
   const handleBuyNow = async () => {
+    if (!product) return
     try {
       await addToCartAsync({ productId: product.id, variantId: selectedVariant || undefined, quantity })
       // Route to appropriate checkout page based on auth status
@@ -77,9 +88,13 @@ export default function ProductDetailPage() {
     )
   }
 
-  const discount = product.salePrice ? calculateDiscount(product.regularPrice, product.salePrice) : 0
-  const currentPrice = product.salePrice || product.regularPrice
-  const savings = product.salePrice ? product.regularPrice - product.salePrice : 0
+  // Use variant price and stock if a variant is selected, otherwise use product price and stock
+  const basePrice = selectedVariantData?.price ?? product.regularPrice
+  const salePrice = selectedVariantData?.salePrice ?? product.salePrice // Use variant sale price if available
+  const discount = salePrice ? calculateDiscount(basePrice, salePrice) : 0
+  const currentPrice = salePrice || basePrice
+  const savings = salePrice ? basePrice - salePrice : 0
+  const currentStock = selectedVariantData?.stock ?? product.stockQuantity
   const currentImageUrl = getProductImageUrl(product, selectedImage)
   const productHasImages = hasProductImages(product)
 
@@ -253,8 +268,15 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Size Display */}
-            {product.size && (
+            {/* Variant Selector */}
+            <VariantSelector
+              productId={product.id}
+              selectedVariantId={selectedVariant}
+              onVariantChange={handleVariantChange}
+            />
+
+            {/* Size Display - Only show if no variants and product has size */}
+            {product.size && !selectedVariantData && (
               <div className="mb-4 sm:mb-6">
                 <span className="text-xs sm:text-sm font-black text-gray-700 block mb-2 sm:mb-3">📦 {tProducts('size')}</span>
                 <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all border-2 border-amber-400/30">
@@ -284,14 +306,14 @@ export default function ProductDetailPage() {
                     size="icon"
                     className="h-10 w-10 sm:h-12 sm:w-12 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white transition-all rounded-r-lg sm:rounded-r-xl"
                     onClick={() => setQuantity(quantity + 1)}
-                    disabled={quantity >= product.stockQuantity}
+                    disabled={quantity >= currentStock}
                   >
                     <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 </div>
                 <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-green-100 to-emerald-100 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full border-2 border-green-200 shadow-md">
                   <span className="text-xs sm:text-sm text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-emerald-700 font-black whitespace-nowrap">
-                    ✅ {product.stockQuantity} {t('stockInStock')}
+                    ✅ {currentStock} {t('stockInStock')}
                   </span>
                 </div>
               </div>
@@ -391,15 +413,15 @@ export default function ProductDetailPage() {
               <Button
                 className="flex-1 h-12 sm:h-16 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 hover:shadow-2xl hover:scale-105 transition-all text-white font-black text-base sm:text-lg rounded-lg sm:rounded-xl border-2 border-amber-400/30"
                 onClick={() => addToCart({ productId: product.id, variantId: selectedVariant || undefined, quantity })}
-                disabled={product.stockQuantity === 0}
+                disabled={currentStock === 0}
               >
-                {product.stockQuantity === 0 ? `❌ ${tProducts('outOfStock')}` : `🛒 ${tProducts('addToCart')}`}
+                {currentStock === 0 ? `❌ ${tProducts('outOfStock')}` : `🛒 ${tProducts('addToCart')}`}
               </Button>
               <Button
                 variant="outline"
                 className="flex-1 h-12 sm:h-16 border-2 border-amber-500 text-gray-800 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white font-black text-base sm:text-lg transition-all rounded-lg sm:rounded-xl hover:shadow-2xl hover:scale-105"
                 onClick={handleBuyNow}
-                disabled={product.stockQuantity === 0}
+                disabled={currentStock === 0}
               >
                 ⚡ {tProducts('buyNow')}
               </Button>
@@ -508,10 +530,10 @@ export default function ProductDetailPage() {
                   <span className="text-gray-700 text-sm">{product.brand.nameEn}</span>
                 </div>
               )}
-              {product.sku && (
+              {(product.sku || selectedVariantData?.sku) && (
                 <div className="flex py-3 border-b border-gray-200">
                   <span className="w-36 font-semibold text-charcoal text-sm">{t('specs.sku')}:</span>
-                  <span className="text-gray-700 text-sm">{product.sku}</span>
+                  <span className="text-gray-700 text-sm">{selectedVariantData?.sku || product.sku}</span>
                 </div>
               )}
               {product.gender && (
@@ -547,7 +569,7 @@ export default function ProductDetailPage() {
               <div className="flex py-3 border-b border-gray-200">
                 <span className="w-36 font-semibold text-charcoal text-sm">{t('specs.stockStatus')}:</span>
                 <span className="text-gray-700 text-sm">
-                  {product.stockQuantity > 0 ? t('specs.inStockUnits', { count: product.stockQuantity }) : t('specs.outOfStock')}
+                  {currentStock > 0 ? t('specs.inStockUnits', { count: currentStock }) : t('specs.outOfStock')}
                 </span>
               </div>
               {product.concentration && (
@@ -556,10 +578,10 @@ export default function ProductDetailPage() {
                   <span className="text-gray-700 text-sm">{product.concentration}</span>
                 </div>
               )}
-              {product.size && (
+              {(product.size || selectedVariantData?.size) && (
                 <div className="flex py-3 border-b border-gray-200">
                   <span className="w-36 font-semibold text-charcoal text-sm">{t('specs.size')}:</span>
-                  <span className="text-gray-700 text-sm">{product.size}</span>
+                  <span className="text-gray-700 text-sm">{selectedVariantData?.size || product.size}</span>
                 </div>
               )}
             </div>

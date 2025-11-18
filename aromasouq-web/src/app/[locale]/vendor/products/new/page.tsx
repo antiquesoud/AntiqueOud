@@ -14,12 +14,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
 import { apiClient } from "@/lib/api-client"
 import toast from "react-hot-toast"
 import { ArrowLeft, Package, Upload, X, ImagePlus } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import imageCompression from 'browser-image-compression'
 import { useTranslations } from 'next-intl'
+import { ProductVariantManager, type ProductVariant } from "@/components/vendor/ProductVariantManager"
 
 // Comprehensive product validation schema
 const createProductSchema = z.object({
@@ -33,13 +36,13 @@ const createProductSchema = z.object({
   brandId: z.string().optional(),
   customBrandName: z.string().optional(),
 
-  // Pricing & Inventory
-  price: z.number().min(1, "Price must be at least 1 AED"),
+  // Pricing & Inventory - Made optional for variant products
+  price: z.number().optional(),
   compareAtPrice: z.number().optional(),
   cost: z.number().optional(),
-  sku: z.string().min(3, "SKU must be at least 3 characters"),
+  sku: z.string().optional(),
   barcode: z.string().optional(),
-  stock: z.number().min(0, "Stock cannot be negative"),
+  stock: z.number().min(0, "Stock cannot be negative").optional(),
   lowStockAlert: z.number().optional(),
 
   // Media
@@ -96,6 +99,8 @@ export default function NewProductPage() {
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [isCompressing, setIsCompressing] = useState(false)
+  const [variants, setVariants] = useState<ProductVariant[]>([])
+  const [productMode, setProductMode] = useState<"single" | "variants">("single")
 
   const form = useForm<CreateProductInput>({
     resolver: zodResolver(createProductSchema),
@@ -232,9 +237,52 @@ export default function NewProductPage() {
   }
 
   const onSubmit = async (data: CreateProductInput) => {
+    console.log('Submit button clicked')
     console.log('Form submitted with data:', data)
+
+    // Validate based on product mode
+    if (productMode === 'single') {
+      // Single product requires price and SKU
+      if (!data.price || data.price < 1) {
+        toast.error('Price is required for single products and must be at least 1 AED')
+        return
+      }
+      if (!data.sku || data.sku.length < 3) {
+        toast.error('SKU is required for single products and must be at least 3 characters')
+        return
+      }
+    } else if (productMode === 'variants') {
+      // Variant mode requires at least one variant
+      if (variants.length === 0) {
+        toast.error('Please add at least one variant for variant products')
+        return
+      }
+      // Variant mode requires base SKU
+      if (!data.sku || data.sku.length < 3) {
+        toast.error('Base SKU is required for variant products (used to generate variant SKUs)')
+        return
+      }
+
+      // Validate all variants have required fields
+      const incompleteVariants = variants.filter(
+        v => !v.price || v.price <= 0 || v.stock === undefined || v.stock < 0 || !v.sku || !v.size
+      )
+      if (incompleteVariants.length > 0) {
+        toast.error('All variants must have a price greater than 0, stock quantity, SKU, and size')
+        return
+      }
+
+      // Set default values for product-level pricing
+      // IMPORTANT: Keep the base SKU that user entered - DO NOT overwrite with variant SKU!
+      // Product SKU: "OUD-001" -> Variant SKUs: "OUD-001-50ML", "OUD-001-100ML"
+      data.price = 0
+      // data.sku already set by user - don't overwrite!
+      data.stock = 0
+    }
+
     setIsLoading(true)
     try {
+
       // Clean up empty optional fields (convert empty strings to undefined)
       const cleanedData = Object.fromEntries(
         Object.entries(data).filter(([_, value]) => {
@@ -266,6 +314,36 @@ export default function NewProductPage() {
         }
       } else {
         toast.success(t('productCreated'))
+      }
+
+      // Step 3: Create variants if any
+      if (variants.length > 0) {
+        toast.loading(`Creating ${variants.length} variants...`, { id: 'create-variants' })
+
+        try {
+          // Create all variants
+          for (const variant of variants) {
+            const variantPayload = {
+              name: variant.name,
+              nameAr: variant.nameAr,
+              sku: variant.sku,
+              price: variant.price,
+              stock: variant.stock,
+              size: variant.size,
+              // Only include salePrice and compareAtPrice if they have valid values
+              ...(variant.salePrice && variant.salePrice > 0 ? { salePrice: variant.salePrice } : {}),
+              ...(variant.compareAtPrice && variant.compareAtPrice > 0 ? { compareAtPrice: variant.compareAtPrice } : {}),
+            }
+
+            console.log('Creating variant with payload:', variantPayload)
+            await apiClient.post(`/products/${productId}/variants`, variantPayload)
+          }
+          toast.success(`Created ${variants.length} variants successfully`, { id: 'create-variants' })
+        } catch (variantError: any) {
+          console.error('Variant creation error:', variantError)
+          console.error('Error response:', variantError?.response?.data)
+          toast.error(`Failed to create variants: ${variantError?.response?.data?.message || 'Unknown error'}`, { id: 'create-variants' })
+        }
       }
 
       router.push('/vendor/products')
@@ -608,7 +686,30 @@ export default function NewProductPage() {
                         {t('pricingInventoryDesc')}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-6">
+                      {/* Product Mode Toggle */}
+                      <div className="border rounded-lg p-4 bg-muted/50">
+                        <Label className="text-base font-semibold mb-3 block">Product Type</Label>
+                        <RadioGroup value={productMode} onValueChange={(value: "single" | "variants") => setProductMode(value)}>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <RadioGroupItem value="single" id="single" />
+                            <Label htmlFor="single" className="font-normal cursor-pointer">
+                              Single Product - One price, one stock level
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="variants" id="variants" />
+                            <Label htmlFor="variants" className="font-normal cursor-pointer">
+                              Product with Variants - Multiple sizes/options with individual pricing
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      {/* Conditional Content Based on Mode */}
+                      {productMode === "single" ? (
+                        // Single Product Pricing Fields
+                        <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
@@ -686,9 +787,14 @@ export default function NewProductPage() {
                           name="sku"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('skuLabel')} <span className="text-red-500">*</span></FormLabel>
+                              <FormLabel>
+                                {t('skuLabel')} <span className="text-red-500">*</span>
+                              </FormLabel>
                               <FormControl>
-                                <Input placeholder={t('skuPlaceholder')} {...field} />
+                                <Input
+                                  placeholder={t('skuPlaceholder')}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormDescription>
                                 {t('skuDesc')}
@@ -757,11 +863,52 @@ export default function NewProductPage() {
                           )}
                         />
                       </div>
+                        </div>
+                      ) : (
+                        // Variant Product Mode
+                        <div className="space-y-6">
+                          {/* Base SKU Field - Required for variant products */}
+                          <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
+                            <FormField
+                              control={form.control}
+                              name="sku"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-base font-semibold">
+                                    Base SKU <span className="text-red-500">*</span>
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="e.g., OUD-001 (variants will be OUD-001-50ML, OUD-001-100ML)"
+                                      className="text-lg font-mono"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormDescription className="text-blue-700">
+                                    ⚠️ <strong>Important:</strong> Enter the base SKU only (e.g., "OUD-001").
+                                    Variant SKUs will auto-generate by adding the size (e.g., "OUD-001-50ML", "OUD-001-100ML").
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          {/* Variant Manager */}
+                          <ProductVariantManager
+                            productType={form.watch("productType") || ""}
+                            baseSku={form.watch("sku") || ""}
+                            variants={variants}
+                            onVariantsChange={setVariants}
+                            mode="create"
+                          />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </TabsContent>
 
-                {/* Tab 4: Scent Profile */}
+                {/* Tab 5: Scent Profile */}
                 <TabsContent value="scent">
                   <Card>
                     <CardHeader>
@@ -1407,107 +1554,109 @@ export default function NewProductPage() {
                         />
                       </div>
 
-                      {/* Flash Sale */}
-                      <div className="space-y-4 border-t pt-6">
-                        <h3 className="font-semibold">{t('flashSale')}</h3>
-                        <FormField
-                          control={form.control}
-                          name="isOnSale"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
+                      {/* Flash Sale - Only show for single products */}
+                      {productMode === 'single' && (
+                        <div className="space-y-4 border-t pt-6">
+                          <h3 className="font-semibold">{t('flashSale')}</h3>
+                          <FormField
+                            control={form.control}
+                            name="isOnSale"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                  <FormLabel>{t('putOnSale')}</FormLabel>
+                                  <FormDescription>
+                                    {t('putOnSaleDesc')}
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                            )}
+                          />
+
+                          {form.watch('isOnSale') && (
+                            <div className="space-y-4 pl-6 border-l-2 border-oud-gold/30">
+                              <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                  control={form.control}
+                                  name="salePrice"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>{t('salePrice')}</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          step="0.01"
+                                          placeholder={t('salePricePlaceholder')}
+                                          {...field}
+                                          value={field.value || ''}
+                                          onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 0)}
+                                        />
+                                      </FormControl>
+                                      <FormDescription>
+                                        {t('salePriceDesc')}
+                                      </FormDescription>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
                                 />
-                              </FormControl>
-                              <div className="space-y-1 leading-none">
-                                <FormLabel>{t('putOnSale')}</FormLabel>
-                                <FormDescription>
-                                  {t('putOnSaleDesc')}
-                                </FormDescription>
+
+                                <FormField
+                                  control={form.control}
+                                  name="discountPercent"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>{t('discountPercent')}</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          min="0"
+                                          max="100"
+                                          placeholder={t('discountPercentPlaceholder')}
+                                          {...field}
+                                          value={field.value || ''}
+                                          onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                                        />
+                                      </FormControl>
+                                      <FormDescription>
+                                        {t('discountPercentDesc')}
+                                      </FormDescription>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
                               </div>
-                            </FormItem>
-                          )}
-                        />
-
-                        {form.watch('isOnSale') && (
-                          <div className="space-y-4 pl-6 border-l-2 border-oud-gold/30">
-                            <div className="grid grid-cols-2 gap-4">
-                              <FormField
-                                control={form.control}
-                                name="salePrice"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>{t('salePrice')}</FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        type="number"
-                                        step="0.01"
-                                        placeholder={t('salePricePlaceholder')}
-                                        {...field}
-                                        value={field.value || ''}
-                                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 0)}
-                                      />
-                                    </FormControl>
-                                    <FormDescription>
-                                      {t('salePriceDesc')}
-                                    </FormDescription>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
 
                               <FormField
                                 control={form.control}
-                                name="discountPercent"
+                                name="saleEndDate"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>{t('discountPercent')}</FormLabel>
+                                    <FormLabel>{t('saleEndDate')}</FormLabel>
                                     <FormControl>
                                       <Input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        placeholder={t('discountPercentPlaceholder')}
+                                        type="datetime-local"
                                         {...field}
-                                        value={field.value || ''}
-                                        onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)}
+                                        value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
+                                        onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
                                       />
                                     </FormControl>
                                     <FormDescription>
-                                      {t('discountPercentDesc')}
+                                      {t('saleEndDateDesc')}
                                     </FormDescription>
                                     <FormMessage />
                                   </FormItem>
                                 )}
                               />
                             </div>
-
-                            <FormField
-                              control={form.control}
-                              name="saleEndDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('saleEndDate')}</FormLabel>
-                                  <FormControl>
-                                    <Input
-                                      type="datetime-local"
-                                      {...field}
-                                      value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
-                                      onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
-                                    />
-                                  </FormControl>
-                                  <FormDescription>
-                                    {t('saleEndDateDesc')}
-                                  </FormDescription>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </TabsContent>

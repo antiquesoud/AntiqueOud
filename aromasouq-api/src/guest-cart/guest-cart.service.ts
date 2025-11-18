@@ -23,25 +23,25 @@ export class GuestCartService {
         items: {
           include: {
             product: {
-              select: {
-                id: true,
-                name: true,
-                nameAr: true,
-                images: true,
-                price: true,
-                stock: true,
-                isActive: true,
+              include: {
+                brand: {
+                  select: {
+                    id: true,
+                    name: true,
+                    nameAr: true,
+                    logo: true,
+                  },
+                },
+                category: {
+                  select: {
+                    id: true,
+                    name: true,
+                    nameAr: true,
+                  },
+                },
               },
             },
-            variant: {
-              select: {
-                id: true,
-                name: true,
-                nameAr: true,
-                price: true,
-                stock: true,
-              },
-            },
+            variant: true,
           },
         },
       },
@@ -56,25 +56,25 @@ export class GuestCartService {
           items: {
             include: {
               product: {
-                select: {
-                  id: true,
-                  name: true,
-                  nameAr: true,
-                  images: true,
-                  price: true,
-                  stock: true,
-                  isActive: true,
+                include: {
+                  brand: {
+                    select: {
+                      id: true,
+                      name: true,
+                      nameAr: true,
+                      logo: true,
+                    },
+                  },
+                  category: {
+                    select: {
+                      id: true,
+                      name: true,
+                      nameAr: true,
+                    },
+                  },
                 },
               },
-              variant: {
-                select: {
-                  id: true,
-                  name: true,
-                  nameAr: true,
-                  price: true,
-                  stock: true,
-                },
-              },
+              variant: true,
             },
           },
         },
@@ -264,8 +264,26 @@ export class GuestCartService {
       const itemTotal = price * item.quantity;
       subtotal += itemTotal;
 
+      // Transform to match frontend Cart type expectations
       return {
-        ...item,
+        id: item.id,
+        cartId: item.guestCartId, // Frontend expects cartId, not guestCartId
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        product: {
+          ...item.product,
+          name: item.product.nameEn || item.product.name, // Ensure name is always populated
+          image: item.product.images?.[0] || '', // Frontend expects single image string
+          stockQuantity: item.product.stock, // Frontend expects stockQuantity
+          regularPrice: item.product.price, // Add regularPrice field
+          salePrice: item.product.salePrice, // Add salePrice field
+        },
+        variant: item.variant ? {
+          ...item.variant,
+          name: item.variant.nameAr || item.variant.name,
+          stock: item.variant.stock,
+        } : undefined,
         price,
         itemTotal,
       };
@@ -274,16 +292,21 @@ export class GuestCartService {
     const tax = subtotal * 0.05; // 5% tax
     const shippingFee = subtotal > 200 ? 0 : 25; // Free shipping over 200 AED
     const total = subtotal + tax + shippingFee;
+    const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    const coinsEarnable = Math.floor(total / 10); // 1 coin per 10 AED
 
     return {
       id: cart.id,
-      sessionToken: cart.sessionToken,
+      sessionId: cart.sessionToken, // Frontend expects sessionId, not sessionToken
       items,
-      itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
-      subtotal,
-      tax,
-      shippingFee,
-      total,
+      summary: {
+        subtotal,
+        shipping: shippingFee,
+        tax,
+        total,
+        itemCount,
+        coinsEarnable,
+      },
       createdAt: cart.createdAt,
       updatedAt: cart.updatedAt,
     };

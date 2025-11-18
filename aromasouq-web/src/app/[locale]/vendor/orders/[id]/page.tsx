@@ -148,6 +148,19 @@ export default function VendorOrderDetailPage() {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium">{item.product.name}</h3>
+                      {item.variant && (
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <Badge variant="secondary" className="text-xs">
+                            {item.variant.size}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {item.variant.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground font-mono">
+                            SKU: {item.variant.sku}
+                          </span>
+                        </div>
+                      )}
                       <p className="text-sm text-muted-foreground mt-1">
                         {t('quantity')}: {item.quantity}
                       </p>

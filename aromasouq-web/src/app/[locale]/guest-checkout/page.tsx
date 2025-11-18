@@ -659,7 +659,11 @@ export default function GuestCheckoutPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.product.name}</p>
                       {item.variant && (
-                        <p className="text-xs text-muted-foreground">{item.variant.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-medium">
+                            {item.variant.name}
+                          </span>
+                        </div>
                       )}
                       <div className="flex justify-between items-center mt-1">
                         <span className="text-xs text-muted-foreground">Qty: {item.quantity}</span>

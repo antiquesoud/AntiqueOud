@@ -82,6 +82,7 @@ export class OrdersService {
                 category: true,
               },
             },
+            variant: true,
           },
         },
         address: true,
@@ -173,10 +174,25 @@ export class OrdersService {
     for (const item of cart.items) {
       const product = item.product;
 
-      if (product.stock < item.quantity) {
-        throw new BadRequestException(
-          `Insufficient stock for "${product.name}". Available: ${product.stock}, Requested: ${item.quantity}`,
-        );
+      // Check variant stock if variant exists, otherwise check product stock
+      if (item.variant) {
+        if (item.variant.stock < item.quantity) {
+          throw new BadRequestException(
+            `Insufficient stock for "${product.name}" (${item.variant.size}). Available: ${item.variant.stock}, Requested: ${item.quantity}`,
+          );
+        }
+
+        if (!item.variant.isActive) {
+          throw new BadRequestException(
+            `Product variant "${product.name}" (${item.variant.size}) is no longer available`,
+          );
+        }
+      } else {
+        if (product.stock < item.quantity) {
+          throw new BadRequestException(
+            `Insufficient stock for "${product.name}". Available: ${product.stock}, Requested: ${item.quantity}`,
+          );
+        }
       }
 
       // Also check if product is active
@@ -189,7 +205,7 @@ export class OrdersService {
 
     // Calculate totals
     let subtotal = 0;
-    const orderItems: { productId: string; quantity: number; price: number }[] = [];
+    const orderItems: { productId: string; variantId?: string; quantity: number; price: number }[] = [];
 
     for (const item of cart.items) {
       const price = item.variant?.price || item.product.price;
@@ -198,6 +214,7 @@ export class OrdersService {
 
       orderItems.push({
         productId: item.productId,
+        variantId: item.variantId || undefined,
         quantity: item.quantity,
         price,
       });
@@ -287,15 +304,40 @@ export class OrdersService {
         },
       });
 
-      // Decrement stock and increment sales for each product
+      // Decrement stock and increment sales for each product/variant
       for (const item of cart.items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            stock: { decrement: item.quantity },
-            salesCount: { increment: item.quantity },
-          },
-        });
+        if (item.variantId) {
+          // Decrement variant stock
+          await tx.productVariant.update({
+            where: { id: item.variantId },
+            data: {
+              stock: { decrement: item.quantity },
+            },
+          });
+
+          // Sync product stock from variants (sum of all variant stocks)
+          const variants = await tx.productVariant.findMany({
+            where: { productId: item.productId, isActive: true },
+          });
+          const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
+
+          await tx.product.update({
+            where: { id: item.productId },
+            data: {
+              stock: totalStock,
+              salesCount: { increment: item.quantity },
+            },
+          });
+        } else {
+          // Decrement product stock (no variant)
+          await tx.product.update({
+            where: { id: item.productId },
+            data: {
+              stock: { decrement: item.quantity },
+              salesCount: { increment: item.quantity },
+            },
+          });
+        }
       }
 
       // Update user's coins if coins were used - handled by wallet service after order creation

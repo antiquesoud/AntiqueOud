@@ -695,6 +695,37 @@ export class ProductsService {
   // PRODUCT VARIANTS
   // ============================================================================
 
+  /**
+   * Synchronizes product stock and price from all active variants
+   * Called after any variant stock/price change to maintain data consistency
+   */
+  private async syncProductStockFromVariants(productId: string): Promise<void> {
+    const variants = await this.prisma.productVariant.findMany({
+      where: {
+        productId,
+        isActive: true,
+      },
+    });
+
+    // If no variants, don't touch product stock (preserves backward compatibility)
+    if (variants.length === 0) {
+      return;
+    }
+
+    const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
+
+    // Calculate minimum price from active variants (use salePrice if available, otherwise price)
+    const minPrice = Math.min(...variants.map(v => v.salePrice || v.price));
+
+    await this.prisma.product.update({
+      where: { id: productId },
+      data: {
+        stock: totalStock,
+        price: minPrice, // Sync minimum variant price as display price
+      },
+    });
+  }
+
   async createVariant(
     userId: string,
     userRole: UserRole,
@@ -719,12 +750,27 @@ export class ProductsService {
       throw new ConflictException(`Variant with SKU ${createVariantDto.sku} already exists`);
     }
 
-    return this.prisma.productVariant.create({
+    // Check if SKU conflicts with any product SKU
+    const productWithSameSku = await this.prisma.product.findUnique({
+      where: { sku: createVariantDto.sku },
+    });
+    if (productWithSameSku) {
+      throw new ConflictException(
+        `SKU ${createVariantDto.sku} is already used by product "${productWithSameSku.name}"`,
+      );
+    }
+
+    const variant = await this.prisma.productVariant.create({
       data: {
         ...createVariantDto,
         productId,
       },
     });
+
+    // Sync product stock from variants
+    await this.syncProductStockFromVariants(productId);
+
+    return variant;
   }
 
   async getVariants(productId: string) {
@@ -761,12 +807,27 @@ export class ProductsService {
       if (existingVariant) {
         throw new ConflictException(`Variant with SKU ${updateVariantDto.sku} already exists`);
       }
+
+      // Check if new SKU conflicts with any product SKU
+      const productWithSameSku = await this.prisma.product.findUnique({
+        where: { sku: updateVariantDto.sku },
+      });
+      if (productWithSameSku) {
+        throw new ConflictException(
+          `SKU ${updateVariantDto.sku} is already used by product "${productWithSameSku.name}"`,
+        );
+      }
     }
 
-    return this.prisma.productVariant.update({
+    const updatedVariant = await this.prisma.productVariant.update({
       where: { id: variantId },
       data: updateVariantDto,
     });
+
+    // Sync product stock from variants (especially if stock was updated)
+    await this.syncProductStockFromVariants(variant.productId);
+
+    return updatedVariant;
   }
 
   async deleteVariant(userId: string, userRole: UserRole, variantId: string) {
@@ -784,10 +845,46 @@ export class ProductsService {
       }
     }
 
-    return this.prisma.productVariant.update({
+    const deletedVariant = await this.prisma.productVariant.update({
       where: { id: variantId },
       data: { isActive: false },
     });
+
+    // Sync product stock from remaining active variants
+    await this.syncProductStockFromVariants(variant.productId);
+
+    return deletedVariant;
+  }
+
+  /**
+   * Get variant presets based on product type
+   * Returns preset size configurations for different product types
+   */
+  getVariantPresets(productType: string) {
+    const presets: Record<string, any[]> = {
+      OUD: [
+        { name: '3 Grams', nameAr: '3 غرام', size: '3gm', defaultPrice: 0, stock: 0 },
+        { name: '6 Grams', nameAr: '6 غرام', size: '6gm', defaultPrice: 0, stock: 0 },
+        { name: '12 Grams', nameAr: '12 غرام', size: '12gm', defaultPrice: 0, stock: 0 },
+      ],
+      PERFUME: [
+        { name: '50 ML', nameAr: '50 مل', size: '50ml', defaultPrice: 0, stock: 0 },
+        { name: '100 ML', nameAr: '100 مل', size: '100ml', defaultPrice: 0, stock: 0 },
+        { name: '150 ML', nameAr: '150 مل', size: '150ml', defaultPrice: 0, stock: 0 },
+      ],
+      ATTAR: [
+        { name: '3 ML', nameAr: '3 مل', size: '3ml', defaultPrice: 0, stock: 0 },
+        { name: '6 ML', nameAr: '6 مل', size: '6ml', defaultPrice: 0, stock: 0 },
+        { name: '12 ML', nameAr: '12 مل', size: '12ml', defaultPrice: 0, stock: 0 },
+      ],
+      BAKHOOR: [
+        { name: '40 Grams', nameAr: '40 غرام', size: '40gm', defaultPrice: 0, stock: 0 },
+        { name: '100 Grams', nameAr: '100 غرام', size: '100gm', defaultPrice: 0, stock: 0 },
+        { name: '200 Grams', nameAr: '200 غرام', size: '200gm', defaultPrice: 0, stock: 0 },
+      ],
+    };
+
+    return presets[productType] || [];
   }
 
   // NEW: Homepage Aggregation Endpoints
