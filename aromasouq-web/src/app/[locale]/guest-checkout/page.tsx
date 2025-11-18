@@ -44,10 +44,14 @@ interface GuestCartItem {
 interface GuestCart {
   id: string
   items: GuestCartItem[]
-  subtotal: number
-  tax: number
-  shippingFee: number
-  total: number
+  summary: {
+    subtotal: number
+    shipping: number
+    tax: number
+    total: number
+    itemCount: number
+    coinsEarnable: number
+  }
 }
 
 // Validation schema for guest checkout
@@ -451,13 +455,13 @@ export default function GuestCheckoutPage() {
                             <h3 className="font-semibold text-lg mb-2">{t('standardDelivery')}</h3>
                             <p className="text-muted-foreground mb-2">{t('deliveryTime3to5')}</p>
                             <p className="text-sm font-medium text-oud-gold">
-                              {cart.shippingFee === 0 ? '✨ ' + t('freeShipping') : formatCurrency(cart.shippingFee)}
+                              {cart.summary.shipping === 0 ? '✨ ' + t('freeShipping') : formatCurrency(cart.summary.shipping)}
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      {cart.subtotal >= 200 && (
+                      {cart.summary.subtotal >= 200 && (
                         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                           <p className="text-green-700 font-medium text-center">
                             🎉 You've qualified for FREE shipping!
@@ -680,19 +684,19 @@ export default function GuestCheckoutPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>{t('subtotal')} ({cart.items.length} {t('items')}):</span>
-                  <span className="font-semibold">{formatCurrency(cart.subtotal)}</span>
+                  <span className="font-semibold">{formatCurrency(cart.summary.subtotal)}</span>
                 </div>
 
                 <div className="flex justify-between text-sm">
                   <span>{t('shipping')}:</span>
                   <span className="font-semibold">
-                    {cart.shippingFee === 0 ? t('freeShipping') : formatCurrency(cart.shippingFee)}
+                    {cart.summary.shipping === 0 ? t('freeShipping') : formatCurrency(cart.summary.shipping)}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-sm">
                   <span>{t('tax')} (5%):</span>
-                  <span className="font-semibold">{formatCurrency(cart.tax)}</span>
+                  <span className="font-semibold">{formatCurrency(cart.summary.tax)}</span>
                 </div>
               </div>
 
@@ -701,7 +705,7 @@ export default function GuestCheckoutPage() {
               <div className="flex justify-between items-baseline">
                 <span className="font-bold">{t('total')}:</span>
                 <span className="text-2xl font-bold text-oud-gold">
-                  {formatCurrency(cart.total)}
+                  {formatCurrency(cart.summary.total)}
                 </span>
               </div>
             </CardContent>

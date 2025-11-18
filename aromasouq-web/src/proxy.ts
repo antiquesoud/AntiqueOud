@@ -11,7 +11,8 @@ const intlMiddleware = createMiddleware({
 })
 
 // Routes that require authentication
-const protectedRoutes = ['/account', '/cart', '/checkout', '/orders', '/wishlist']
+// Note: /cart and /checkout removed to support guest users with guest-checkout flow
+const protectedRoutes = ['/account', '/orders', '/wishlist']
 const vendorRoutes = ['/vendor']
 const adminRoutes = ['/admin']
 

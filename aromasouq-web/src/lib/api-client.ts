@@ -18,8 +18,20 @@ class ApiClient {
       (response) => response,
       (error: AxiosError) => {
         if (error.response?.status === 401) {
+          // Check if this is a guest endpoint - don't redirect for these
+          const requestUrl = error.config?.url || ''
+          const guestEndpoints = ['/guest-cart', '/guest-orders', '/guest-checkout']
+          const isGuestEndpoint = guestEndpoints.some(endpoint => requestUrl.includes(endpoint))
+
+          // For guest endpoints, just reject without redirect
+          if (isGuestEndpoint) {
+            return Promise.reject(error)
+          }
+
           // Unauthorized - clear auth state and optionally redirect
           if (typeof window !== 'undefined') {
+            const currentPath = window.location.pathname
+
             // Clear auth from localStorage to prevent stale data
             try {
               const authStorage = localStorage.getItem('auth-storage')
@@ -34,9 +46,18 @@ class ApiClient {
               localStorage.removeItem('auth-storage')
             }
 
-            const currentPath = window.location.pathname
-            // Public paths that don't need authentication
-            const publicPaths = ['/', '/login', '/register', '/become-vendor', '/products', '/brands', '/categories']
+            // Special case: If on cart page and got 401 from /cart endpoint
+            // This means stale auth - clear storage and reload to re-initialize with guest cart
+            if (currentPath.includes('/cart') && requestUrl === '/cart') {
+              console.log('Cart page: Cleared stale auth, reloading to use guest cart')
+              setTimeout(() => {
+                window.location.reload()
+              }, 100)
+              return Promise.reject(error)
+            }
+
+            // Public paths that don't need authentication (including cart and checkout for guest users)
+            const publicPaths = ['/', '/login', '/register', '/become-vendor', '/products', '/brands', '/categories', '/cart', '/guest-checkout']
             const isPublicPath = publicPaths.some(path => {
               // Exact match for homepage or starts with for other paths
               if (path === '/') return currentPath === '/' || currentPath.match(/^\/[a-z]{2}$/)

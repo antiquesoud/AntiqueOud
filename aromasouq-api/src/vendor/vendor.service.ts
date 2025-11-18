@@ -863,17 +863,32 @@ export class VendorService {
 
     const productIds = products.map((p) => p.id);
 
-    // Get the order and verify it contains vendor's products
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        items: {
-          where: {
-            productId: { in: productIds },
+    // Try to find order in both authenticated Order and GuestOrder tables
+    const [userOrder, guestOrder] = await Promise.all([
+      this.prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.guestOrder.findUnique({
+        where: { id: orderId },
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const order = userOrder || guestOrder;
+    const isGuestOrder = !!guestOrder;
 
     if (!order) {
       throw new NotFoundException(`Order with ID ${orderId} not found`);
@@ -906,15 +921,17 @@ export class VendorService {
         break;
       case OrderStatus.DELIVERED:
         updateData.deliveredAt = new Date();
-        // Award coins to user when order is delivered
-        await this.prisma.user.update({
-          where: { id: order.userId },
-          data: {
-            coinsBalance: {
-              increment: order.coinsEarned,
+        // Award coins to user when order is delivered (only for authenticated users, not guests)
+        if (!isGuestOrder && userOrder?.userId) {
+          await this.prisma.user.update({
+            where: { id: userOrder.userId },
+            data: {
+              coinsBalance: {
+                increment: userOrder.coinsEarned || 0,
+              },
             },
-          },
-        });
+          });
+        }
         break;
       case OrderStatus.CANCELLED:
         throw new BadRequestException(
@@ -922,47 +939,78 @@ export class VendorService {
         );
     }
 
-    const updatedOrder = await this.prisma.order.update({
-      where: { id: orderId },
-      data: updateData,
-      include: {
-        items: {
-          where: {
-            productId: { in: productIds },
-          },
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                images: true,
+    // Update the appropriate order table based on order type
+    if (isGuestOrder) {
+      const updatedOrder = await this.prisma.guestOrder.update({
+        where: { id: orderId },
+        data: updateData,
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  images: true,
+                },
               },
             },
           },
         },
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            email: true,
+      });
+
+      return {
+        ...updatedOrder,
+        isGuestOrder: true,
+      };
+    } else {
+      const updatedOrder = await this.prisma.order.update({
+        where: { id: orderId },
+        data: updateData,
+        include: {
+          items: {
+            where: {
+              productId: { in: productIds },
+            },
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  images: true,
+                },
+              },
+            },
+          },
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return {
-      id: updatedOrder.id,
-      orderNumber: updatedOrder.orderNumber,
-      customerName: `${updatedOrder.user.firstName} ${updatedOrder.user.lastName}`,
-      customerEmail: updatedOrder.user.email,
-      itemCount: updatedOrder.items.length,
-      total: updatedOrder.items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      ),
-      status: updatedOrder.orderStatus,
-      createdAt: updatedOrder.createdAt,
-      items: updatedOrder.items,
-    };
+      return {
+        id: updatedOrder.id,
+        orderNumber: updatedOrder.orderNumber,
+        customerName: `${updatedOrder.user.firstName} ${updatedOrder.user.lastName}`,
+        customerEmail: updatedOrder.user.email,
+        itemCount: updatedOrder.items.length,
+        total: updatedOrder.items.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0,
+        ),
+        status: updatedOrder.orderStatus,
+        createdAt: updatedOrder.createdAt,
+        items: updatedOrder.items,
+        isGuestOrder: false,
+      };
+    }
   }
 }
+
