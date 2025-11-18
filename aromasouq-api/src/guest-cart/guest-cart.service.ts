@@ -273,7 +273,7 @@ export class GuestCartService {
         quantity: item.quantity,
         product: {
           ...item.product,
-          name: item.product.nameEn || item.product.name, // Ensure name is always populated
+          name: item.product.name, // Ensure name is always populated
           image: item.product.images?.[0] || '', // Frontend expects single image string
           stockQuantity: item.product.stock, // Frontend expects stockQuantity
           regularPrice: item.product.price, // Add regularPrice field
