@@ -442,19 +442,19 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#ECDBC7]/10 via-white to-[#ECDBC7]/10">
       {/* Dynamic Hero Section - Vibrant & Artistic */}
       <div className={`relative overflow-hidden bg-gradient-to-br ${pageContext.gradient} text-white py-8 sm:py-12 md:py-16 lg:py-20 mb-0`}>
         {/* Artistic Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Sparkles */}
           <div className="absolute top-20 left-[15%] w-3 h-3 bg-yellow-300 rounded-full shadow-[0_0_25px_10px_rgba(253,224,71,0.6)] animate-pulse"></div>
-          <div className="absolute top-40 right-[20%] w-2 h-2 bg-amber-400 rounded-full shadow-[0_0_20px_8px_rgba(251,191,36,0.5)] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute bottom-32 left-[25%] w-2 h-2 bg-orange-300 rounded-full shadow-[0_0_20px_8px_rgba(251,146,60,0.5)] animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-40 right-[20%] w-2 h-2 bg-[#C9A86A] rounded-full shadow-[0_0_20px_8px_rgba(201,168,106,0.5)] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute bottom-32 left-[25%] w-2 h-2 bg-[#B3967D] rounded-full shadow-[0_0_20px_8px_rgba(179,150,125,0.5)] animate-pulse" style={{ animationDelay: '1s' }}></div>
 
           {/* Glowing orbs */}
-          <div className="absolute top-10 right-[10%] w-96 h-96 bg-yellow-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-10 left-[15%] w-80 h-80 bg-orange-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-10 right-[10%] w-96 h-96 bg-[#C9A86A]/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 left-[15%] w-80 h-80 bg-[#550000]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
 
           {/* Decorative patterns */}
           <svg className="absolute top-0 right-0 w-64 h-64 opacity-10" viewBox="0 0 100 100" fill="none">
@@ -511,10 +511,10 @@ export default function ProductsPage() {
           <aside
             className={`hidden ${showFilters ? 'lg:block' : 'lg:hidden'} lg:w-80 transition-all duration-300 overflow-hidden`}
           >
-            <div className="bg-gradient-to-br from-white to-amber-50 rounded-2xl shadow-xl p-6 sticky top-24 border-2 border-amber-200">
+            <div className="bg-gradient-to-br from-white to-[#ECDBC7]/10 rounded-2xl shadow-xl p-6 sticky top-24 border-2 border-[#ECDBC7]">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">
-                  <Filter className="w-6 h-6 text-amber-600" />
+                <h2 className="text-2xl font-black flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000]">
+                  <Filter className="w-6 h-6 text-[#550000]" />
                   {t('ui.filters')}
                 </h2>
                 {hasActiveFilters && (
@@ -537,7 +537,7 @@ export default function ProductsPage() {
                     value={filters.search}
                     onChange={(e) => handleFilterChange('search', e.target.value)}
                     placeholder={t('ui.searchPlaceholder')}
-                    className="w-full px-4 py-2.5 text-sm border-2 border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-semibold transition-all"
+                    className="w-full px-4 py-2.5 text-sm border-2 border-[#B3967D] rounded-xl focus:ring-2 focus:ring-[#B3967D] focus:border-[#550000] font-semibold transition-all"
                   />
                 </div>
 
@@ -865,7 +865,7 @@ export default function ProductsPage() {
           {/* Products Grid */}
           <main className="flex-1">
             {/* Toolbar */}
-            <div className="bg-gradient-to-r from-white via-amber-50 to-orange-50 rounded-2xl shadow-xl p-3 sm:p-5 mb-6 sm:mb-8 border-2 border-amber-200">
+            <div className="bg-gradient-to-r from-white via-[#ECDBC7]/5 to-[#F5E6D3]/5 rounded-2xl shadow-xl p-3 sm:p-5 mb-6 sm:mb-8 border-2 border-[#ECDBC7]">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
                 <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                   {/* Mobile Filters Sheet */}
@@ -877,8 +877,8 @@ export default function ProductsPage() {
                       </button>
                     </SheetTrigger>
                     <SheetContent side={isRTL ? "right" : "left"} className="w-[85vw] sm:w-[400px] overflow-y-auto">
-                      <SheetTitle className="text-xl font-black flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 mb-6">
-                        <Filter className="w-5 h-5 text-amber-600" />
+                      <SheetTitle className="text-xl font-black flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000] mb-6">
+                        <Filter className="w-5 h-5 text-[#550000]" />
                         {t('ui.filters')}
                       </SheetTitle>
 
@@ -903,7 +903,7 @@ export default function ProductsPage() {
                             value={filters.search}
                             onChange={(e) => handleFilterChange('search', e.target.value)}
                             placeholder={t('ui.searchPlaceholder')}
-                            className="w-full px-3 py-2 text-sm border-2 border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-semibold transition-all"
+                            className="w-full px-3 py-2 text-sm border-2 border-[#B3967D] rounded-xl focus:ring-2 focus:ring-[#B3967D] focus:border-[#550000] font-semibold transition-all"
                           />
                         </div>
 
@@ -1121,7 +1121,7 @@ export default function ProductsPage() {
                       {/* Apply Button */}
                       <button
                         onClick={() => setMobileFiltersOpen(false)}
-                        className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black rounded-xl hover:shadow-lg transition-all text-base"
+                        className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white font-black rounded-xl hover:shadow-lg transition-all text-base"
                       >
                         {t('ui.apply') || 'Apply Filters'}
                       </button>
@@ -1129,12 +1129,9 @@ export default function ProductsPage() {
                   </Sheet>
 
                   <p className="text-gray-700 font-semibold text-xs sm:text-sm">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 font-black text-sm sm:text-lg">
-                      {(data as any)?.pagination?.total || 0}
-                    </span>
-                    {' '}{t('ui.productsFound', { count: (data as any)?.pagination?.total || 0, plural: (data as any)?.pagination?.total !== 1 ? 's' : '' })}
+                    {t('ui.productsFound', { count: (data as any)?.pagination?.total || 0, plural: (data as any)?.pagination?.total !== 1 ? 's' : '' })}
                     {hasActiveFilters && (
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 ml-2 font-black">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000] ml-2 font-black">
                         {t('ui.filtered')}
                       </span>
                     )}
@@ -1153,7 +1150,7 @@ export default function ProductsPage() {
                 <select
                   value={filters.sort}
                   onChange={(e) => handleFilterChange('sort', e.target.value)}
-                  className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-amber-300 rounded-xl bg-gradient-to-r from-white to-amber-50 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-bold text-gray-700 hover:shadow-md transition-all cursor-pointer text-xs sm:text-sm"
+                  className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-[#B3967D] rounded-xl bg-gradient-to-r from-white to-[#ECDBC7]/20 focus:ring-2 focus:ring-[#B3967D] focus:border-[#550000] font-bold text-gray-700 hover:shadow-md transition-all cursor-pointer text-xs sm:text-sm"
                 >
                   <option value="createdAt_desc">✨ {t('sort.newestFirst')}</option>
                   <option value="createdAt_asc">{t('sort.oldestFirst')}</option>
@@ -1171,10 +1168,10 @@ export default function ProductsPage() {
             {isLoading && (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="animate-pulse bg-white rounded-xl p-2 sm:p-3 md:p-4 shadow-lg border-2 border-amber-100">
-                    <div className="bg-gradient-to-br from-amber-200 to-orange-200 rounded-xl aspect-square mb-2 sm:mb-3 md:mb-4"></div>
-                    <div className="h-2.5 sm:h-3 md:h-4 bg-gradient-to-r from-amber-200 to-orange-200 rounded-full w-3/4 mb-1.5 sm:mb-2"></div>
-                    <div className="h-2.5 sm:h-3 md:h-4 bg-gradient-to-r from-amber-200 to-orange-200 rounded-full w-1/2"></div>
+                  <div key={i} className="animate-pulse bg-white rounded-xl p-2 sm:p-3 md:p-4 shadow-lg border-2 border-[#ECDBC7]">
+                    <div className="bg-gradient-to-br from-[#ECDBC7] to-[#B3967D] rounded-xl aspect-square mb-2 sm:mb-3 md:mb-4"></div>
+                    <div className="h-2.5 sm:h-3 md:h-4 bg-gradient-to-r from-[#ECDBC7] to-[#B3967D] rounded-full w-3/4 mb-1.5 sm:mb-2"></div>
+                    <div className="h-2.5 sm:h-3 md:h-4 bg-gradient-to-r from-[#ECDBC7] to-[#B3967D] rounded-full w-1/2"></div>
                   </div>
                 ))}
               </div>
@@ -1182,7 +1179,7 @@ export default function ProductsPage() {
 
             {/* Error State */}
             {error && (
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-300 rounded-2xl p-8 text-center shadow-xl">
+              <div className="bg-gradient-to-br from-red-50 to-[#ECDBC7]/10 border-2 border-red-300 rounded-2xl p-8 text-center shadow-xl">
                 <div className="text-5xl mb-4">⚠️</div>
                 <p className="text-red-700 font-bold text-lg">{t('ui.failedToLoad')}</p>
               </div>
@@ -1190,18 +1187,18 @@ export default function ProductsPage() {
 
             {/* Empty State */}
             {!isLoading && !error && (data as any)?.data?.length === 0 && (
-              <div className="bg-gradient-to-br from-white to-amber-50 rounded-2xl shadow-2xl p-8 sm:p-12 md:p-16 text-center border-2 border-amber-200">
-                <div className="bg-gradient-to-br from-amber-100 to-orange-100 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5 md:mb-6 shadow-lg">
-                  <Filter className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-amber-600" />
+              <div className="bg-gradient-to-br from-white to-[#ECDBC7]/10 rounded-2xl shadow-2xl p-8 sm:p-12 md:p-16 text-center border-2 border-[#ECDBC7]">
+                <div className="bg-gradient-to-br from-[#ECDBC7] to-[#B3967D] w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5 md:mb-6 shadow-lg">
+                  <Filter className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-[#550000]" />
                 </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-black mb-2 sm:mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">{t('ui.noProducts')}</h3>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black mb-2 sm:mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000]">{t('ui.noProducts')}</h3>
                 <p className="text-gray-700 mb-4 sm:mb-5 md:mb-6 text-sm sm:text-base md:text-lg font-semibold">
                   {t('ui.tryDifferentFilters')}
                 </p>
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className="px-6 sm:px-7 md:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full font-black text-sm sm:text-base hover:shadow-2xl transition-all hover:scale-105 border-2 border-amber-300/30"
+                    className="px-6 sm:px-7 md:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white rounded-full font-black text-sm sm:text-base hover:shadow-2xl transition-all hover:scale-105 border-2 border-[#B3967D]/30"
                   >
                     {t('ui.clearFilters')}
                   </button>
@@ -1224,7 +1221,7 @@ export default function ProductsPage() {
                     <button
                       onClick={() => setPage(page - 1)}
                       disabled={page === 1}
-                      className="px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border-2 border-amber-300 rounded-xl bg-gradient-to-r from-white to-amber-50 hover:from-amber-50 hover:to-orange-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-gray-700 hover:shadow-lg transition-all disabled:hover:shadow-none text-xs sm:text-sm md:text-base"
+                      className="px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border-2 border-[#B3967D] rounded-xl bg-gradient-to-r from-white to-[#ECDBC7]/20 hover:from-[#ECDBC7]/20 hover:to-[#F5E6D3]/20 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-gray-700 hover:shadow-lg transition-all disabled:hover:shadow-none text-xs sm:text-sm md:text-base"
                     >
                       {t('pagination.previous')}
                     </button>
@@ -1243,8 +1240,8 @@ export default function ProductsPage() {
                               onClick={() => setPage(pageNum)}
                               className={`px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 border-2 rounded-xl font-black transition-all text-xs sm:text-sm md:text-base ${
                                 page === pageNum
-                                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-amber-400 shadow-lg scale-110'
-                                  : 'border-amber-300 bg-white hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 text-gray-700 hover:shadow-md'
+                                  ? 'bg-gradient-to-r from-[#550000] to-[#6B0000] text-white border-[#550000] shadow-lg scale-110'
+                                  : 'border-[#B3967D] bg-white hover:bg-gradient-to-r hover:from-[#ECDBC7]/20 hover:to-[#F5E6D3]/20 text-gray-700 hover:shadow-md'
                               }`}
                             >
                               {pageNum}
@@ -1254,7 +1251,7 @@ export default function ProductsPage() {
                           pageNum === page - 2 ||
                           pageNum === page + 2
                         ) {
-                          return <span key={pageNum} className="px-1.5 sm:px-2 md:px-3 text-amber-600 font-black text-base sm:text-lg md:text-xl">...</span>;
+                          return <span key={pageNum} className="px-1.5 sm:px-2 md:px-3 text-[#550000] font-black text-base sm:text-lg md:text-xl">...</span>;
                         }
                         return null;
                       })}
@@ -1263,7 +1260,7 @@ export default function ProductsPage() {
                     <button
                       onClick={() => setPage(page + 1)}
                       disabled={page === (data as any).pagination.totalPages}
-                      className="px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border-2 border-amber-300 rounded-xl bg-gradient-to-r from-white to-amber-50 hover:from-amber-50 hover:to-orange-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-gray-700 hover:shadow-lg transition-all disabled:hover:shadow-none text-xs sm:text-sm md:text-base"
+                      className="px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border-2 border-[#B3967D] rounded-xl bg-gradient-to-r from-white to-[#ECDBC7]/20 hover:from-[#ECDBC7]/20 hover:to-[#F5E6D3]/20 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-gray-700 hover:shadow-lg transition-all disabled:hover:shadow-none text-xs sm:text-sm md:text-base"
                     >
                       {t('pagination.next')}
                     </button>

@@ -11,18 +11,19 @@ import { Link } from '@/i18n/navigation';
 import { Region } from '@/lib/api/homepage';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { translateRegion, safeTranslate } from '@/lib/translation-helpers';
+import Image from 'next/image';
 
 interface ShopByRegionProps {
   regions: Region[];
 }
 
-// Custom regions with specific flags as requested
+// Custom regions with specific flag images
 const customRegions = [
-  { name: 'Hindi', flag: '🇮🇳', key: 'hindi' },
-  { name: 'Silani', flag: '🇱🇰', key: 'silani' },
-  { name: 'Cambodi', flag: '🇰🇭', key: 'cambodi' },
-  { name: 'Philipini', flag: '🇵🇭', key: 'philipini' },
-  { name: 'Meruke', flag: '🇮🇩', key: 'meruke' },
+  { name: 'Hindi', flagImage: 'https://flagcdn.com/w320/in.png', flagCode: 'in', key: 'hindi' },
+  { name: 'Silani', flagImage: 'https://flagcdn.com/w320/lk.png', flagCode: 'lk', key: 'silani' },
+  { name: 'Cambodi', flagImage: 'https://flagcdn.com/w320/kh.png', flagCode: 'kh', key: 'cambodi' },
+  { name: 'Philipini', flagImage: 'https://flagcdn.com/w320/ph.png', flagCode: 'ph', key: 'philipini' },
+  { name: 'Meruke', flagImage: 'https://flagcdn.com/w320/id.png', flagCode: 'id', key: 'meruke' },
 ];
 
 // Flag emoji mapping for regions - extended with new regions
@@ -92,7 +93,8 @@ export function ShopByRegion({ regions }: ShopByRegionProps) {
     return {
       region: cr.name,
       count: dbRegion?.count || 0,
-      flag: cr.flag,
+      flagImage: cr.flagImage,
+      flagCode: cr.flagCode,
       searchKey: cr.key, // Keep the key for URL filtering
     };
   });
@@ -145,8 +147,14 @@ export function ShopByRegion({ regions }: ShopByRegionProps) {
               href={`/products?region=${encodeURIComponent(region.searchKey)}`}
               className="flex-shrink-0 w-[220px] bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer border border-gray-200 group"
             >
-              <div className="h-[140px] flex items-center justify-center text-7xl bg-gray-50 group-hover:bg-gray-100 transition-all duration-300">
-                {region.flag}
+              <div className="relative h-[140px] overflow-hidden bg-gray-50 group-hover:bg-gray-100 transition-all duration-300">
+                <Image
+                  src={region.flagImage}
+                  alt={`${region.region} flag`}
+                  fill
+                  className="object-cover p-4 transition-transform duration-500 group-hover:scale-110"
+                  sizes="220px"
+                />
               </div>
               <div className="p-4 text-center bg-white">
                 <div className="text-base font-bold text-[#550000] mb-1">

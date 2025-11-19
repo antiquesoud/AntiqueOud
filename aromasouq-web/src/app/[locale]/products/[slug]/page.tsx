@@ -105,20 +105,20 @@ export default function ProductDetailPage() {
   const finalPrice = totalPrice - coinDiscount
 
   return (
-    <div className="bg-gradient-to-br from-amber-50 via-white to-orange-50 min-h-screen">
+    <div className="bg-gradient-to-br from-[#ECDBC7]/10 via-white to-[#ECDBC7]/10 min-h-screen">
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-[5%] py-4 sm:py-6">
         <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold overflow-x-auto">
-          <Link href="/" className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 transition-all">
+          <Link href="/" className="text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000] hover:from-[#6B0000] hover:to-[#8B0000] transition-all">
             🏠 {t('home')}
           </Link>
-          <span className="text-amber-400">→</span>
+          <span className="text-[#B3967D]">→</span>
           {product.category?.nameEn && (
             <>
-              <Link href={`/products?categorySlug=${product.category.slug}`} className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 transition-all">
+              <Link href={`/products?categorySlug=${product.category.slug}`} className="text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000] hover:from-[#6B0000] hover:to-[#8B0000] transition-all">
                 {product.category.nameEn}
               </Link>
-              <span className="text-amber-400">→</span>
+              <span className="text-[#B3967D]">→</span>
             </>
           )}
           <span className="text-gray-700">{product.nameEn}</span>
@@ -133,7 +133,7 @@ export default function ProductDetailPage() {
             {/* Main Image with Lens Zoom */}
             {productHasImages ? (
               <Lens lensSize={200} zoomFactor={2.5} className="mb-3 sm:mb-4">
-                <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
+                <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-[#ECDBC7] via-[#F5E6D3] to-[#ECDBC7] shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
                   {currentImageUrl ? (
                     <Image
                       src={currentImageUrl}
@@ -145,17 +145,17 @@ export default function ProductDetailPage() {
                     <ProductImagePlaceholder className="w-full h-full" />
                   )}
                   {product.salePrice && (
-                    <div className="absolute top-2 sm:top-5 left-2 sm:left-5 bg-gradient-to-r from-red-600 to-orange-600 text-white px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-black shadow-xl border-2 border-red-400/30">
+                    <div className="absolute top-2 sm:top-5 left-2 sm:left-5 bg-gradient-to-r from-red-600 to-[#550000] text-white px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-black shadow-xl border-2 border-red-400/30">
                       🔥 -{discount}% {t('offBadge')}
                     </div>
                   )}
                 </div>
               </Lens>
             ) : (
-              <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 mb-3 sm:mb-4 shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
+              <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-[#ECDBC7] via-[#F5E6D3] to-[#ECDBC7] mb-3 sm:mb-4 shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
                 <ProductImagePlaceholder className="w-full h-full" />
                 {product.salePrice && (
-                  <div className="absolute top-2 sm:top-5 left-2 sm:left-5 bg-gradient-to-r from-red-600 to-orange-600 text-white px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-black shadow-xl border-2 border-red-400/30">
+                  <div className="absolute top-2 sm:top-5 left-2 sm:left-5 bg-gradient-to-r from-red-600 to-[#550000] text-white px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-black shadow-xl border-2 border-red-400/30">
                     🔥 -{discount}% {t('offBadge')}
                   </div>
                 )}
@@ -173,8 +173,8 @@ export default function ProductDetailPage() {
                       onClick={() => setSelectedImage(index)}
                       className={`relative flex-shrink-0 w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] lg:w-[100px] lg:h-[100px] rounded-lg sm:rounded-xl overflow-hidden transition-all shadow-md sm:shadow-lg hover:shadow-xl sm:hover:shadow-2xl hover:scale-105 ${
                         selectedImage === index
-                          ? 'ring-2 sm:ring-4 ring-amber-500 shadow-xl sm:shadow-2xl scale-105'
-                          : 'ring-1 sm:ring-2 ring-amber-200 hover:ring-amber-400'
+                          ? 'ring-2 sm:ring-4 ring-[#550000] shadow-xl sm:shadow-2xl scale-105'
+                          : 'ring-1 sm:ring-2 ring-[#ECDBC7] hover:ring-[#B3967D]'
                       }`}
                     >
                       {thumbUrl ? (
@@ -192,8 +192,8 @@ export default function ProductDetailPage() {
           {/* Product Info */}
           <div className="py-0 sm:py-3">
             {/* Brand */}
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-amber-100 to-orange-100 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-2 sm:mb-3 border-2 border-amber-200 shadow-md">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-orange-700 text-xs sm:text-sm font-black uppercase tracking-wider">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#ECDBC7] to-[#F5E6D3] px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-2 sm:mb-3 border-2 border-[#ECDBC7] shadow-md">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000] text-xs sm:text-sm font-black uppercase tracking-wider">
                 ✨ {product.brand?.nameEn || t('premiumBrand')}
               </span>
             </div>
@@ -211,8 +211,8 @@ export default function ProductDetailPage() {
             )}
 
             {/* Rating */}
-            <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6 pb-4 sm:pb-6 border-b-2 border-amber-200">
-              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-amber-50 to-orange-50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border-2 border-amber-200 shadow-md">
+            <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6 pb-4 sm:pb-6 border-b-2 border-[#ECDBC7]">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#ECDBC7]/10 to-[#ECDBC7]/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border-2 border-[#ECDBC7] shadow-md">
                 <div className="flex text-base sm:text-2xl">
                   {[...Array(5)].map((_, i) => (
                     <span
@@ -228,15 +228,15 @@ export default function ProductDetailPage() {
                 </div>
                 <span className="text-sm sm:text-base font-black text-gray-700">{(product.rating || 0).toFixed(1)}</span>
               </div>
-              <a href="#reviews" className="text-xs sm:text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 transition-all whitespace-nowrap">
+              <a href="#reviews" className="text-xs sm:text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000] hover:from-[#6B0000] hover:to-[#8B0000] transition-all whitespace-nowrap">
                 📝 {product.reviewCount || 0} {tProducts('reviews')}
               </a>
             </div>
 
             {/* Price */}
-            <div className="mb-4 sm:mb-8 pb-4 sm:pb-8 border-b-2 border-amber-200">
+            <div className="mb-4 sm:mb-8 pb-4 sm:pb-8 border-b-2 border-[#ECDBC7]">
               <div className="flex flex-wrap items-baseline gap-2 sm:gap-4 mb-2 sm:mb-3">
-                <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">
+                <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000]">
                   {formatCurrency(currentPrice)}
                 </span>
                 {product.salePrice && (
@@ -244,7 +244,7 @@ export default function ProductDetailPage() {
                     <span className="text-lg sm:text-xl lg:text-2xl text-gray-400 line-through font-bold">
                       {formatCurrency(product.regularPrice)}
                     </span>
-                    <Badge className="bg-gradient-to-r from-red-600 to-orange-600 text-white text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-1.5 font-black shadow-lg border-2 border-red-400/30">
+                    <Badge className="bg-gradient-to-r from-red-600 to-[#550000] text-white text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-1.5 font-black shadow-lg border-2 border-red-400/30">
                       -{discount}% {t('offBadge')}
                     </Badge>
                   </>
@@ -279,7 +279,7 @@ export default function ProductDetailPage() {
             {product.size && !selectedVariantData && (
               <div className="mb-4 sm:mb-6">
                 <span className="text-xs sm:text-sm font-black text-gray-700 block mb-2 sm:mb-3">📦 {tProducts('size')}</span>
-                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all border-2 border-amber-400/30">
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all border-2 border-[#D4AF37]/30">
                   <Package className="h-5 w-5" />
                   <span>{product.size}</span>
                 </div>
@@ -290,11 +290,11 @@ export default function ProductDetailPage() {
             <div className="mb-4 sm:mb-8">
               <span className="text-xs sm:text-sm font-black text-gray-700 block mb-2 sm:mb-3">🔢 {tProducts('quantity')}</span>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                <div className="flex items-center border-2 border-amber-300 rounded-lg sm:rounded-xl bg-white shadow-md sm:shadow-lg">
+                <div className="flex items-center border-2 border-[#B3967D] rounded-lg sm:rounded-xl bg-white shadow-md sm:shadow-lg">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 sm:h-12 sm:w-12 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white transition-all rounded-l-lg sm:rounded-l-xl"
+                    className="h-10 w-10 sm:h-12 sm:w-12 hover:bg-gradient-to-r hover:from-[#550000] hover:to-[#6B0000] hover:text-white transition-all rounded-l-lg sm:rounded-l-xl"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     disabled={quantity <= 1}
                   >
@@ -304,7 +304,7 @@ export default function ProductDetailPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 sm:h-12 sm:w-12 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white transition-all rounded-r-lg sm:rounded-r-xl"
+                    className="h-10 w-10 sm:h-12 sm:w-12 hover:bg-gradient-to-r hover:from-[#550000] hover:to-[#6B0000] hover:text-white transition-all rounded-r-lg sm:rounded-r-xl"
                     onClick={() => setQuantity(quantity + 1)}
                     disabled={quantity >= currentStock}
                   >
@@ -337,10 +337,10 @@ export default function ProductDetailPage() {
                   <div className="pt-3 border-t border-blue-200">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <Coins className="w-5 h-5 text-amber-600" />
+                        <Coins className="w-5 h-5 text-[#D4AF37]" />
                         <span className="text-sm font-bold text-gray-700">{t('useCoins')}</span>
                       </div>
-                      <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold">
+                      <Badge className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-white font-bold">
                         {wallet.balance} {t('coinsAvailable')}
                       </Badge>
                     </div>
@@ -352,7 +352,7 @@ export default function ProductDetailPage() {
                         max={Math.min(wallet.balance, totalPrice)}
                         value={coinsToUse}
                         onChange={(e) => setCoinsToUse(Number(e.target.value))}
-                        className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                        className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-[#D4AF37]"
                       />
                       <div className="flex items-center justify-between">
                         <input
@@ -367,7 +367,7 @@ export default function ProductDetailPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => setCoinsToUse(Math.min(wallet.balance, totalPrice))}
-                          className="border-2 border-amber-500 text-amber-700 hover:bg-amber-500 hover:text-white transition-all"
+                          className="border-2 border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition-all"
                         >
                           {t('useMax')}
                         </Button>
@@ -411,7 +411,7 @@ export default function ProductDetailPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-6 sm:mb-10">
               <Button
-                className="flex-1 h-12 sm:h-16 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 hover:shadow-2xl hover:scale-105 transition-all text-white font-black text-base sm:text-lg rounded-lg sm:rounded-xl border-2 border-amber-400/30"
+                className="flex-1 h-12 sm:h-16 bg-gradient-to-r from-[#550000] to-[#6B0000] hover:from-[#6B0000] hover:to-[#8B0000] hover:shadow-2xl hover:scale-105 transition-all text-white font-black text-base sm:text-lg rounded-lg sm:rounded-xl border-2 border-[#550000]/30"
                 onClick={() => addToCart({ productId: product.id, variantId: selectedVariant || undefined, quantity })}
                 disabled={currentStock === 0}
               >
@@ -419,7 +419,7 @@ export default function ProductDetailPage() {
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 h-12 sm:h-16 border-2 border-amber-500 text-gray-800 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white font-black text-base sm:text-lg transition-all rounded-lg sm:rounded-xl hover:shadow-2xl hover:scale-105"
+                className="flex-1 h-12 sm:h-16 border-2 border-[#550000] text-gray-800 hover:bg-gradient-to-r hover:from-[#550000] hover:to-[#6B0000] hover:text-white font-black text-base sm:text-lg transition-all rounded-lg sm:rounded-xl hover:shadow-2xl hover:scale-105"
                 onClick={handleBuyNow}
                 disabled={currentStock === 0}
               >
@@ -429,7 +429,7 @@ export default function ProductDetailPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-amber-300 hover:border-red-500 hover:bg-red-50 transition-all rounded-lg sm:rounded-xl shadow-md hover:shadow-lg"
+                  className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-[#B3967D] hover:border-red-500 hover:bg-red-50 transition-all rounded-lg sm:rounded-xl shadow-md hover:shadow-lg"
                   onClick={() => toggleWishlist(product.id)}
                 >
                   <Heart
@@ -439,7 +439,7 @@ export default function ProductDetailPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-amber-300 hover:border-amber-500 hover:bg-amber-50 transition-all rounded-lg sm:rounded-xl shadow-md hover:shadow-lg"
+                  className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-[#B3967D] hover:border-[#550000] hover:bg-[#ECDBC7]/20 transition-all rounded-lg sm:rounded-xl shadow-md hover:shadow-lg"
                 >
                   <Share2 className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
                 </Button>
@@ -447,7 +447,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Features Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-8 pb-4 sm:pb-8 border-b-2 border-amber-200">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-8 pb-4 sm:pb-8 border-b-2 border-[#ECDBC7]">
               <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg sm:rounded-xl text-xs sm:text-sm shadow-md border-2 border-blue-200 hover:shadow-lg transition-all">
                 <div className="bg-white p-1.5 sm:p-2 rounded-lg shadow-sm">
                   <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
@@ -466,9 +466,9 @@ export default function ProductDetailPage() {
                 </div>
                 <span className="text-gray-700 font-bold">{t('easyReturns')}</span>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg sm:rounded-xl text-xs sm:text-sm shadow-md border-2 border-orange-200 hover:shadow-lg transition-all">
+              <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-br from-[#ECDBC7]/20 to-[#F5E6D3]/20 rounded-lg sm:rounded-xl text-xs sm:text-sm shadow-md border-2 border-[#ECDBC7] hover:shadow-lg transition-all">
                 <div className="bg-white p-1.5 sm:p-2 rounded-lg shadow-sm">
-                  <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600 flex-shrink-0" />
+                  <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-[#550000] flex-shrink-0" />
                 </div>
                 <span className="text-gray-700 font-bold">{t('securePayment')}</span>
               </div>
@@ -485,28 +485,28 @@ export default function ProductDetailPage() {
       {/* Tabs Section */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-[5%] mb-8 sm:mb-12 lg:mb-16">
         <Tabs defaultValue="description" className="w-full">
-          <TabsList className="w-full justify-start border-b-2 border-amber-200 bg-gradient-to-r from-white to-amber-50 h-auto p-0 rounded-none shadow-md overflow-x-auto scrollbar-hide">
+          <TabsList className="w-full justify-start border-b-2 border-[#ECDBC7] bg-gradient-to-r from-white to-[#ECDBC7]/20 h-auto p-0 rounded-none shadow-md overflow-x-auto scrollbar-hide">
             <TabsTrigger
               value="description"
-              className="data-[state=active]:border-b-4 data-[state=active]:border-amber-500 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-orange-600 data-[state=active]:font-black rounded-none px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-bold text-gray-600 hover:text-gray-800 transition-all text-xs sm:text-sm whitespace-nowrap"
+              className="data-[state=active]:border-b-4 data-[state=active]:border-[#550000] data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#550000] data-[state=active]:to-[#6B0000] data-[state=active]:font-black rounded-none px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-bold text-gray-600 hover:text-gray-800 transition-all text-xs sm:text-sm whitespace-nowrap"
             >
               📝 {t('tabs.description')}
             </TabsTrigger>
             <TabsTrigger
               value="specifications"
-              className="data-[state=active]:border-b-4 data-[state=active]:border-amber-500 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-orange-600 data-[state=active]:font-black rounded-none px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-bold text-gray-600 hover:text-gray-800 transition-all text-xs sm:text-sm whitespace-nowrap"
+              className="data-[state=active]:border-b-4 data-[state=active]:border-[#550000] data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#550000] data-[state=active]:to-[#6B0000] data-[state=active]:font-black rounded-none px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-bold text-gray-600 hover:text-gray-800 transition-all text-xs sm:text-sm whitespace-nowrap"
             >
               📊 {t('tabs.specifications')}
             </TabsTrigger>
             <TabsTrigger
               value="notes"
-              className="data-[state=active]:border-b-4 data-[state=active]:border-amber-500 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-orange-600 data-[state=active]:font-black rounded-none px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-bold text-gray-600 hover:text-gray-800 transition-all text-xs sm:text-sm whitespace-nowrap"
+              className="data-[state=active]:border-b-4 data-[state=active]:border-[#550000] data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#550000] data-[state=active]:to-[#6B0000] data-[state=active]:font-black rounded-none px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-bold text-gray-600 hover:text-gray-800 transition-all text-xs sm:text-sm whitespace-nowrap"
             >
               🌸 {t('tabs.fragranceNotes')}
             </TabsTrigger>
             <TabsTrigger
               value="reviews"
-              className="data-[state=active]:border-b-4 data-[state=active]:border-amber-500 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-orange-600 data-[state=active]:font-black rounded-none px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-bold text-gray-600 hover:text-gray-800 transition-all text-xs sm:text-sm whitespace-nowrap"
+              className="data-[state=active]:border-b-4 data-[state=active]:border-[#550000] data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#550000] data-[state=active]:to-[#6B0000] data-[state=active]:font-black rounded-none px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-bold text-gray-600 hover:text-gray-800 transition-all text-xs sm:text-sm whitespace-nowrap"
             >
               ⭐ {t('tabs.reviews')} ({product.reviewCount || 0})
             </TabsTrigger>
@@ -633,7 +633,7 @@ export default function ProductDetailPage() {
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-semibold text-charcoal">{t('customerReviews')}</h3>
               <Link href={`/products/${params.slug}/write-review`}>
-                <Button className="bg-gradient-to-r from-oud-gold to-amber-600 text-white">
+                <Button className="bg-gradient-to-r from-[#D4AF37] to-[#550000] text-white">
                   {tProducts('writeReview')}
                 </Button>
               </Link>

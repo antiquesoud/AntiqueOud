@@ -9,25 +9,30 @@ import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 import { Link } from '@/i18n/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
 const oudTypes = [
   {
-    icon: '🪔',
+    image: 'https://images.unsplash.com/photo-1585916420730-d7f95e942d43?w=400&h=300&fit=crop&q=80',
+    alt: 'Cambodian Oud Wood',
     translationKey: 'cambodian',
     slug: 'CAMBODIAN',
   },
   {
-    icon: '💎',
+    image: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=400&h=300&fit=crop&q=80',
+    alt: 'Indian Oud Chips',
     translationKey: 'indian',
     slug: 'INDIAN',
   },
   {
-    icon: '✨',
+    image: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=300&fit=crop&q=80',
+    alt: 'Thai Oud Essence',
     translationKey: 'thai',
     slug: 'THAI',
   },
   {
-    icon: '🌙',
+    image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=300&fit=crop&q=80',
+    alt: 'Mukhallat Oud Blend',
     translationKey: 'dehnAlOud',
     slug: 'MUKHALLAT',
   },
@@ -108,10 +113,17 @@ export function OudCollection() {
               href={`/products?oudType=${oud.slug}`}
               className="flex-shrink-0 w-[280px] md:w-auto rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer border-2 border-[#ECDBC7] group bg-white"
             >
-              <div className="h-[180px] bg-gradient-to-br from-[#ECDBC7]/30 via-white to-[#B3967D]/20 flex items-center justify-center text-7xl relative overflow-hidden">
-                {/* Subtle glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#550000]/5 to-transparent"></div>
-                <span className="relative z-10 drop-shadow-lg transform group-hover:scale-125 group-hover:rotate-6 transition-all duration-500">{oud.icon}</span>
+              <div className="h-[180px] relative overflow-hidden">
+                {/* Image */}
+                <Image
+                  src={oud.image}
+                  alt={oud.alt}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  sizes="(max-width: 768px) 280px, (max-width: 1024px) 50vw, 25vw"
+                />
+                {/* Overlay gradient for better text contrast */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#550000]/40 via-[#550000]/10 to-transparent"></div>
               </div>
               <div className="p-5 text-center bg-gradient-to-br from-white to-[#ECDBC7]/10">
                 <div className="text-lg font-black text-[#550000] mb-2">
