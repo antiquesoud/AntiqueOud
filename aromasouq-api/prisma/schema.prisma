@@ -574,6 +574,7 @@ model GuestOrder {
   orderStatus     String           @map("order_status")
   paymentMethod   String           @map("payment_method")
   paymentStatus   String           @default("PENDING") @map("payment_status")
+  paymentId       String?          @map("payment_id")
   trackingNumber  String?          @map("tracking_number")
   trackingUrl     String?          @map("tracking_url")
   createdAt       DateTime         @default(now()) @map("created_at")

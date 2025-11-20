@@ -13,7 +13,6 @@ import {
   LogOut,
   Menu,
   X,
-  Home,
   Tag,
   FolderTree
 } from 'lucide-react'
@@ -78,15 +77,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full">
-          {/* Logo */}
+          {/* Admin Header with User Info */}
           <div className="flex items-center justify-between p-6 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-oud-gold to-amber flex items-center justify-center font-heading font-bold text-deep-navy">
-                A
-              </div>
-              <div>
-                <h2 className="font-heading font-bold text-oud-gold">{t('aromasouq')}</h2>
-                <p className="text-xs text-gray-400">{t('adminPanel')}</p>
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Avatar className="h-10 w-10">
+                <AvatarFallback className="bg-oud-gold text-deep-navy font-bold">
+                  {userName?.charAt(0)?.toUpperCase() || 'A'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{userName}</p>
+                <p className="text-xs text-oud-gold truncate">{t('adminPanel')}</p>
               </div>
             </div>
             <Button
@@ -97,21 +98,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <X className="h-5 w-5" />
             </Button>
-          </div>
-
-          {/* Admin info */}
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarFallback className="bg-oud-gold text-deep-navy">
-                  {userName?.charAt(0)?.toUpperCase() || 'A'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{userName}</p>
-                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-              </div>
-            </div>
           </div>
 
           {/* Navigation */}
@@ -141,17 +127,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
 
           {/* Actions */}
-          <div className="p-4 border-t border-white/10 space-y-2">
-            <Link href="/" className="block">
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-gray-300 hover:text-white hover:bg-white/10"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <Home className="h-5 w-5 mr-3" />
-                {t('backToHomepage')}
-              </Button>
-            </Link>
+          <div className="p-4 border-t border-white/10">
             <Button
               variant="ghost"
               className="w-full justify-start text-gray-300 hover:text-white hover:bg-white/10"

@@ -24,6 +24,8 @@ import { formatCurrency } from "@/lib/utils"
 import { apiClient } from "@/lib/api-client"
 import toast from "react-hot-toast"
 import { useTranslations } from "next-intl"
+import { StripeProvider } from "@/components/payment/StripeProvider"
+import { StripeCardForm } from "@/components/payment/StripeCardForm"
 
 type DeliveryMethod = "standard" | "express" | "sameDay"
 
@@ -40,12 +42,16 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("card")
   const [coinsToUse, setCoinsToUse] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [showStripeForm, setShowStripeForm] = useState(false)
 
   const steps = [
     { id: 1, name: t('steps.address'), key: "address" },
     { id: 2, name: t('steps.delivery'), key: "delivery" },
     { id: 3, name: t('steps.payment'), key: "payment" },
     { id: 4, name: t('steps.review'), key: "review" },
+    ...(showStripeForm ? [{ id: 5, name: 'Complete Payment', key: "stripe-payment" }] : []),
   ]
 
   // Redirect if cart is empty
@@ -138,19 +144,44 @@ export default function CheckoutPage() {
       // Then create the order using the address ID
       const order = await apiClient.post<{ id: string; orderNumber: string }>('/orders', {
         addressId: address.id,
-        paymentMethod: paymentMethod === 'card' ? 'CARD' : 'CASH_ON_DELIVERY',
+        paymentMethod: paymentMethod === 'card' ? 'CREDIT_CARD' : 'CASH_ON_DELIVERY',
         coinsToUse,
         couponCode: appliedCoupon?.coupon.code,
       })
 
-      toast.success(`Order #${order.orderNumber} placed successfully!`)
-      clearCart()
-      router.push(`/order-success?orderId=${order.id}`)
+      // If card payment, initialize Stripe and show payment form
+      if (paymentMethod === 'card') {
+        const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent', {
+          orderId: order.id,
+        })
+
+        setCreatedOrderId(order.id)
+        setClientSecret(paymentIntent.clientSecret)
+        setShowStripeForm(true)
+        setCurrentStep(5)
+      } else {
+        // COD - complete order immediately
+        toast.success(`Order #${order.orderNumber} placed successfully!`)
+        clearCart()
+        router.push(`/order-success?orderId=${order.id}`)
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || t('processing'))
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handlePaymentSuccess = () => {
+    clearCart()
+    router.push(`/order-success?orderId=${createdOrderId}`)
+  }
+
+  const handlePaymentCancel = () => {
+    setShowStripeForm(false)
+    setClientSecret(null)
+    setCurrentStep(4)
+    toast('Payment cancelled')
   }
 
   if (!cart || !cart.items || cart.items.length === 0) {
@@ -641,6 +672,23 @@ export default function CheckoutPage() {
                       </div>
                     </CardContent>
                   </Card>
+                </motion.div>
+              )}
+
+              {/* Step 5: Stripe Payment */}
+              {currentStep === 5 && showStripeForm && clientSecret && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <StripeProvider clientSecret={clientSecret}>
+                    <StripeCardForm
+                      orderId={createdOrderId!}
+                      total={finalTotal}
+                      onSuccess={handlePaymentSuccess}
+                      onCancel={handlePaymentCancel}
+                    />
+                  </StripeProvider>
                 </motion.div>
               )}
             </form>

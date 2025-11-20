@@ -6,8 +6,7 @@ import { notFound } from 'next/navigation';
 import { locales, localeDirections } from '@/i18n/config';
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "react-hot-toast";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
+import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import "../globals.css";
 
 // Antique Oud Brand Fonts
@@ -79,7 +78,7 @@ export default async function LocaleLayout({
   const direction = localeDirections[locale as keyof typeof localeDirections];
 
   return (
-    <html lang={locale} dir={direction}>
+    <html lang={locale} dir={direction} suppressHydrationWarning>
       <body
         className={`${inter.variable} ${changa.variable} ${ibmPlexArabic.variable} antialiased min-h-screen`}
         style={{ fontFamily: locale === 'ar' ? 'var(--font-ibm-plex-arabic)' : 'var(--font-inter)' }}
@@ -87,9 +86,7 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>
-            <Header />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
+            <ConditionalLayout>{children}</ConditionalLayout>
             <Toaster
               position={direction === 'rtl' ? 'top-left' : 'top-right'}
               toastOptions={{

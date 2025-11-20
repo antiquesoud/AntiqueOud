@@ -23,6 +23,7 @@ import { WalletModule} from './wallet/wallet.module';
 import { SessionModule } from './session/session.module';
 import { GuestCartModule } from './guest-cart/guest-cart.module';
 import { GuestOrdersModule } from './guest-orders/guest-orders.module';
+import { PaymentsModule } from './payments/payments.module';
 
 // Phase 5: File uploads & media management modules loaded
 // Phase 6: Wallet & Coins system integrated
@@ -54,6 +55,7 @@ import { GuestOrdersModule } from './guest-orders/guest-orders.module';
     VendorModule,
     CouponsModule,
     CheckoutModule,
+    PaymentsModule, // Stripe payment integration
   ],
   controllers: [AppController],
   providers: [AppService],

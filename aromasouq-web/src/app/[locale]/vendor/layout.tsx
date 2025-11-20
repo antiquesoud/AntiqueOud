@@ -96,16 +96,7 @@ export default function VendorLayout({
         </nav>
 
         {/* Actions */}
-        <div className="p-4 space-y-2">
-          <Link href="/" className="block">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-white hover:bg-white/10"
-            >
-              <Home className="h-5 w-5 mr-3" />
-              {t('backToHomepage')}
-            </Button>
-          </Link>
+        <div className="p-4">
           <Button
             variant="ghost"
             className="w-full justify-start text-white hover:bg-white/10"

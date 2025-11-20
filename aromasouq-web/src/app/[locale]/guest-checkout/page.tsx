@@ -20,6 +20,8 @@ import { apiClient } from "@/lib/api-client"
 import toast from "react-hot-toast"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
+import { StripeProvider } from "@/components/payment/StripeProvider"
+import { StripeCardForm } from "@/components/payment/StripeCardForm"
 
 // Guest cart types
 interface GuestCartItem {
@@ -81,12 +83,18 @@ export default function GuestCheckoutPage() {
   const [cart, setCart] = useState<GuestCart | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
+  const [createdOrderNumber, setCreatedOrderNumber] = useState<string | null>(null)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [showStripeForm, setShowStripeForm] = useState(false)
+  const [guestEmail, setGuestEmail] = useState<string>('')
 
   const steps = [
     { id: 1, name: t('steps.address'), icon: ShoppingBag },
     { id: 2, name: t('steps.delivery'), icon: Truck },
     { id: 3, name: t('steps.payment'), icon: CreditCard },
     { id: 4, name: t('steps.review'), icon: Eye },
+    ...(showStripeForm ? [{ id: 5, name: 'Complete Payment', icon: CreditCard }] : []),
   ]
 
   const form = useForm<GuestCheckoutInput>({
@@ -161,16 +169,82 @@ export default function GuestCheckoutPage() {
 
       const order = await apiClient.post<{ id: string; orderNumber: string }>('/guest-orders', orderData)
 
-      toast.success(`Order #${order.orderNumber} placed successfully!`)
+      setCreatedOrderId(order.id)
+      setCreatedOrderNumber(order.orderNumber)
+      setGuestEmail(data.guestEmail)
 
-      // Redirect to track order page with pre-filled information
-      router.push(`/track-order?orderNumber=${order.orderNumber}&email=${data.guestEmail}`)
+      // If online payment, initialize Stripe
+      if (data.paymentMethod === 'ONLINE_PAYMENT') {
+        console.log('[Checkout] Creating payment intent for order:', order.id)
+
+        try {
+          const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent-guest', {
+            orderId: order.id,
+          })
+
+          console.log('[Checkout] Payment intent created successfully')
+          console.log('[Checkout] Client secret received:', paymentIntent.clientSecret?.substring(0, 20) + '...')
+
+          if (!paymentIntent.clientSecret) {
+            throw new Error('No client secret received from payment API')
+          }
+
+          setClientSecret(paymentIntent.clientSecret)
+          setShowStripeForm(true)
+          setCurrentStep(5)
+
+          console.log('[Checkout] Moved to payment step 5')
+        } catch (paymentError: any) {
+          console.error('[Checkout] Payment intent creation failed:', paymentError)
+          toast.error(paymentError.response?.data?.message || 'Failed to initialize payment. Please try again.')
+          // Keep the order created, but don't proceed to payment
+        }
+      } else {
+        // COD or Bank Transfer - complete immediately
+        console.log('[Checkout] COD order placed, clearing cart...')
+
+        try {
+          await apiClient.delete('/guest-cart')
+          console.log('[Checkout] Cart cleared successfully')
+        } catch (error) {
+          console.error('[Checkout] Failed to clear cart:', error)
+          // Continue anyway
+        }
+
+        toast.success(`Order #${order.orderNumber} placed successfully!`)
+        router.push(`/track-order?orderNumber=${order.orderNumber}&email=${data.guestEmail}`)
+      }
     } catch (error: any) {
-      console.error('Order creation failed:', error)
+      console.error('[Checkout] Order creation failed:', error)
       toast.error(error.response?.data?.message || 'Failed to place order')
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handlePaymentSuccess = async () => {
+    try {
+      console.log('[Checkout] Payment successful, clearing cart...')
+
+      // Clear the guest cart
+      await apiClient.delete('/guest-cart')
+
+      console.log('[Checkout] Cart cleared successfully')
+      toast.success('Payment successful!')
+      router.push(`/track-order?orderNumber=${createdOrderNumber}&email=${guestEmail}`)
+    } catch (error) {
+      console.error('[Checkout] Failed to clear cart:', error)
+      // Still redirect even if cart clear fails
+      toast.success('Payment successful!')
+      router.push(`/track-order?orderNumber=${createdOrderNumber}&email=${guestEmail}`)
+    }
+  }
+
+  const handlePaymentCancel = () => {
+    setShowStripeForm(false)
+    setClientSecret(null)
+    setCurrentStep(4)
+    toast('Payment cancelled')
   }
 
   if (isLoading) {
@@ -633,6 +707,30 @@ export default function GuestCheckoutPage() {
                       </div>
                     </CardContent>
                   </Card>
+                </motion.div>
+              )}
+
+              {/* Step 5: Stripe Payment */}
+              {currentStep === 5 && showStripeForm && clientSecret && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-700">
+                      <strong>Order #{createdOrderNumber}</strong> created. Complete payment to confirm.
+                    </p>
+                  </div>
+
+                  <StripeProvider clientSecret={clientSecret}>
+                    <StripeCardForm
+                      orderId={createdOrderId!}
+                      total={cart?.summary.total || 0}
+                      isGuestOrder={true}
+                      onSuccess={handlePaymentSuccess}
+                      onCancel={handlePaymentCancel}
+                    />
+                  </StripeProvider>
                 </motion.div>
               )}
             </form>

@@ -22,6 +22,8 @@ import { GiftOptionsModal } from '@/components/features/gift-options-modal'
 import { useTranslations } from 'next-intl'
 import { AddressForm } from '@/components/addresses/AddressForm'
 import { useCreateAddress, CreateAddressDto } from '@/hooks/useAddresses'
+import { StripeProvider } from '@/components/payment/StripeProvider'
+import { StripeCardForm } from '@/components/payment/StripeCardForm'
 
 interface Product {
   id: string
@@ -70,6 +72,10 @@ export default function QuickCheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
   const [couponError, setCouponError] = useState('')
   const [showAddressForm, setShowAddressForm] = useState(false)
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
+  const [createdOrderNumber, setCreatedOrderNumber] = useState<string | null>(null)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [showStripeForm, setShowStripeForm] = useState(false)
 
   const createAddressMutation = useCreateAddress()
 
@@ -100,9 +106,9 @@ export default function QuickCheckoutPage() {
     })
   }
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!selectedAddress) {
-      alert('Please select a delivery address')
+      toast.error('Please select a delivery address')
       return
     }
 
@@ -112,7 +118,7 @@ export default function QuickCheckoutPage() {
       quantity,
       addressId: selectedAddress,
       deliveryMethod,
-      paymentMethod: paymentMethod === 'CARD' ? 'CARD' : 'CASH_ON_DELIVERY',
+      paymentMethod: paymentMethod === 'CARD' ? 'CREDIT_CARD' : 'CASH_ON_DELIVERY',
       coinsToUse,
       giftOptions,
     }
@@ -122,7 +128,37 @@ export default function QuickCheckoutPage() {
       checkoutData.couponCode = appliedCoupon.coupon.code
     }
 
-    quickCheckout(checkoutData)
+    try {
+      const order = await apiClient.post<{ id: string; orderNumber: string }>('/checkout/quick', checkoutData)
+
+      setCreatedOrderId(order.id)
+      setCreatedOrderNumber(order.orderNumber)
+
+      if (paymentMethod === 'CARD') {
+        const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent', {
+          orderId: order.id,
+        })
+
+        setClientSecret(paymentIntent.clientSecret)
+        setShowStripeForm(true)
+      } else {
+        toast.success(`Order #${order.orderNumber} placed successfully!`)
+        router.push(`/order-success?orderId=${order.id}`)
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to place order')
+    }
+  }
+
+  const handlePaymentSuccess = () => {
+    toast.success('Payment successful!')
+    router.push(`/order-success?orderId=${createdOrderId}`)
+  }
+
+  const handlePaymentCancel = () => {
+    setShowStripeForm(false)
+    setClientSecret(null)
+    toast('Payment cancelled')
   }
 
   if (productLoading || addressesLoading || authLoading) {
@@ -557,6 +593,30 @@ export default function QuickCheckoutPage() {
         onClose={() => setGiftOptionsOpen(false)}
         onSave={setGiftOptions}
       />
+
+      {/* Stripe Payment Modal */}
+      {showStripeForm && clientSecret && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  <strong>Order #{createdOrderNumber}</strong> created. Complete payment to confirm.
+                </p>
+              </div>
+
+              <StripeProvider clientSecret={clientSecret}>
+                <StripeCardForm
+                  orderId={createdOrderId!}
+                  total={total}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
+                />
+              </StripeProvider>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

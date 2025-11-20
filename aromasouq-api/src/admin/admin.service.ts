@@ -239,6 +239,20 @@ export class AdminService {
                   name: true,
                   nameAr: true,
                   images: true,
+                  vendor: {
+                    select: {
+                      id: true,
+                      businessName: true,
+                      businessNameAr: true,
+                      user: {
+                        select: {
+                          firstName: true,
+                          lastName: true,
+                          email: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -266,14 +280,24 @@ export class AdminService {
   async getAllProducts(params?: {
     isActive?: boolean;
     isFeatured?: boolean;
+    search?: string;
     page?: number;
     limit?: number;
   }) {
-    const { isActive, isFeatured, page = 1, limit = 20 } = params || {};
+    const { isActive, isFeatured, search, page = 1, limit = 20 } = params || {};
 
     const where: any = {};
     if (isActive !== undefined) where.isActive = isActive;
     if (isFeatured !== undefined) where.isFeatured = isFeatured;
+
+    // Add search functionality
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { nameAr: { contains: search, mode: 'insensitive' } },
+        { sku: { contains: search, mode: 'insensitive' } },
+      ];
+    }
 
     const skip = (page - 1) * limit;
 
@@ -295,6 +319,35 @@ export class AdminService {
               nameAr: true,
             },
           },
+          vendor: {
+            select: {
+              id: true,
+              businessName: true,
+              businessNameAr: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          variants: {
+            select: {
+              id: true,
+              name: true,
+              nameAr: true,
+              size: true,
+              price: true,
+              salePrice: true,
+              stock: true,
+              isActive: true,
+            },
+            orderBy: {
+              sortOrder: 'asc',
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -303,8 +356,35 @@ export class AdminService {
       this.prisma.product.count({ where }),
     ]);
 
+    // Calculate total stock and effective price for each product
+    const productsWithCalculations = products.map((product) => {
+      // Calculate total stock (from product + all variants)
+      const totalStock =
+        product.stock +
+        (product.variants?.reduce((sum, v) => sum + v.stock, 0) || 0);
+
+      // Determine effective price
+      let effectivePrice = product.salePrice || product.price;
+
+      // If product has variants, use the lowest price
+      if (product.variants && product.variants.length > 0) {
+        const variantPrices = product.variants.map(
+          (v) => v.salePrice || v.price,
+        );
+        const lowestPrice = Math.min(...variantPrices);
+        effectivePrice = lowestPrice;
+      }
+
+      return {
+        ...product,
+        stockQuantity: totalStock, // Add for frontend compatibility
+        regularPrice: product.price, // Add for frontend compatibility
+        calculatedPrice: effectivePrice, // Add calculated price
+      };
+    });
+
     return {
-      data: products,
+      data: productsWithCalculations,
       meta: {
         total,
         page,
@@ -511,5 +591,26 @@ export class AdminService {
     });
 
     return updatedVendor;
+  }
+
+  async updateProductStatus(productId: string, isActive: boolean) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${productId} not found`);
+    }
+
+    return this.prisma.product.update({
+      where: { id: productId },
+      data: { isActive },
+      select: {
+        id: true,
+        name: true,
+        nameAr: true,
+        isActive: true,
+      },
+    });
   }
 }

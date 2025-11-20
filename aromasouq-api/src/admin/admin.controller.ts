@@ -119,4 +119,12 @@ export class AdminController {
   ) {
     return this.adminService.updateVendorStatus(id, updateVendorStatusDto);
   }
+
+  @Patch('products/:id/status')
+  updateProductStatus(
+    @Param('id') id: string,
+    @Body() body: { status: boolean },
+  ) {
+    return this.adminService.updateProductStatus(id, body.status);
+  }
 }

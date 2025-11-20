@@ -35,7 +35,9 @@ export default function ProductModerationPage() {
     queryKey: ['admin-products', { search, status: activeTab === 'ALL' ? undefined : activeTab }],
     queryFn: () => apiClient.get('/admin/products', {
       search: search || undefined,
-      status: activeTab === 'ALL' ? undefined : activeTab
+      isActive: activeTab === 'ALL' ? undefined : (activeTab === 'ACTIVE'),
+      page: 1,
+      limit: 50, // Increase from default 20
     }),
   })
 
@@ -51,19 +53,20 @@ export default function ProductModerationPage() {
     },
   })
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'DRAFT':
-        return <Badge variant="outline" className="bg-gray-100 text-gray-800">{t('statusDraft')}</Badge>
-      case 'ACTIVE':
-        return <Badge variant="outline" className="bg-green-100 text-green-800">{t('statusActive')}</Badge>
-      case 'INACTIVE':
-        return <Badge variant="outline" className="bg-[#B3967D]/100 text-[#B3967D]/800">{t('statusInactive')}</Badge>
-      case 'OUT_OF_STOCK':
-        return <Badge variant="outline" className="bg-red-100 text-red-800">{t('statusOutOfStock')}</Badge>
-      default:
-        return <Badge variant="outline">{status}</Badge>
+  const getStatusBadge = (product: any) => {
+    // Determine status from isActive and stock
+    const isActive = product.isActive
+    const stock = product.stockQuantity !== undefined ? product.stockQuantity : product.stock || 0
+
+    if (!isActive) {
+      return <Badge variant="outline" className="bg-gray-100 text-gray-800">{t('statusInactive')}</Badge>
     }
+
+    if (stock === 0) {
+      return <Badge variant="outline" className="bg-red-100 text-red-800">{t('statusOutOfStock')}</Badge>
+    }
+
+    return <Badge variant="outline" className="bg-green-100 text-green-800">{t('statusActive')}</Badge>
   }
 
   return (
@@ -94,8 +97,6 @@ export default function ProductModerationPage() {
           <TabsTrigger value="ALL">{t('all')}</TabsTrigger>
           <TabsTrigger value="ACTIVE">{t('active')}</TabsTrigger>
           <TabsTrigger value="INACTIVE">{t('inactive')}</TabsTrigger>
-          <TabsTrigger value="OUT_OF_STOCK">{t('outOfStock')}</TabsTrigger>
-          <TabsTrigger value="DRAFT">{t('draft')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-6">
@@ -146,14 +147,34 @@ export default function ProductModerationPage() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>{product.vendor?.businessName || product.vendor?.firstName}</TableCell>
-                          <TableCell>{formatCurrency(product.salePrice || product.regularPrice)}</TableCell>
+                          <TableCell>{product.vendor?.businessName || product.vendor?.user?.firstName || '-'}</TableCell>
                           <TableCell>
-                            <span className={product.stockQuantity < 10 ? 'text-red-600 font-medium' : ''}>
-                              {product.stockQuantity}
-                            </span>
+                            {product.calculatedPrice
+                              ? formatCurrency(product.calculatedPrice)
+                              : product.variants && product.variants.length > 0
+                                ? formatCurrency(Math.min(...product.variants.map((v: any) => v.salePrice || v.price)))
+                                : formatCurrency(product.salePrice || product.price || 0)
+                            }
+                            {product.variants && product.variants.length > 0 && (
+                              <span className="text-xs text-muted-foreground ml-1">
+                                ({product.variants.length} variants)
+                              </span>
+                            )}
                           </TableCell>
-                          <TableCell>{getStatusBadge(product.status)}</TableCell>
+                          <TableCell>
+                            {product.stockQuantity !== undefined ? (
+                              <span className={product.stockQuantity < 10 ? 'text-red-600 font-medium' : ''}>
+                                {product.stockQuantity}
+                              </span>
+                            ) : product.stock !== undefined ? (
+                              <span className={product.stock < 10 ? 'text-red-600 font-medium' : ''}>
+                                {product.stock}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">---</span>
+                            )}
+                          </TableCell>
+                          <TableCell>{getStatusBadge(product)}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
                               <Button variant="ghost" size="sm" asChild>
@@ -161,13 +182,13 @@ export default function ProductModerationPage() {
                                   <Eye className="h-4 w-4" />
                                 </Link>
                               </Button>
-                              {product.status !== 'ACTIVE' && (
+                              {!product.isActive && (
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() => updateStatusMutation.mutate({
                                     productId: product.id,
-                                    status: 'ACTIVE'
+                                    status: true
                                   })}
                                   disabled={updateStatusMutation.isPending}
                                 >
@@ -175,13 +196,13 @@ export default function ProductModerationPage() {
                                   {t('activate')}
                                 </Button>
                               )}
-                              {product.status === 'ACTIVE' && (
+                              {product.isActive && (
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() => updateStatusMutation.mutate({
                                     productId: product.id,
-                                    status: 'INACTIVE'
+                                    status: false
                                   })}
                                   disabled={updateStatusMutation.isPending}
                                 >
