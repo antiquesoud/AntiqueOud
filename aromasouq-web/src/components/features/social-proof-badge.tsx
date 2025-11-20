@@ -33,7 +33,7 @@ export function SocialProofBadges() {
       {
         id: '3',
         type: 'trending',
-        message: '🔥 Trending now - 45 sold today',
+        message: 'Trending now - 45 sold today',
         timestamp: new Date(),
       },
     ]

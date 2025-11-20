@@ -14,64 +14,64 @@ import { useDirection } from '@/lib/rtl-utils';
 
 // Context data for dynamic page rendering
 const scentFamilyIcons: Record<string, string> = {
-  floral: "🌸",
-  fruity: "🍎",
-  fresh: "🌊",
-  aquatic: "🌊",
-  oriental: "🌟",
-  woody: "🌳",
-  citrus: "🍊",
-  spicy: "🌶️",
-  green: "🌿",
-  gourmand: "🍬"
+  floral: "",
+  fruity: "",
+  fresh: "",
+  aquatic: "",
+  oriental: "",
+  woody: "",
+  citrus: "",
+  spicy: "",
+  green: "",
+  gourmand: ""
 };
 
 const regionFlags: Record<string, string> = {
-  UAE: "🇦🇪",
-  SAUDI: "🇸🇦",
-  KUWAIT: "🇰🇼",
-  QATAR: "🇶🇦",
-  OMAN: "🇴🇲",
-  BAHRAIN: "🇧🇭",
-  FRANCE: "🇫🇷",
-  ITALY: "🇮🇹",
-  UK: "🇬🇧",
-  USA: "🇺🇸",
-  INDIA: "🇮🇳",
-  THAILAND: "🇹🇭",
-  HINDI: "🇮🇳",
-  SILANI: "🇱🇰",
-  CAMBODI: "🇰🇭",
-  PHILIPINI: "🇵🇭",
-  MERUKE: "🇮🇩"
+  UAE: "",
+  SAUDI: "",
+  KUWAIT: "",
+  QATAR: "",
+  OMAN: "",
+  BAHRAIN: "",
+  FRANCE: "",
+  ITALY: "",
+  UK: "",
+  USA: "",
+  INDIA: "",
+  THAILAND: "",
+  HINDI: "",
+  SILANI: "",
+  CAMBODI: "",
+  PHILIPINI: "",
+  MERUKE: ""
 };
 
 const occasionIcons: Record<string, string> = {
-  OFFICE: "💼",
-  DAILY: "🌞",
-  PARTY: "🎉",
-  WEDDING: "💍",
-  RAMADAN: "🌙",
-  EID: "✨",
-  DATE: "💝"
+  OFFICE: "",
+  DAILY: "",
+  PARTY: "",
+  WEDDING: "",
+  RAMADAN: "",
+  EID: "",
+  DATE: ""
 };
 
 const collectionIcons: Record<string, string> = {
-  RAMADAN: "🌙",
-  SIGNATURE: "⭐",
-  CELEBRITY: "👑",
-  MOST_LOVED: "❤️",
-  TRENDING: "🔥",
-  EXCLUSIVE: "💎"
+  RAMADAN: "",
+  SIGNATURE: "",
+  CELEBRITY: "",
+  MOST_LOVED: "",
+  TRENDING: "",
+  EXCLUSIVE: ""
 };
 
 const oudTypeIcons: Record<string, string> = {
-  CAMBODIAN: "🪔",
-  INDIAN: "💎",
-  THAI: "✨",
-  MALAYSIAN: "🌴",
-  LAOTIAN: "🏔️",
-  MUKHALLAT: "🌙"
+  CAMBODIAN: "",
+  INDIAN: "",
+  THAI: "",
+  MALAYSIAN: "",
+  LAOTIAN: "",
+  MUKHALLAT: ""
 };
 
 interface PageContext {
@@ -96,7 +96,7 @@ function getPageContext(filters: any, t: any): PageContext {
     return {
       title: collectionName,
       subtitle: collectionSubtitle,
-      icon: collectionIcons[collectionKey] || "✨",
+      icon: collectionIcons[collectionKey] || "",
       gradient: "from-[#8B3A3A] via-[#1A1F2E] to-[#C9A86A]",
       description: collectionDesc,
       breadcrumbs: [
@@ -138,7 +138,7 @@ function getPageContext(filters: any, t: any): PageContext {
       unisex: {
         title: t('gender.unisex.title'),
         subtitle: t('gender.unisex.subtitle'),
-        icon: "✨",
+        icon: "",
         gradient: "from-[#C9A86A] via-[#D4A574] to-[#E8C4A0]",
         description: t('gender.unisex.description'),
         breadcrumbs: [
@@ -197,7 +197,7 @@ function getPageContext(filters: any, t: any): PageContext {
       title: t(`occasions.${occasionKey}.title`),
       subtitle: t(`occasions.${occasionKey}.subtitle`),
       description: t(`occasions.${occasionKey}.description`),
-      icon: occasionIcons[occasionKey] || "✨",
+      icon: occasionIcons[occasionKey] || "",
       gradient: "from-[#1A1F2E] via-[#8B3A3A] to-[#C9A86A]",
       breadcrumbs: [
         { label: t('breadcrumbs.home'), href: "/" },
@@ -232,7 +232,7 @@ function getPageContext(filters: any, t: any): PageContext {
     return {
       title: typeName,
       subtitle: t('contexts.qualityGuaranteed'),
-      icon: "✨",
+      icon: "",
       gradient: "from-[#C9A86A] to-[#D4A574]",
       description: t('contexts.authenticFragrances'),
       breadcrumbs: [
@@ -1152,7 +1152,7 @@ export default function ProductsPage() {
                   onChange={(e) => handleFilterChange('sort', e.target.value)}
                   className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-[#B3967D] rounded-xl bg-gradient-to-r from-white to-[#ECDBC7]/20 focus:ring-2 focus:ring-[#B3967D] focus:border-[#550000] font-bold text-gray-700 hover:shadow-md transition-all cursor-pointer text-xs sm:text-sm"
                 >
-                  <option value="createdAt_desc">✨ {t('sort.newestFirst')}</option>
+                  <option value="createdAt_desc">{t('sort.newestFirst')}</option>
                   <option value="createdAt_asc">{t('sort.oldestFirst')}</option>
                   <option value="price_asc">{t('sort.priceLowToHigh')}</option>
                   <option value="price_desc">{t('sort.priceHighToLow')}</option>

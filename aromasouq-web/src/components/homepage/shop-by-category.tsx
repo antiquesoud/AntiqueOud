@@ -11,15 +11,16 @@ import { Category } from '@/lib/api/homepage';
 import { translateCategory } from '@/lib/translation-helpers';
 import { ArabicBorder } from '@/components/ui/arabic-border';
 
-// Mapping categories to images
+// Mapping categories to images - only 4 categories now
 const categoryImages: Record<string, string> = {
-  'perfumes': '/perfume-images/antik-posts8.jpg',
-  'oud': '/perfume-images/antik-posts9.jpg',
-  'attars': '/perfume-images/antik-posts10.jpg',
-  'bakhoor': '/perfume-images/antik-posts11.jpg',
-  'gift-sets': '/perfume-images/antik-posts13.jpg',
-  'home-fragrance': '/perfume-images/antik-posts14.jpg',
+  'oud': '/perfume-images/antik-posts9.jpg', // Oudh - keep same image
+  'perfumes': '/perfume-images/antik-posts6.jpg', // Perfume
+  'body-spray': '/perfume-images/antik-posts7.jpg', // Body Spray
+  'dehnal-oud': '/perfume-images/antik-posts11.jpg', // Dehnal Oud
 };
+
+// Only show these 4 categories (removed attars)
+const allowedCategories = ['oud', 'perfumes', 'body-spray', 'dehnal-oud'];
 
 interface ShopByCategoryProps {
   categories: Category[];
@@ -28,6 +29,11 @@ interface ShopByCategoryProps {
 export function ShopByCategory({ categories }: ShopByCategoryProps) {
   const t = useTranslations('homepage.categories');
   const tCategories = useTranslations('categories');
+
+  // Debug: Log categories
+  console.log('All categories received:', categories.map(c => c.slug));
+  const filteredCategories = categories.filter((category) => allowedCategories.includes(category.slug));
+  console.log('Filtered categories:', filteredCategories.map(c => c.slug));
 
   return (
     <div className="relative overflow-hidden bg-white py-16 mb-0">
@@ -49,8 +55,8 @@ export function ShopByCategory({ categories }: ShopByCategoryProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-[1200px] mx-auto">
-          {categories.map((category) => {
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-[1200px] mx-auto">
+          {filteredCategories.map((category) => {
             const categoryImage = categoryImages[category.slug] || '/perfume-images/antik-posts2.jpg';
 
             return (
@@ -59,7 +65,7 @@ export function ShopByCategory({ categories }: ShopByCategoryProps) {
                 href={`/products?categorySlug=${category.slug}`}
                 className="group cursor-pointer transition-all duration-300 hover:-translate-y-2"
               >
-                <div className="relative bg-white rounded-xl overflow-hidden shadow-xl transition-all duration-300 group-hover:shadow-2xl border-4 border-[#ECDBC7]">
+                <div className="relative bg-white rounded-xl overflow-hidden shadow-xl transition-all duration-300 group-hover:shadow-2xl">
                   {/* Category Image */}
                   <div
                     className="h-48 bg-cover bg-center relative"
@@ -69,27 +75,10 @@ export function ShopByCategory({ categories }: ShopByCategoryProps) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/70 transition-all"></div>
                   </div>
 
-                  {/* Arabic Border */}
-                  <div className="h-12">
-                    <svg
-                      className="w-full h-full"
-                      viewBox="0 0 400 48"
-                      preserveAspectRatio="xMidYMid slice"
-                      fill="none"
-                    >
-                      <defs>
-                        <pattern id={`pattern-${category.id}`} x="0" y="0" width="40" height="48" patternUnits="userSpaceOnUse">
-                          <path d="M20 8 L23 11 L20 14 L17 11 Z" fill="#550000" opacity="0.8" />
-                          <path d="M20 34 L23 37 L20 40 L17 37 Z" fill="#550000" opacity="0.8" />
-                          <path d="M10 24 L13 21 L16 24 L13 27 Z" fill="#550000" opacity="0.6" />
-                          <path d="M30 24 L33 21 L36 24 L33 27 Z" fill="#550000" opacity="0.6" />
-                          <rect x="0" y="0" width="40" height="2" fill="#550000" />
-                          <rect x="0" y="46" width="40" height="2" fill="#550000" />
-                        </pattern>
-                      </defs>
-                      <rect x="0" y="0" width="400" height="48" fill="#ECDBC7" />
-                      <rect x="0" y="0" width="400" height="48" fill={`url(#pattern-${category.id})`} />
-                    </svg>
+                  {/* Maroon Separator Lines */}
+                  <div className="w-full">
+                    <div className="h-[2px] bg-[#550000]"></div>
+                    <div className="h-[2px] bg-[#550000] mt-[2px]"></div>
                   </div>
 
                   {/* Category Name */}

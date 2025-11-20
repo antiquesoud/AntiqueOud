@@ -316,6 +316,36 @@ async function main() {
     },
   });
 
+  const bodySprayCategory = await prisma.category.upsert({
+    where: { slug: 'body-spray' },
+    update: {},
+    create: {
+      name: 'Body Spray',
+      nameAr: 'بخاخ الجسم',
+      slug: 'body-spray',
+      description: 'Refreshing body sprays for everyday use',
+      descriptionAr: 'بخاخات الجسم المنعشة للاستخدام اليومي',
+      icon: '💦',
+      sortOrder: 8,
+      isActive: true,
+    },
+  });
+
+  const dehnalOudCategory = await prisma.category.upsert({
+    where: { slug: 'dehnal-oud' },
+    update: {},
+    create: {
+      name: 'Dehnal Oud',
+      nameAr: 'دهن العود',
+      slug: 'dehnal-oud',
+      description: 'Premium Dehnal Oud oil-based fragrances',
+      descriptionAr: 'عطور دهن العود الفاخرة الزيتية',
+      icon: '🧴',
+      sortOrder: 9,
+      isActive: true,
+    },
+  });
+
   const ourBrandCategory = await prisma.category.upsert({
     where: { slug: 'our-brand' },
     update: {},
@@ -326,12 +356,12 @@ async function main() {
       description: 'Exclusive AromaSouq branded fragrances',
       descriptionAr: 'عطور حصرية من علامة أروماسوق التجارية',
       icon: '⭐',
-      sortOrder: 8,
+      sortOrder: 10,
       isActive: true,
     },
   });
 
-  console.log('✅ Created 8 categories\n');
+  console.log('✅ Created 10 categories\n');
 
   // ====================================
   // BRANDS
@@ -1229,7 +1259,7 @@ async function main() {
   console.log('🎉 Database seeding completed successfully!\n');
   console.log('📊 Summary:');
   console.log('  - 6 GCC Currency Rates (AED, SAR, KWD, BHD, OMR, QAR)');
-  console.log('  - 8 Categories (perfumes, oud, attars, bakhoor, home-fragrance, gift-sets, body-mist, our-brand)');
+  console.log('  - 10 Categories (perfumes, oud, attars, bakhoor, home-fragrance, gift-sets, body-mist, body-spray, dehnal-oud, our-brand)');
   console.log('  - 6 Brands (Dior, Chanel, Tom Ford, Versace, Ajmal, AromaSouq)');
   console.log(`  - ${products.length} Products (all with mandatory productType)`);
   console.log('  - 2 Users (admin, vendor) with wallets');

@@ -529,7 +529,7 @@ export default function GuestCheckoutPage() {
                             <h3 className="font-semibold text-lg mb-2">{t('standardDelivery')}</h3>
                             <p className="text-muted-foreground mb-2">{t('deliveryTime3to5')}</p>
                             <p className="text-sm font-medium text-oud-gold">
-                              {cart.summary.shipping === 0 ? '✨ ' + t('freeShipping') : formatCurrency(cart.summary.shipping)}
+                              {cart.summary.shipping === 0 ? t('freeShipping') : formatCurrency(cart.summary.shipping)}
                             </p>
                           </div>
                         </div>

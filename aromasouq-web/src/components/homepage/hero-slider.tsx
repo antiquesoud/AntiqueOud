@@ -99,9 +99,7 @@ export function HeroSlider() {
         <div className="text-center max-w-4xl px-4 sm:px-5">
           {/* Badge */}
           <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white px-3 sm:px-5 py-1.5 sm:py-2 rounded-full mb-3 sm:mb-5 shadow-2xl text-xs sm:text-sm font-black tracking-wider border-2 border-[#ECDBC7]/30 animate-pulse">
-            <span className="text-sm sm:text-lg">✨</span>
             <span className="text-[10px] sm:text-sm">{t('subtitle').toUpperCase()}</span>
-            <span className="text-sm sm:text-lg">✨</span>
           </div>
 
           {/* Heading */}
@@ -113,7 +111,7 @@ export function HeroSlider() {
 
           {/* Subtitle */}
           <p className="text-sm sm:text-lg md:text-xl lg:text-2xl mb-5 sm:mb-8 font-semibold text-white drop-shadow-lg max-w-2xl mx-auto px-2">
-            🌟 {t('description')}
+            {t('description')}
           </p>
 
           {/* CTA Button */}

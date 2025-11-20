@@ -419,7 +419,7 @@ export default function QuickCheckoutPage() {
                 {coinsToUse > 0 && (
                   <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-sm text-green-700 font-medium">
-                      ✨ {t('youllSave', { amount: formatCurrency(coinDiscount) })}
+                      {t('youllSave', { amount: formatCurrency(coinDiscount) })}
                     </p>
                   </div>
                 )}

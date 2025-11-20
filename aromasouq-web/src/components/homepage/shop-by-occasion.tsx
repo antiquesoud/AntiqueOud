@@ -101,7 +101,7 @@ export function ShopByOccasion({ occasions }: ShopByOccasionProps) {
         <div className="flex justify-between items-center mb-12">
           <div className="text-center flex-1">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white px-5 py-1.5 rounded-full mb-3 shadow-lg text-xs font-bold tracking-wide">
-              ✨ {t('badge').toUpperCase()}
+              {t('badge').toUpperCase()}
             </div>
             <h2 className="text-5xl text-[var(--color-deep-navy)] font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#550000] to-[#6B0000]">
               {t('title')}

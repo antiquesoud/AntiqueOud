@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { GlareCard } from "@/components/aceternity/glare-card"
 import { ProductImagePlaceholder } from "@/components/ui/product-image-placeholder"
-import { ArabicBorderSmall } from "@/components/ui/arabic-border-small"
 import { cn, formatCurrency, calculateDiscount } from "@/lib/utils"
 import { getFirstProductImage } from "@/lib/image-utils"
 import { Product } from "@/types"
@@ -76,8 +75,8 @@ export function ProductCard({
         className={cn("h-full", className)}
       >
         <Card className={cn(
-          "h-full overflow-hidden transition-all duration-300 border border-gray-200",
-          compact ? "hover:shadow-lg rounded-lg" : "hover:shadow-xl rounded-xl border-gray-100"
+          "h-full overflow-hidden transition-all duration-300",
+          compact ? "hover:shadow-lg rounded-lg" : "hover:shadow-xl rounded-xl"
         )}>
           {/* Image Container */}
           <div className={cn(
@@ -128,7 +127,7 @@ export function ProductCard({
                   "bg-gradient-to-br from-[#B3967D] to-[#B3967D] border-0 text-white font-bold shadow-[0_2px_8px_rgba(179,150,125,0.3)]",
                   compact ? "text-[8px] py-0.5 px-1.5" : "text-[9px] py-0.5 px-2"
                 )}>
-                  🔥 {(product as any).salesCount}
+                  {(product as any).salesCount}
                 </Badge>
               )}
             </div>
@@ -187,8 +186,11 @@ export function ProductCard({
             )}
           </div>
 
-          {/* Arabic Border Decoration */}
-          <ArabicBorderSmall />
+          {/* Maroon Separator Lines */}
+          <div className="w-full">
+            <div className="h-[2px] bg-[#550000]"></div>
+            <div className="h-[2px] bg-[#550000] mt-[2px]"></div>
+          </div>
 
           {/* Content */}
           <CardContent className={compact ? "p-2.5" : "p-3"}>

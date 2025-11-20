@@ -18,7 +18,7 @@ interface ProductCarouselProps {
 
 export function ProductCarousel({ products, className = '', compact = false }: ProductCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const cardWidth = compact ? 220 : 260;
+  const cardWidth = compact ? 200 : 240;
   const gap = compact ? 12 : 16;
 
   const scroll = (direction: 'left' | 'right') => {
@@ -61,7 +61,7 @@ export function ProductCarousel({ products, className = '', compact = false }: P
         className={`flex ${compact ? 'gap-3' : 'gap-4'} overflow-x-auto scrollbar-hide scroll-smooth`}
       >
         {products.map((product) => (
-          <div key={product.id} className={`flex-shrink-0 ${compact ? 'w-[220px]' : 'w-[260px]'}`}>
+          <div key={product.id} className={`flex-shrink-0 ${compact ? 'w-[200px]' : 'w-[240px]'}`}>
             <ProductCard product={product as any} compact={compact} />
           </div>
         ))}

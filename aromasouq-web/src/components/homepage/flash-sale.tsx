@@ -54,7 +54,7 @@ export function FlashSale({ products }: FlashSaleProps) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000] py-12 mb-0">
+    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000] py-8 mb-0">
       {/* Decorative elements - stars and glaze effect */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Glowing orbs */}
@@ -72,17 +72,15 @@ export function FlashSale({ products }: FlashSaleProps) {
 
       <div className="container mx-auto px-[5%] relative z-10">
         {/* Header with countdown */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-6">
           <div>
-            <div className="inline-flex items-center gap-2 bg-[#ECDBC7] text-[#550000] px-4 py-1.5 rounded-full mb-3 shadow-lg text-xs font-bold tracking-wide">
-              <span className="text-base">⚡</span>
-              <span>LIMITED TIME OFFER</span>
-              <span className="text-base">⚡</span>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ECDBC7] to-[#f5e6d3] text-[#550000] px-5 py-2 rounded-full mb-3 shadow-lg text-xs font-black tracking-wider animate-pulse border-2 border-[#ECDBC7]/50">
+              <span className="animate-bounce">LIMITED TIME OFFER</span>
             </div>
-            <h2 className="text-3xl md:text-4xl text-white font-bold mb-2">
+            <h2 className="text-3xl md:text-4xl text-white font-black mb-2 tracking-tight">
               {t('title')}
             </h2>
-            <p className="text-base text-[#ECDBC7]">
+            <p className="text-base text-[#ECDBC7] font-medium">
               {t('hurry')}
             </p>
           </div>

@@ -5,7 +5,6 @@ import { Instagram, Facebook, Twitter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useTranslations, useLocale } from 'next-intl'
-import { ArabicBorder } from "@/components/ui/arabic-border"
 
 export function Footer() {
   const t = useTranslations('footer');
@@ -86,9 +85,6 @@ export function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Arabic Geometric Border at Bottom */}
-      <ArabicBorder />
     </footer>
   )
 }

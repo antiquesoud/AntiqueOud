@@ -39,9 +39,7 @@ export function ShopByBrand({ brands }: ShopByBrandProps) {
       <div className="container mx-auto px-[5%] relative z-10">
         <div className="mb-12">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#550000] to-[#B3967D] text-white px-6 py-2 rounded-full mb-4 shadow-2xl text-sm font-black tracking-wider border-2 border-[#ECDBC7]/30 animate-glow-pulse">
-            <span className="text-lg">👑</span>
             <span>{t('badge').toUpperCase()}</span>
-            <span className="text-lg">✨</span>
           </div>
           <h2 className="text-5xl md:text-6xl font-black mb-3 drop-shadow-lg">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#550000] via-[#B3967D] to-[#550000]">

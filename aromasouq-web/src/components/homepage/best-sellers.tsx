@@ -18,7 +18,15 @@ export function BestSellers({ products }: BestSellersProps) {
   const t = useTranslations('homepage.bestSellers');
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000] py-12 mb-0">
+    <div className="relative overflow-hidden py-12 mb-0" style={{
+      backgroundImage: 'url(/perfume-images/antik-posts2.jpg)', // Using posts2 as posts12 doesn't exist
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}>
+      {/* Dark overlay for text readability - reduced opacity to show background better */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#550000]/50 via-[#6B0000]/45 to-[#550000]/50"></div>
+
       {/* Decorative elements - stars and glaze effect */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Glowing orbs */}
@@ -44,7 +52,6 @@ export function BestSellers({ products }: BestSellersProps) {
           <div className="inline-flex items-center gap-2 bg-[#ECDBC7] text-[#550000] px-4 py-1.5 rounded-full mb-3 shadow-lg text-xs font-bold tracking-wide">
             <TrendingUp className="w-4 h-4" />
             <span>{t('badge').toUpperCase()}</span>
-            <span className="text-base">⭐</span>
           </div>
 
           <h2 className="text-3xl md:text-4xl text-white font-bold mb-2">
