@@ -188,7 +188,7 @@ export default function ProductModerationPage() {
                                   variant="outline"
                                   onClick={() => updateStatusMutation.mutate({
                                     productId: product.id,
-                                    status: true
+                                    status: 'ACTIVE'
                                   })}
                                   disabled={updateStatusMutation.isPending}
                                 >
@@ -202,7 +202,7 @@ export default function ProductModerationPage() {
                                   variant="outline"
                                   onClick={() => updateStatusMutation.mutate({
                                     productId: product.id,
-                                    status: false
+                                    status: 'INACTIVE'
                                   })}
                                   disabled={updateStatusMutation.isPending}
                                 >
