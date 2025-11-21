@@ -7,6 +7,7 @@ import { locales, localeDirections } from '@/i18n/config';
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "react-hot-toast";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import "../globals.css";
 
 // Antique Oud Brand Fonts
@@ -87,6 +88,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>
             <ConditionalLayout>{children}</ConditionalLayout>
+            <WhatsAppButton />
             <Toaster
               position={direction === 'rtl' ? 'top-left' : 'top-right'}
               toastOptions={{

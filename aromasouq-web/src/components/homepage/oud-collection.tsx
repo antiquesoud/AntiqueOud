@@ -13,26 +13,26 @@ import Image from 'next/image';
 
 const oudTypes = [
   {
-    image: 'https://images.unsplash.com/photo-1585916420730-d7f95e942d43?w=400&h=300&fit=crop&q=80',
+    image: '/perfume-images/antik-posts4.jpg',
     alt: 'Cambodian Oud Wood',
     translationKey: 'cambodian',
     slug: 'CAMBODIAN',
   },
   {
-    image: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=400&h=300&fit=crop&q=80',
+    image: '/perfume-images/antik-posts8.jpg',
     alt: 'Indian Oud Chips',
     translationKey: 'indian',
     slug: 'INDIAN',
   },
   {
-    image: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=300&fit=crop&q=80',
+    image: '/perfume-images/antik-posts10.jpg',
     alt: 'Thai Oud Essence',
     translationKey: 'thai',
     slug: 'THAI',
   },
   {
-    image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=300&fit=crop&q=80',
-    alt: 'Mukhallat Oud Blend',
+    image: '/perfume-images/antik-posts13.jpg',
+    alt: 'Dehn Al Oud',
     translationKey: 'dehnAlOud',
     slug: 'MUKHALLAT',
   },
@@ -111,17 +111,15 @@ export function OudCollection() {
               href={`/products?oudType=${oud.slug}`}
               className="flex-shrink-0 w-[280px] md:w-auto rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer border-2 border-[#ECDBC7] group bg-white"
             >
-              <div className="h-[180px] relative overflow-hidden">
+              <div className="h-[240px] relative overflow-hidden bg-gradient-to-br from-[#2C1810] to-[#3D2416]">
                 {/* Image */}
                 <Image
                   src={oud.image}
                   alt={oud.alt}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="object-contain transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 768px) 280px, (max-width: 1024px) 50vw, 25vw"
                 />
-                {/* Overlay gradient for better text contrast */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#550000]/40 via-[#550000]/10 to-transparent"></div>
               </div>
               <div className="p-5 text-center bg-gradient-to-br from-white to-[#ECDBC7]/10">
                 <div className="text-lg font-black text-[#550000] mb-2">

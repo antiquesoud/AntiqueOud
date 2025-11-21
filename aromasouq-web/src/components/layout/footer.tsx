@@ -16,9 +16,30 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="font-heading text-2xl text-[#ECDBC7] mb-4" style={{ fontFamily: 'serif' }}>
-              {locale === 'ar' ? 'أنتيك العود' : 'Antique Oud'}
-            </h3>
+            <div className="mb-4">
+              <h3
+                className="text-2xl md:text-3xl font-black text-[#ECDBC7] leading-none"
+                style={{
+                  fontFamily: 'Cairo, Amiri, serif',
+                  letterSpacing: '0.02em',
+                  textShadow: '0 0 1px rgba(236, 219, 199, 0.8), 0 0 2px rgba(236, 219, 199, 0.4)',
+                  fontWeight: 900,
+                  WebkitTextStroke: '0.3px #ECDBC7'
+                }}
+              >
+                أنتيك العود
+              </h3>
+              <p
+                className="text-[10px] md:text-xs text-[#ECDBC7] font-bold leading-tight mt-1"
+                style={{
+                  fontFamily: 'Cairo, Amiri, serif',
+                  letterSpacing: '0.01em',
+                  fontWeight: 700
+                }}
+              >
+                ارث من الماضي وطيب للحاضر
+              </p>
+            </div>
             <p className="text-sm text-gray-300 mb-4">
               {t('description')}
             </p>

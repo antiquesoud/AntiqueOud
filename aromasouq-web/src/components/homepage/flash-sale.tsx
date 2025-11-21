@@ -54,7 +54,7 @@ export function FlashSale({ products }: FlashSaleProps) {
   }, []);
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000] py-8 mb-0">
+    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000] py-12 mb-12">
       {/* Decorative elements - stars and glaze effect */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Glowing orbs */}

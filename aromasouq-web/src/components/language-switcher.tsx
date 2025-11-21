@@ -30,10 +30,10 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="icon"
-          className="hover:bg-[#B3967D]/50 rounded-full transition-colors"
+          className="h-8 w-8 md:h-10 md:w-10 hover:bg-[#B3967D]/30 rounded-full transition-colors"
           aria-label="Change language"
         >
-          <Globe className="h-5 w-5 text-gray-700" />
+          <Globe className="h-4 w-4 md:h-5 md:w-5 text-gray-700" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={isRTL ? 'start' : 'end'} className="min-w-[120px]">

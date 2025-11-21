@@ -37,7 +37,10 @@ export function Header() {
   const categorySlug = searchParams.get('categorySlug')
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-md">
+    <header className="sticky top-0 z-50 w-full bg-white shadow-md border-b-[6px] border-[#550000]" style={{
+      borderImage: 'linear-gradient(to right, #550000, #6B0000, #550000) 1',
+      boxShadow: '0 6px 8px -1px rgba(85, 0, 0, 0.2), 0 3px 5px -1px rgba(85, 0, 0, 0.12)'
+    }}>
       {/* Top Bar - Promotional */}
       <div className="bg-gradient-to-r from-[#550000] to-[#6B0000] text-white">
         <div className="container mx-auto px-4 py-2.5 flex justify-between items-center text-xs md:text-sm">
@@ -146,12 +149,28 @@ export function Header() {
               </SheetContent>
             </Sheet>
 
-            <Link href="/" className="flex flex-col items-start gap-0">
-              <h1 className="font-heading text-2xl lg:text-3xl font-black text-[#550000]" style={{ fontFamily: 'serif' }}>
-                {locale === 'ar' ? 'أنتيك العود' : 'Antique Oud'}
+            <Link href="/" className="flex flex-col items-start gap-0 leading-none">
+              <h1
+                className="text-2xl md:text-3xl lg:text-4xl font-black text-[#550000] leading-none"
+                style={{
+                  fontFamily: 'Cairo, Amiri, serif',
+                  letterSpacing: '0.02em',
+                  textShadow: '0 0 1px rgba(85, 0, 0, 0.8), 0 0 2px rgba(85, 0, 0, 0.4)',
+                  fontWeight: 900,
+                  WebkitTextStroke: '0.4px #550000'
+                }}
+              >
+                أنتيك العود
               </h1>
-              <p className="text-[10px] lg:text-xs text-[#550000]/70 font-semibold tracking-wide" style={{ fontFamily: 'serif' }}>
-                {locale === 'ar' ? 'ارث من الماضي وطيب للحاضر' : 'Heritage from the past, fragrance for the present'}
+              <p
+                className="text-[10px] md:text-xs lg:text-sm text-[#550000] font-bold leading-none mt-0.5"
+                style={{
+                  fontFamily: 'Cairo, Amiri, serif',
+                  letterSpacing: '0.01em',
+                  fontWeight: 700
+                }}
+              >
+                ارث من الماضي وطيب للحاضر
               </p>
             </Link>
           </div>
@@ -227,9 +246,9 @@ export function Header() {
           </nav>
 
           {/* Actions - Right */}
-          <div className="flex items-center gap-1.5 md:gap-3">
-            {/* Language Switcher - Hidden on small mobile */}
-            <div className="hidden sm:block">
+          <div className="flex items-center gap-1 md:gap-2 lg:gap-3">
+            {/* Language Switcher - Now visible on all screens */}
+            <div className="flex items-center">
               <LanguageSwitcher />
             </div>
 
@@ -247,7 +266,7 @@ export function Header() {
             {/* Wishlist - Hidden on very small mobile */}
             <Link
               href="/wishlist"
-              className="hidden sm:block p-2 md:p-2.5 hover:bg-amber-50 rounded-full transition-colors"
+              className="hidden sm:block p-1.5 md:p-2.5 hover:bg-amber-50 rounded-full transition-colors"
             >
               <Heart className="h-4 md:h-5 w-4 md:w-5 text-gray-700 hover:text-red-500 transition-colors" />
             </Link>
@@ -255,7 +274,7 @@ export function Header() {
             {/* Cart */}
             <Link
               href="/cart"
-              className="relative p-2 md:p-2.5 hover:bg-amber-50 rounded-full transition-colors"
+              className="relative p-1.5 md:p-2.5 hover:bg-amber-50 rounded-full transition-colors"
             >
               <ShoppingCart className="h-4 md:h-5 w-4 md:w-5 text-gray-700" />
               {itemCount > 0 && (
@@ -269,7 +288,7 @@ export function Header() {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-2 md:p-2.5 hover:bg-amber-50 rounded-full transition-colors">
+                  <button className="p-1.5 md:p-2.5 hover:bg-amber-50 rounded-full transition-colors">
                     <User className="h-4 md:h-5 w-4 md:w-5 text-gray-700" />
                   </button>
                 </DropdownMenuTrigger>
@@ -313,7 +332,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="px-3 md:px-5 py-1.5 md:py-2 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white font-bold rounded-full hover:shadow-lg transition-all text-xs md:text-sm hover:scale-105"
+                className="px-2.5 md:px-5 py-1.5 md:py-2 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white font-bold rounded-full hover:shadow-lg transition-all text-[10px] md:text-sm hover:scale-105"
               >
                 {tUser('login')}
               </Link>
