@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
-import { ProductImagePlaceholder } from "@/components/ui/product-image-placeholder"
 import { useCart } from "@/hooks/useCart"
 import { useAuth } from "@/hooks/useAuth"
 import { formatCurrency } from "@/lib/utils"
+import { getRandomPlaceholderImage, isPlaceholderImage } from "@/lib/image-utils"
 import toast from "react-hot-toast"
 import { useMutation } from "@tanstack/react-query"
 import { apiClient } from "@/lib/api-client"
@@ -122,7 +122,10 @@ export default function CartPage() {
 
   const productImage = (item: any) => {
     const firstImage = item.product?.images?.[0]
-    if (!firstImage) return null
+    if (!firstImage) {
+      // Return random placeholder based on product ID for consistency
+      return getRandomPlaceholderImage(item.productId || item.product?.id)
+    }
     return typeof firstImage === 'string' ? firstImage : firstImage.url
   }
 
@@ -170,21 +173,23 @@ export default function CartPage() {
                   <CardContent className="p-4">
                     <div className="flex gap-4">
                       {/* Product Image */}
-                      <Link
-                        href={`/products/${productSlug(item)}`}
-                        className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 group bg-gray-100"
-                      >
-                        {productImage(item) ? (
-                          <Image
-                            src={productImage(item)!}
-                            alt={productName(item)}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform"
-                          />
-                        ) : (
-                          <ProductImagePlaceholder className="w-full h-full" size="sm" />
-                        )}
-                      </Link>
+                      {(() => {
+                        const imgSrc = productImage(item)
+                        const isPlaceholder = isPlaceholderImage(imgSrc)
+                        return (
+                          <Link
+                            href={`/products/${productSlug(item)}`}
+                            className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 group bg-gradient-to-br from-[#ECDBC7] via-[#F5E6D3] to-[#ECDBC7]"
+                          >
+                            <Image
+                              src={imgSrc}
+                              alt={productName(item)}
+                              fill
+                              className={isPlaceholder ? "object-contain p-2 group-hover:scale-105 transition-transform" : "object-cover group-hover:scale-105 transition-transform"}
+                            />
+                          </Link>
+                        )
+                      })()}
 
                       {/* Product Details */}
                       <div className="flex-1 min-w-0">

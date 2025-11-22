@@ -58,6 +58,10 @@ export function useCart() {
       queryClient.invalidateQueries({ queryKey: ['cart'] })
       toast.success('Removed from cart')
     },
+    onError: (error: any) => {
+      console.error('Remove from cart error:', error)
+      toast.error(error?.response?.data?.message || 'Failed to remove item')
+    },
   })
 
   const clearCart = useMutation({

@@ -25,10 +25,14 @@ export class SessionService {
     const frontendUrl = process.env.FRONTEND_URL || '';
     const isLocalhostFrontend = frontendUrl.includes('localhost');
 
+    // For cross-origin requests (prod), we need sameSite: 'none' and secure: true
+    // For localhost, use 'lax' which works without secure in dev
+    const isCrossOrigin = isProduction && !isLocalhostFrontend;
+
     res.cookie('guest_session', sessionToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isLocalhostFrontend ? 'lax' : 'none',
+      secure: isCrossOrigin, // Must be true when sameSite is 'none'
+      sameSite: isCrossOrigin ? 'none' : 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/',
     });
@@ -48,11 +52,12 @@ export class SessionService {
     const isProduction = process.env.NODE_ENV === 'production';
     const frontendUrl = process.env.FRONTEND_URL || '';
     const isLocalhostFrontend = frontendUrl.includes('localhost');
+    const isCrossOrigin = isProduction && !isLocalhostFrontend;
 
     res.clearCookie('guest_session', {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isLocalhostFrontend ? 'lax' : 'none',
+      secure: isCrossOrigin,
+      sameSite: isCrossOrigin ? 'none' : 'lax',
       path: '/',
     });
   }

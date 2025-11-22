@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { GlareCard } from "@/components/aceternity/glare-card"
 import { ProductImagePlaceholder } from "@/components/ui/product-image-placeholder"
 import { cn, formatCurrency, calculateDiscount } from "@/lib/utils"
-import { getFirstProductImage } from "@/lib/image-utils"
+import { getFirstProductImage, isPlaceholderImage } from "@/lib/image-utils"
 import { Product } from "@/types"
 import { useTranslations, useLocale } from "next-intl"
 import { useDirection } from "@/lib/rtl-utils"
@@ -53,6 +53,7 @@ export function ProductCard({
 
   // Get product image (returns placeholder if no image available)
   const productImage = getFirstProductImage(product)
+  const isPlaceholder = isPlaceholderImage(productImage)
 
   const brandName = (product.brand as any)?.name || product.brand?.nameEn || (product as any).vendor?.businessName || 'Premium Brand'
   // Use Arabic name if locale is 'ar' and nameAr exists, otherwise use English name
@@ -88,7 +89,10 @@ export function ProductCard({
                 src={productImage}
                 alt={productName}
                 fill
-                className="object-cover transition-transform duration-500 hover:scale-110"
+                className={isPlaceholder
+                  ? "object-contain p-2 transition-transform duration-500 hover:scale-105"
+                  : "object-cover transition-transform duration-500 hover:scale-110"
+                }
               />
             </Link>
 

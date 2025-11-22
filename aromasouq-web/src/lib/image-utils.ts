@@ -80,3 +80,10 @@ export function getFirstProductImage(product: Product | any): string {
 export function hasProductImages(product: Product | any): boolean {
   return !!(product.images && product.images.length > 0)
 }
+
+/**
+ * Check if a URL is a placeholder image
+ */
+export function isPlaceholderImage(url: string): boolean {
+  return url.includes('/placeholder-images/')
+}

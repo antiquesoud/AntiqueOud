@@ -10,7 +10,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
-import { ProductImagePlaceholder } from "@/components/ui/product-image-placeholder"
 import { ProductCard } from "@/components/ui/product-card"
 import { useProduct } from "@/hooks/useProducts"
 import { useCart } from "@/hooks/useCart"
@@ -18,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { useWishlist } from "@/hooks/useWishlist"
 import { useWallet } from "@/hooks/useWallet"
 import { formatCurrency, calculateDiscount } from "@/lib/utils"
-import { getProductImageUrl, hasProductImages } from "@/lib/image-utils"
+import { getProductImageUrl, hasProductImages, getRandomPlaceholderImage, isPlaceholderImage } from "@/lib/image-utils"
 import { ReviewStats } from "@/components/reviews/ReviewStats"
 import { ReviewList } from "@/components/reviews/ReviewList"
 import { useReviewStats } from "@/hooks/useReviews"
@@ -131,36 +130,27 @@ export default function ProductDetailPage() {
           {/* Image Gallery - Sticky */}
           <div className="lg:sticky lg:top-[140px] lg:self-start">
             {/* Main Image with Lens Zoom */}
-            {productHasImages ? (
-              <Lens lensSize={200} zoomFactor={2.5} className="mb-3 sm:mb-4">
-                <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-[#ECDBC7] via-[#F5E6D3] to-[#ECDBC7] shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
-                  {currentImageUrl ? (
+            {(() => {
+              const displayImage = currentImageUrl || getRandomPlaceholderImage(product.id)
+              const isPlaceholder = isPlaceholderImage(displayImage)
+              return (
+                <Lens lensSize={200} zoomFactor={2.5} className="mb-3 sm:mb-4">
+                  <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-[#ECDBC7] via-[#F5E6D3] to-[#ECDBC7] shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
                     <Image
-                      src={currentImageUrl}
+                      src={displayImage}
                       alt={product.nameEn}
                       fill
-                      className="object-cover"
+                      className={isPlaceholder ? "object-contain p-4" : "object-cover"}
                     />
-                  ) : (
-                    <ProductImagePlaceholder className="w-full h-full" />
-                  )}
-                  {product.salePrice && (
-                    <div className="absolute top-2 sm:top-5 left-2 sm:left-5 bg-gradient-to-r from-red-600 to-[#550000] text-white px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-black shadow-xl border-2 border-red-400/30">
-                      -{discount}% {t('offBadge')}
-                    </div>
-                  )}
-                </div>
-              </Lens>
-            ) : (
-              <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-[#ECDBC7] via-[#F5E6D3] to-[#ECDBC7] mb-3 sm:mb-4 shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
-                <ProductImagePlaceholder className="w-full h-full" />
-                {product.salePrice && (
-                  <div className="absolute top-2 sm:top-5 left-2 sm:left-5 bg-gradient-to-r from-red-600 to-[#550000] text-white px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-black shadow-xl border-2 border-red-400/30">
-                    -{discount}% {t('offBadge')}
+                    {product.salePrice && (
+                      <div className="absolute top-2 sm:top-5 left-2 sm:left-5 bg-gradient-to-r from-red-600 to-[#550000] text-white px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-black shadow-xl border-2 border-red-400/30">
+                        -{discount}% {t('offBadge')}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
+                </Lens>
+              )
+            })()}
 
             {/* Thumbnails */}
             {productHasImages && (
@@ -177,11 +167,12 @@ export default function ProductDetailPage() {
                           : 'ring-1 sm:ring-2 ring-[#ECDBC7] hover:ring-[#B3967D]'
                       }`}
                     >
-                      {thumbUrl ? (
-                        <Image src={thumbUrl} alt={`Product ${index + 1}`} fill className="object-cover" />
-                      ) : (
-                        <ProductImagePlaceholder className="w-full h-full" size="sm" />
-                      )}
+                      <Image
+                        src={thumbUrl || getRandomPlaceholderImage(product.id)}
+                        alt={`Product ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
                     </button>
                   )
                 })}

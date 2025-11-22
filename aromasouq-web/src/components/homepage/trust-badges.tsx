@@ -1,3 +1,5 @@
+'use client';
+
 import { Shield, Package, TruckIcon, Award, CheckCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -32,29 +34,57 @@ export function TrustBadges() {
     },
   ];
 
+  // Duplicate badges for seamless infinite scroll
+  const duplicatedBadges = [...badges, ...badges];
+
   return (
-    <section className="bg-gradient-to-br from-amber-50 to-orange-50 py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {badges.map((badge, index) => {
+    <section className="bg-gradient-to-r from-[#ECDBC7] via-[#f5e6d3] to-[#ECDBC7] py-3 overflow-hidden border-b border-[#B3967D]/30">
+      <div className="relative">
+        {/* Marquee container */}
+        <div className="flex animate-marquee hover:pause-animation">
+          {duplicatedBadges.map((badge, index) => {
             const Icon = badge.icon;
             return (
               <div
                 key={index}
-                className="flex flex-col items-center text-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                className="flex items-center gap-2 px-6 md:px-8 whitespace-nowrap"
               >
-                <div className="bg-gradient-to-br from-amber-100 to-orange-100 p-3 rounded-full mb-3">
-                  <Icon className="h-6 w-6 text-[#550000]" />
+                <div className="bg-white/80 p-1.5 rounded-full shadow-sm">
+                  <Icon className="h-4 w-4 text-[#550000]" />
                 </div>
-                <h3 className="font-bold text-gray-900 text-sm mb-1">
-                  {badge.title}
-                </h3>
-                <p className="text-xs text-gray-600">{badge.description}</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-[#550000] text-xs md:text-sm">
+                    {badge.title}
+                  </span>
+                  <span className="text-[#550000]/60 text-[10px] md:text-xs hidden sm:inline">
+                    - {badge.description}
+                  </span>
+                </div>
+                {/* Separator dot */}
+                <span className="ml-4 w-1.5 h-1.5 rounded-full bg-[#550000]/30"></span>
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* Custom CSS for marquee animation */}
+      <style jsx>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-marquee {
+          animation: marquee 15s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </section>
   );
 }
