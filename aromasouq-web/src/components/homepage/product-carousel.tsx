@@ -14,9 +14,21 @@ interface ProductCarouselProps {
   products: Product[];
   className?: string;
   compact?: boolean;
+  onQuickView?: (product: any) => void;
+  onAddToCart?: (product: any) => void;
+  onToggleWishlist?: (product: any) => void;
+  isWishlisted?: (productId: string) => boolean;
 }
 
-export function ProductCarousel({ products, className = '', compact = false }: ProductCarouselProps) {
+export function ProductCarousel({
+  products,
+  className = '',
+  compact = false,
+  onQuickView,
+  onAddToCart,
+  onToggleWishlist,
+  isWishlisted,
+}: ProductCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const cardWidth = compact ? 200 : 240;
   const gap = compact ? 12 : 16;
@@ -62,7 +74,14 @@ export function ProductCarousel({ products, className = '', compact = false }: P
       >
         {products.map((product) => (
           <div key={product.id} className={`flex-shrink-0 ${compact ? 'w-[200px]' : 'w-[240px]'}`}>
-            <ProductCard product={product as any} compact={compact} />
+            <ProductCard
+              product={product as any}
+              compact={compact}
+              onQuickView={onQuickView}
+              onAddToCart={onAddToCart}
+              onToggleWishlist={onToggleWishlist}
+              isWishlisted={isWishlisted ? isWishlisted(product.id) : false}
+            />
           </div>
         ))}
       </div>

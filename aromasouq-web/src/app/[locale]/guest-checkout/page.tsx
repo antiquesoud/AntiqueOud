@@ -538,7 +538,7 @@ export default function GuestCheckoutPage() {
                       {cart.summary.subtotal >= 200 && (
                         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                           <p className="text-green-700 font-medium text-center">
-                            🎉 You've qualified for FREE shipping!
+                            You've qualified for FREE shipping!
                           </p>
                         </div>
                       )}
@@ -683,7 +683,7 @@ export default function GuestCheckoutPage() {
 
                       <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
                         <p className="text-sm text-amber-800">
-                          <strong>📧 Order Tracking:</strong> We'll send order updates to <strong>{form.getValues("guestEmail")}</strong>
+                          <strong>Order Tracking:</strong> We'll send order updates to <strong>{form.getValues("guestEmail")}</strong>
                         </p>
                       </div>
 

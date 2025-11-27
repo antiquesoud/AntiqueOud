@@ -5,132 +5,78 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Product } from '@/lib/api/homepage';
 import { ProductCarousel } from './product-carousel';
+import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
+import toast from 'react-hot-toast';
 
 interface FlashSaleProps {
   products: Product[];
 }
 
-interface TimeLeft {
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
-
 export function FlashSale({ products }: FlashSaleProps) {
   const t = useTranslations('homepage.flashSale');
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>({ hours: 12, minutes: 34, seconds: 56 });
+  const { addToCart } = useCart();
+  const { wishlist, toggleWishlist } = useWishlist();
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        let { hours, minutes, seconds } = prev;
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      productId: product.id,
+      quantity: 1,
+    });
+    toast.success(`${product.name || product.nameEn} added to cart`);
+  };
 
-        if (seconds > 0) {
-          seconds--;
-        } else {
-          seconds = 59;
-          if (minutes > 0) {
-            minutes--;
-          } else {
-            minutes = 59;
-            if (hours > 0) {
-              hours--;
-            } else {
-              // Reset to initial time when countdown ends
-              return { hours: 12, minutes: 34, seconds: 56 };
-            }
-          }
-        }
+  const handleToggleWishlist = (product: any) => {
+    toggleWishlist(product.id);
+    const isWishlisted = wishlist?.some((p: any) => p.id === product.id);
+    toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+  };
 
-        return { hours, minutes, seconds };
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
+  const isWishlisted = (productId: string) => {
+    return wishlist?.some((p: any) => p.id === productId) || false;
+  };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000] py-12 mb-12">
-      {/* Decorative elements - stars and glaze effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Glowing orbs */}
-        <div className="absolute top-20 right-[25%] w-64 h-64 bg-[#ECDBC7]/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-40 left-[20%] w-80 h-80 bg-[#B3967D]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+    <div className="relative overflow-hidden py-16 mb-16">
+      {/* Elegant gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000]"></div>
 
-        {/* Sparkle stars */}
-        <div className="absolute top-24 left-[30%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse"></div>
-        <div className="absolute top-48 right-[35%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-        <div className="absolute bottom-32 left-[25%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 right-[20%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-        <div className="absolute top-36 left-[15%] w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_15px_6px_rgba(255,255,255,0.5)] animate-pulse" style={{ animationDelay: '0.8s' }}></div>
-        <div className="absolute bottom-48 right-[15%] w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_15px_6px_rgba(255,255,255,0.5)] animate-pulse" style={{ animationDelay: '0.3s' }}></div>
-      </div>
+      {/* Decorative top border */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#B3967D] to-transparent"></div>
 
       <div className="container mx-auto px-[5%] relative z-10">
-        {/* Header with countdown */}
-        <div className="flex flex-col items-center text-center md:flex-row md:justify-between md:items-center md:text-left gap-4 mb-6">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ECDBC7] to-[#f5e6d3] text-[#550000] px-4 md:px-5 py-1.5 md:py-2 rounded-full mb-2 md:mb-3 shadow-lg text-[10px] md:text-xs font-black tracking-wider animate-pulse border-2 border-[#ECDBC7]/50">
-              <span className="animate-bounce">LIMITED TIME OFFER</span>
-            </div>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl text-white font-black mb-1 md:mb-2 tracking-tight">
-              {t('title')}
-            </h2>
-            <p className="text-sm md:text-base text-[#ECDBC7] font-medium">
-              {t('hurry')}
-            </p>
+        {/* Enhanced Header */}
+        <div className="text-center mb-12">
+          {/* Decorative line above title */}
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-[1px] w-16 bg-gradient-to-r from-transparent to-[#B3967D]"></div>
+            <div className="mx-4 text-[#B3967D] text-sm tracking-widest uppercase">Limited Time</div>
+            <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-[#B3967D]"></div>
           </div>
 
-          {/* Stylish countdown timer */}
-          <div className="flex gap-1.5 md:gap-2">
-            <div className="relative">
-              <div className="absolute inset-0 bg-[#ECDBC7]/30 rounded-lg blur-md"></div>
-              <div className="relative text-center bg-white/95 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-lg border-2 border-[#ECDBC7] shadow-xl">
-                <div className="text-xl md:text-2xl font-bold text-[#550000]">
-                  {String(timeLeft.hours).padStart(2, '0')}
-                </div>
-                <div className="text-[8px] md:text-[10px] text-gray-600 uppercase font-semibold">
-                  {t('hours')}
-                </div>
-              </div>
-            </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-white font-bold mb-3 tracking-wide">
+            {t('title')}
+          </h2>
 
-            <div className="flex items-center text-xl md:text-2xl font-bold text-white">:</div>
-
-            <div className="relative">
-              <div className="absolute inset-0 bg-[#ECDBC7]/30 rounded-lg blur-md"></div>
-              <div className="relative text-center bg-white/95 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-lg border-2 border-[#ECDBC7] shadow-xl">
-                <div className="text-xl md:text-2xl font-bold text-[#550000]">
-                  {String(timeLeft.minutes).padStart(2, '0')}
-                </div>
-                <div className="text-[8px] md:text-[10px] text-gray-600 uppercase font-semibold">
-                  {t('minutes')}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center text-xl md:text-2xl font-bold text-white">:</div>
-
-            <div className="relative">
-              <div className="absolute inset-0 bg-[#ECDBC7]/30 rounded-lg blur-md"></div>
-              <div className="relative text-center bg-white/95 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-lg border-2 border-[#ECDBC7] shadow-xl">
-                <div className="text-xl md:text-2xl font-bold text-[#550000]">
-                  {String(timeLeft.seconds).padStart(2, '0')}
-                </div>
-                <div className="text-[8px] md:text-[10px] text-gray-600 uppercase font-semibold">
-                  {t('seconds')}
-                </div>
-              </div>
-            </div>
-          </div>
+          <p className="text-[#ECDBC7] text-sm md:text-base max-w-2xl mx-auto">
+            Exclusive deals on premium fragrances
+          </p>
         </div>
 
-        <ProductCarousel products={products} compact={true} />
+        <ProductCarousel
+          products={products}
+          compact={true}
+          onAddToCart={handleAddToCart}
+          onToggleWishlist={handleToggleWishlist}
+          isWishlisted={isWishlisted}
+        />
       </div>
+
+      {/* Decorative bottom border */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#B3967D] to-transparent"></div>
     </div>
   );
 }

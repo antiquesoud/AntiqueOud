@@ -42,7 +42,6 @@ export function LanguageSwitcher() {
           className={locale === 'en' ? 'bg-[#B3967D]/50 font-bold text-[var(--color-oud-gold)]' : 'cursor-pointer'}
         >
           <span className="flex items-center gap-2">
-            {locale === 'en' && <span className="text-[var(--color-oud-gold)]">✓</span>}
             <span>English</span>
           </span>
         </DropdownMenuItem>
@@ -51,7 +50,6 @@ export function LanguageSwitcher() {
           className={locale === 'ar' ? 'bg-[#B3967D]/50 font-bold text-[var(--color-oud-gold)]' : 'cursor-pointer'}
         >
           <span className="flex items-center gap-2">
-            {locale === 'ar' && <span className="text-[var(--color-oud-gold)]">✓</span>}
             <span>العربية</span>
           </span>
         </DropdownMenuItem>

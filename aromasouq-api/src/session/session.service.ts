@@ -64,13 +64,14 @@ export class SessionService {
 
   /**
    * Get or create guest session
-   * If guest_session cookie exists, return it
+   * If guest_session cookie exists and is valid, return it
    * Otherwise generate new session and set cookie
    */
   getOrCreateGuestSession(cookies: any, res: Response): string {
     let sessionToken = this.getGuestSession(cookies);
 
-    if (!sessionToken) {
+    // Validate existing token - if invalid or missing, regenerate
+    if (!sessionToken || !this.isValidGuestSession(sessionToken)) {
       sessionToken = this.generateGuestSession();
       this.setGuestSessionCookie(res, sessionToken);
     }

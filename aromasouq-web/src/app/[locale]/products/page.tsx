@@ -11,6 +11,9 @@ import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useDirection } from '@/lib/rtl-utils';
+import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
+import toast from 'react-hot-toast';
 
 // Context data for dynamic page rendering
 const scentFamilyIcons: Record<string, string> = {
@@ -296,6 +299,8 @@ export default function ProductsPage() {
   const searchParams = useSearchParams();
   const t = useTranslations('productsPage');
   const { isRTL } = useDirection();
+  const { addToCart } = useCart();
+  const { wishlist, toggleWishlist } = useWishlist();
 
   // Initialize filters from URL params
   const [filters, setFilters] = useState({
@@ -441,6 +446,24 @@ export default function ProductsPage() {
     });
   };
 
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      productId: product.id,
+      quantity: 1,
+    });
+    toast.success(`${product.name || product.nameEn} added to cart`);
+  };
+
+  const handleToggleWishlist = (product: any) => {
+    toggleWishlist(product.id);
+    const isWishlisted = wishlist?.some((p: any) => p.id === product.id);
+    toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+  };
+
+  const isWishlisted = (productId: string) => {
+    return wishlist?.some((p: any) => p.id === productId) || false;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#ECDBC7]/10 via-white to-[#ECDBC7]/10">
       {/* Dynamic Hero Section - Vibrant & Artistic */}
@@ -531,7 +554,7 @@ export default function ProductsPage() {
               <div className="space-y-5">
                 {/* Search */}
                 <div>
-                  <label className="block text-sm font-black mb-2 text-gray-700">🔍 {t('ui.search')}</label>
+                  <label className="block text-sm font-black mb-2 text-gray-700">{t('ui.search')}</label>
                   <input
                     type="text"
                     value={filters.search}
@@ -897,7 +920,7 @@ export default function ProductsPage() {
                       <div className="space-y-4">
                         {/* Search */}
                         <div>
-                          <label className="block text-sm font-black mb-2 text-gray-700">🔍 {t('ui.search')}</label>
+                          <label className="block text-sm font-black mb-2 text-gray-700">{t('ui.search')}</label>
                           <input
                             type="text"
                             value={filters.search}
@@ -1211,7 +1234,14 @@ export default function ProductsPage() {
               <>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                   {(data as any).data.map((product: any) => (
-                    <ProductCard key={product.id} product={product} compact={true} />
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      compact={true}
+                      onAddToCart={handleAddToCart}
+                      onToggleWishlist={handleToggleWishlist}
+                      isWishlisted={isWishlisted(product.id)}
+                    />
                   ))}
                 </div>
 

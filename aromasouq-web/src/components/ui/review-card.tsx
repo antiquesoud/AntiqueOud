@@ -56,7 +56,7 @@ export function ReviewCard({
                 <span className="font-semibold">{review.userName}</span>
                 {review.verified && (
                   <Badge variant="outline" className="text-xs">
-                    ✓ Verified Purchase
+                    Verified Purchase
                   </Badge>
                 )}
               </div>

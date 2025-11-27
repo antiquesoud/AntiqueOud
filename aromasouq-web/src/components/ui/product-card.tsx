@@ -126,14 +126,6 @@ export function ProductCard({
                   {stockQuantity} {t('left')}
                 </Badge>
               )}
-              {(product as any).salesCount && (product as any).salesCount > 0 && (
-                <Badge className={cn(
-                  "bg-gradient-to-br from-[#B3967D] to-[#B3967D] border-0 text-white font-bold shadow-[0_2px_8px_rgba(179,150,125,0.3)]",
-                  compact ? "text-[8px] py-0.5 px-1.5" : "text-[9px] py-0.5 px-2"
-                )}>
-                  {(product as any).salesCount}
-                </Badge>
-              )}
             </div>
 
             {/* Wishlist Heart */}
@@ -257,7 +249,7 @@ export function ProductCard({
             {/* Coins - Smaller */}
             {(product as any).coinsToAward && (product as any).coinsToAward > 0 && (
               <div className="mt-1 text-[9px] text-gray-500">
-                +{(product as any).coinsToAward} {t('coins')} 🪙
+                +{(product as any).coinsToAward} {t('coins')}
               </div>
             )}
 
@@ -266,7 +258,7 @@ export function ProductCard({
               <Button
                 variant="primary"
                 size="sm"
-                className="w-full mt-3 bg-gradient-to-r from-[#550000] to-[#6b0000] hover:from-[#B3967D] hover:to-[#B3967D] text-[11px] py-1.5 font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+                className="w-full mt-3 bg-gradient-to-r from-[#B3967D] to-[#C9A86A] hover:from-[#C9A86A] hover:to-[#D4AF74] text-white text-[11px] py-1.5 font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
                 onClick={(e) => {
                   e.preventDefault()
                   onAddToCart(product)

@@ -325,7 +325,7 @@ export default function CartPage() {
                   <span className="text-muted-foreground">{t('shipping')}:</span>
                   <span className="font-semibold">
                     {shipping === 0 ? (
-                      <span className="text-green-600">{t('freeShipping')} ✓</span>
+                      <span className="text-green-600">{t('freeShipping')}</span>
                     ) : (
                       formatCurrency(shipping)
                     )}
@@ -456,7 +456,6 @@ export default function CartPage() {
 
               {/* Security Badge */}
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                <span className="text-green-600">🔒</span>
                 <span>{t('secureCheckout')}</span>
               </div>
             </CardContent>

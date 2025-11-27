@@ -73,9 +73,6 @@ export function OudCollection() {
       <div className="container mx-auto px-[5%] relative z-10">
         <div className="flex justify-between items-center mb-12">
           <div className="text-center flex-1">
-            <div className="inline-flex items-center gap-2 bg-[#ECDBC7] text-[#550000] px-5 py-2 rounded-full mb-4 shadow-lg text-sm font-bold tracking-wide">
-              <span>PREMIUM OUD COLLECTION</span>
-            </div>
             <h2 className="text-4xl md:text-5xl text-[#550000] font-black mb-3">
               {t('title')}
             </h2>
