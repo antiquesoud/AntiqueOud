@@ -82,7 +82,7 @@ export function ShopByCategory({ categories }: ShopByCategoryProps) {
                   </div>
 
                   {/* Category Name */}
-                  <div className="p-4 bg-gradient-to-br from-[#ECDBC7] to-[#E5D4BD] text-center">
+                  <div className="p-4 bg-white text-center">
                     <h3 className="font-black text-[#550000] text-lg group-hover:scale-105 transition-all">
                       {translateCategory(tCategories, category.name)}
                     </h3>
