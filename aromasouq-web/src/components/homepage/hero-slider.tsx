@@ -67,7 +67,7 @@ export function HeroSlider() {
           {/* CTA Button */}
           <Link
             href="/products"
-            className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white px-6 sm:px-10 py-3 sm:py-4 rounded-full text-sm sm:text-base lg:text-lg font-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(85,0,0,0.6)] shadow-2xl border-2 border-[#ECDBC7]/30 hover:scale-105"
+            className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#B3967D] to-[#C9A86A] hover:from-[#C9A86A] hover:to-[#D4AF74] text-white px-6 sm:px-10 py-3 sm:py-4 rounded-full text-sm sm:text-base lg:text-lg font-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(179,150,125,0.5)] shadow-2xl border-2 border-white/30 hover:scale-105"
           >
             <span>{t('shopNow')}</span>
             <span className="text-base sm:text-xl">→</span>

@@ -91,16 +91,16 @@ export function VariantSelector({
                 relative p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all text-left
                 ${
                   isSelected
-                    ? "border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg scale-105"
+                    ? "border-[#B3967D] bg-gradient-to-br from-[#ECDBC7]/20 to-[#B3967D]/10 shadow-lg scale-105"
                     : isOutOfStock
                     ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
-                    : "border-amber-200 bg-white hover:border-amber-400 hover:shadow-md hover:scale-102"
+                    : "border-[#B3967D]/40 bg-white hover:border-[#B3967D] hover:shadow-md hover:scale-102"
                 }
               `}
             >
               {/* Selected checkmark */}
               {isSelected && (
-                <div className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full p-1">
+                <div className="absolute top-2 right-2 bg-gradient-to-r from-[#B3967D] to-[#C9A86A] text-white rounded-full p-1">
                   <Check className="h-3 w-3" />
                 </div>
               )}
@@ -125,7 +125,7 @@ export function VariantSelector({
                     </div>
                   </>
                 ) : (
-                  <div className="text-sm sm:text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">
+                  <div className="text-sm sm:text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000]">
                     {formatCurrency(variant.price)}
                   </div>
                 )}

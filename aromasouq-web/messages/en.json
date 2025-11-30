@@ -2127,14 +2127,14 @@
       "goHome": "Go Home"
     },
     "sort": {
-      "newestFirst": "✨ Newest First",
-      "oldestFirst": "🕐 Oldest First",
-      "priceLowToHigh": "💰 Price: Low to High",
-      "priceHighToLow": "💎 Price: High to Low",
-      "nameAZ": "🔤 Name: A to Z",
-      "nameZA": "🔡 Name: Z to A",
-      "highestRated": "⭐ Highest Rated",
-      "mostPopular": "🔥 Most Popular"
+      "newestFirst": "Newest First",
+      "oldestFirst": "Oldest First",
+      "priceLowToHigh": "Price: Low to High",
+      "priceHighToLow": "Price: High to Low",
+      "nameAZ": "Name: A to Z",
+      "nameZA": "Name: Z to A",
+      "highestRated": "Highest Rated",
+      "mostPopular": "Most Popular"
     },
     "pagination": {
       "previous": "← Previous",

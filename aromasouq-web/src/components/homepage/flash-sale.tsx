@@ -40,9 +40,9 @@ export function FlashSale({ products }: FlashSaleProps) {
   };
 
   return (
-    <div className="relative overflow-hidden py-16 mb-16">
-      {/* Elegant gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#550000] via-[#6B0000] to-[#550000]"></div>
+    <div className="relative overflow-hidden py-16 mb-8 bg-white">
+      {/* Removed - clean background */}
+      
 
       {/* Decorative top border */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#B3967D] to-transparent"></div>
@@ -57,11 +57,11 @@ export function FlashSale({ products }: FlashSaleProps) {
             <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-[#B3967D]"></div>
           </div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl text-white font-bold mb-3 tracking-wide">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-\[#550000\] font-bold mb-3 tracking-wide">
             {t('title')}
           </h2>
 
-          <p className="text-[#ECDBC7] text-sm md:text-base max-w-2xl mx-auto">
+          <p className="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">
             Exclusive deals on premium fragrances
           </p>
         </div>

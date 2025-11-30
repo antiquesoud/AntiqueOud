@@ -125,7 +125,7 @@ export function OudCollection() {
                 <div className="text-sm text-gray-700 mb-4 font-medium">
                   {t(`oudTypes.${oud.translationKey}.description`)}
                 </div>
-                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#550000] to-[#6B0000] text-white px-5 py-2.5 rounded-full font-bold text-xs transition-all duration-300 hover:shadow-lg hover:scale-105 border-2 border-[#ECDBC7]/30">
+                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#B3967D] to-[#C9A86A] hover:from-[#C9A86A] hover:to-[#D4AF74] text-white px-5 py-2.5 rounded-full font-bold text-xs transition-all duration-300 hover:shadow-lg hover:scale-105 border-2 border-[#ECDBC7]/30">
                   <span>{t('exploreCollection')}</span>
                   <span className="text-sm">→</span>
                 </span>

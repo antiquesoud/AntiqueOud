@@ -346,6 +346,12 @@ export default function ProductsPage() {
   }, [searchParams]);
   const [showFilters, setShowFilters] = useState(true); // For desktop sidebar toggle
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false); // For mobile sheet
+
+  // Close mobile sidebar when filters change (URL changes)
+  useEffect(() => {
+    setMobileFiltersOpen(false);
+  }, [searchParams]);
+
   const [expandedSections, setExpandedSections] = useState({
     price: true,
     gender: true,
@@ -403,6 +409,7 @@ export default function ProductsPage() {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     setPage(1);
+    setMobileFiltersOpen(false);
 
     // Update URL params
     const params = new URLSearchParams();
@@ -468,25 +475,6 @@ export default function ProductsPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#ECDBC7]/10 via-white to-[#ECDBC7]/10">
       {/* Dynamic Hero Section - Vibrant & Artistic */}
       <div className={`relative overflow-hidden bg-gradient-to-br ${pageContext.gradient} text-white py-8 sm:py-12 md:py-16 lg:py-20 mb-0`}>
-        {/* Artistic Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Sparkles */}
-          <div className="absolute top-20 left-[15%] w-3 h-3 bg-yellow-300 rounded-full shadow-[0_0_25px_10px_rgba(253,224,71,0.6)] animate-pulse"></div>
-          <div className="absolute top-40 right-[20%] w-2 h-2 bg-[#C9A86A] rounded-full shadow-[0_0_20px_8px_rgba(201,168,106,0.5)] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute bottom-32 left-[25%] w-2 h-2 bg-[#B3967D] rounded-full shadow-[0_0_20px_8px_rgba(179,150,125,0.5)] animate-pulse" style={{ animationDelay: '1s' }}></div>
-
-          {/* Glowing orbs */}
-          <div className="absolute top-10 right-[10%] w-96 h-96 bg-[#C9A86A]/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-10 left-[15%] w-80 h-80 bg-[#550000]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-
-          {/* Decorative patterns */}
-          <svg className="absolute top-0 right-0 w-64 h-64 opacity-10" viewBox="0 0 100 100" fill="none">
-            <circle cx="50" cy="50" r="40" stroke="white" strokeWidth="2" />
-            <circle cx="50" cy="50" r="30" stroke="white" strokeWidth="1.5" opacity="0.7" />
-            <circle cx="50" cy="50" r="20" stroke="white" strokeWidth="1" opacity="0.5" />
-          </svg>
-        </div>
-
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumbs - Hidden on mobile */}
           <nav className="hidden sm:flex items-center gap-2 text-sm mb-6 md:mb-8 text-white/90">
@@ -509,10 +497,7 @@ export default function ProductsPage() {
 
           {/* Hero Content */}
           <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 sm:gap-3 bg-white/20 backdrop-blur-md px-3 sm:px-5 py-1.5 sm:py-2 rounded-full mb-3 sm:mb-6 border border-white/30">
-              <span className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">{pageContext.icon}</span>
-              <span className="text-[10px] sm:text-xs md:text-sm font-black tracking-wider uppercase">{pageContext.subtitle}</span>
-            </div>
+            
 
             <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-black mb-2 sm:mb-4 drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)] leading-tight">
               {pageContext.title}
@@ -1189,7 +1174,7 @@ export default function ProductsPage() {
 
             {/* Loading State */}
             {isLoading && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-8">
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="animate-pulse bg-white rounded-xl p-2 sm:p-3 md:p-4 shadow-lg border-2 border-[#ECDBC7]">
                     <div className="bg-gradient-to-br from-[#ECDBC7] to-[#B3967D] rounded-xl aspect-square mb-2 sm:mb-3 md:mb-4"></div>
@@ -1232,7 +1217,7 @@ export default function ProductsPage() {
             {/* Products Grid */}
             {!isLoading && !error && (data as any)?.data?.length > 0 && (
               <>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-8">
                   {(data as any).data.map((product: any) => (
                     <ProductCard
                       key={product.id}

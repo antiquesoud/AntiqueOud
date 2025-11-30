@@ -131,37 +131,27 @@ export function Testimonials() {
 
   return (
     <div
-      className="relative overflow-hidden py-16 mt-12 bg-gradient-to-br from-[#2C1810] via-[#3D2416] to-[#2C1810]"
+      className="relative overflow-hidden py-16 mt-12 bg-white"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Glowing orbs */}
-        <div className="absolute top-20 left-[15%] w-72 h-72 bg-[#ECDBC7]/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-[15%] w-96 h-96 bg-[#B3967D]/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-
-        {/* Sparkle stars */}
-        <div className="absolute top-32 right-[25%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse"></div>
-        <div className="absolute bottom-40 left-[30%] w-2 h-2 bg-[#ECDBC7] rounded-full shadow-[0_0_20px_8px_rgba(236,219,199,0.6)] animate-pulse" style={{ animationDelay: '0.7s' }}></div>
-        <div className="absolute top-1/2 left-[20%] w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_15px_6px_rgba(255,255,255,0.5)] animate-pulse" style={{ animationDelay: '1.2s' }}></div>
-      </div>
+      
 
       <div className="container mx-auto px-[5%] relative z-10">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#ECDBC7] text-[#550000] px-4 py-1.5 rounded-full mb-3 shadow-lg text-xs font-bold tracking-wide">
+          <div className="inline-flex items-center gap-2 bg-[#B3967D] text-[#550000] px-4 py-1.5 rounded-full mb-3 shadow-lg text-xs font-bold tracking-wide">
             <Star className="w-4 h-4 fill-current" />
             <span>
               {locale === 'ar' ? 'آراء العملاء' : 'CUSTOMER REVIEWS'}
             </span>
           </div>
 
-          <h2 className="text-3xl md:text-4xl text-white font-bold mb-2">
+          <h2 className="text-3xl md:text-4xl text-[#550000] font-bold mb-2">
             {locale === 'ar' ? 'ماذا يقول عملاؤنا' : 'What Our Customers Say'}
           </h2>
 
-          <p className="text-base text-[#ECDBC7]">
+          <p className="text-base text-gray-600">
             {locale === 'ar'
               ? 'تجارب حقيقية من عملائنا الكرام'
               : 'Real experiences from our valued customers'
@@ -223,10 +213,10 @@ export function Testimonials() {
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#ECDBC7] ${
+                className={`transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#B3967D] ${
                   index === currentIndex
-                    ? 'w-8 h-3 bg-[#ECDBC7]'
-                    : 'w-3 h-3 bg-[#ECDBC7]/40 hover:bg-[#ECDBC7]/60'
+                    ? 'w-8 h-3 bg-[#B3967D]'
+                    : 'w-3 h-3 bg-[#B3967D]/40 hover:bg-[#B3967D]/60'
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}
               />

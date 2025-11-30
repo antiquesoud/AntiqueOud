@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { ProductCard } from "@/components/ui/product-card"
+import { ProductCarousel } from "@/components/homepage/product-carousel"
 import { useProduct } from "@/hooks/useProducts"
 import { useCart } from "@/hooks/useCart"
 import { useAuth } from "@/hooks/useAuth"
@@ -142,11 +143,7 @@ export default function ProductDetailPage() {
                       fill
                       className={isPlaceholder ? "object-contain p-4" : "object-cover"}
                     />
-                    {product.salePrice && (
-                      <div className="absolute top-2 sm:top-5 left-2 sm:left-5 bg-gradient-to-r from-red-600 to-[#550000] text-white px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-black shadow-xl border-2 border-red-400/30">
-                        -{discount}% {t('offBadge')}
-                      </div>
-                    )}
+                    
                   </div>
                 </Lens>
               )
@@ -205,7 +202,7 @@ export default function ProductDetailPage() {
                     </span>
                   ))}
                 </div>
-                <span className="text-sm sm:text-base font-black text-gray-700">{(product.rating || 0).toFixed(1)}</span>
+                {(product.rating || 0) > 0 && <span className="text-sm sm:text-base font-black text-gray-700">{(product.rating || 0).toFixed(1)}</span>}
               </div>
               <a href="#reviews" className="text-xs sm:text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000] hover:from-[#6B0000] hover:to-[#8B0000] transition-all whitespace-nowrap">
                 {product.reviewCount || 0} {tProducts('reviews')}
@@ -218,12 +215,12 @@ export default function ProductDetailPage() {
                 <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000]">
                   {formatCurrency(currentPrice)}
                 </span>
-                {product.salePrice && (
+                {product.salePrice && discount > 0 && (
                   <>
                     <span className="text-lg sm:text-xl lg:text-2xl text-gray-400 line-through font-bold">
                       {formatCurrency(product.regularPrice)}
                     </span>
-                    <Badge className="bg-gradient-to-r from-red-600 to-[#550000] text-white text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-1.5 font-black shadow-lg border-2 border-red-400/30">
+                    <Badge className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-white text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-1.5 font-black shadow-lg border-2 border-[#D4AF37]/30">
                       -{discount}% {t('offBadge')}
                     </Badge>
                   </>
@@ -251,7 +248,7 @@ export default function ProductDetailPage() {
             {product.size && !selectedVariantData && (
               <div className="mb-4 sm:mb-6">
                 <span className="text-xs sm:text-sm font-black text-gray-700 block mb-2 sm:mb-3">{tProducts('size')}</span>
-                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all border-2 border-[#D4AF37]/30">
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#B3967D] to-[#C9A86A] text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all border-2 border-[#B3967D]/30">
                   <Package className="h-5 w-5" />
                   <span>{product.size}</span>
                 </div>
@@ -287,7 +284,7 @@ export default function ProductDetailPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-6 sm:mb-10">
               <Button
-                className="flex-1 h-12 sm:h-16 bg-gradient-to-r from-[#550000] to-[#6B0000] hover:from-[#6B0000] hover:to-[#8B0000] hover:shadow-2xl hover:scale-105 transition-all text-white font-black text-base sm:text-lg rounded-lg sm:rounded-xl border-2 border-[#550000]/30"
+                className="flex-1 h-12 sm:h-16 bg-gradient-to-r from-[#B3967D] to-[#C9A86A] hover:from-[#C9A86A] hover:to-[#D4AF74] hover:shadow-2xl hover:scale-105 transition-all text-white font-black text-base sm:text-lg rounded-lg sm:rounded-xl border-2 border-[#B3967D]/30"
                 onClick={() => addToCart({ productId: product.id, variantId: selectedVariant || undefined, quantity })}
                 disabled={currentStock === 0}
               >
@@ -295,7 +292,7 @@ export default function ProductDetailPage() {
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 h-12 sm:h-16 border-2 border-[#550000] text-gray-800 hover:bg-gradient-to-r hover:from-[#550000] hover:to-[#6B0000] hover:text-white font-black text-base sm:text-lg transition-all rounded-lg sm:rounded-xl hover:shadow-2xl hover:scale-105"
+                className="flex-1 h-12 sm:h-16 border-2 border-[#B3967D] text-gray-800 hover:bg-gradient-to-r hover:from-[#B3967D] hover:to-[#C9A86A] hover:text-white font-black text-base sm:text-lg transition-all rounded-lg sm:rounded-xl hover:shadow-2xl hover:scale-105"
                 onClick={handleBuyNow}
                 disabled={currentStock === 0}
               >
@@ -375,11 +372,7 @@ export default function ProductDetailPage() {
             <h2 className="text-2xl sm:text-3xl font-bold text-charcoal mb-2">{t('youMayAlsoLike')}</h2>
             <p className="text-sm sm:text-[15px] text-gray-600">{t('similarFragrances')}</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-            {relatedProducts.map((relatedProduct) => (
-              <ProductCard key={relatedProduct.id} product={relatedProduct} />
-            ))}
-          </div>
+          <ProductCarousel products={relatedProducts} compact={true} />
         </div>
       )}
     </div>

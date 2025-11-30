@@ -229,9 +229,7 @@ export function ProductCard({
                   </span>
                 ))}
               </div>
-              <span className={cn("text-gray-500 font-medium", compact ? "text-[9px]" : "text-[10px]")}>
-                ({reviewCount})
-              </span>
+              
             </div>
 
             {/* Price */}

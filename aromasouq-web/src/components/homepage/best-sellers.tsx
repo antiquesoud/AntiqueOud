@@ -40,23 +40,17 @@ export function BestSellers({ products }: BestSellersProps) {
   };
 
   return (
-    <div className="relative overflow-hidden py-12 mb-0" style={{
-      backgroundImage: 'url(/perfume-images/antik-posts2.jpg)', // Using posts2 as posts12 doesn't exist
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    }}>
-      {/* Dark overlay for text readability - reduced opacity to show background better */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#550000]/50 via-[#6B0000]/45 to-[#550000]/50"></div>
+    <div className="relative overflow-hidden py-16 mb-8 bg-white">
+      {/* Top border separator */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#B3967D] to-transparent"></div>
 
       <div className="container mx-auto px-[5%] relative z-10">
         <div className="text-center mb-8">
-
-          <h2 className="text-3xl md:text-4xl text-white font-bold mb-2">
+          <h2 className="text-3xl md:text-4xl text-[#550000] font-bold mb-2">
             {t('title')}
           </h2>
 
-          <p className="text-base text-[#ECDBC7]">
+          <p className="text-base text-gray-600">
             {t('description')}
           </p>
         </div>
@@ -69,6 +63,9 @@ export function BestSellers({ products }: BestSellersProps) {
           isWishlisted={isWishlisted}
         />
       </div>
+
+      {/* Bottom border separator */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#B3967D] to-transparent"></div>
     </div>
   );
 }
