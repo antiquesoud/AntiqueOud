@@ -82,7 +82,7 @@
     "Perfumes": "عطور",
     "Our Brand": "علامتنا التجارية",
     "Body Mist": "رذاذ الجسم",
-    "Body Spray": "بخاخ الجسم",
+    "Body Spray": "سبراي كامل",
     "Dehnal Oud": "دهن العود"
   },
   "header": {
@@ -90,12 +90,16 @@
       "freeShipping": "✨ شحن مجاني للطلبات فوق 300 درهم"
     },
     "nav": {
+      "home": "الرئيسية",
       "allProducts": "جميع المنتجات",
       "perfumes": "عطور",
       "oud": "عود",
+      "dehnOud": "دهن العود",
+      "allOverSpray": "سبراي كامل",
       "attars": "عطارة",
       "bakhoor": "بخور",
       "giftSets": "مجموعات هدايا",
+      "bestSellers": "الأكثر مبيعاً",
       "about": "من نحن",
       "contact": "اتصل بنا",
       "trackOrder": "تتبع الطلب",
@@ -1331,7 +1335,7 @@
       "SIMILAR_DNA": "عطور بنفس الحمض النووي",
       "NICHE": "عطور متخصصة",
       "ATTAR": "عطارة تقليدية",
-      "BODY_SPRAY": "بخاخ جسم"
+      "BODY_SPRAY": "سبراي كامل"
     },
     "breadcrumbs": {
       "home": "الرئيسية",
@@ -1398,7 +1402,7 @@
       "similarDNA": "نفس الحمض النووي",
       "niche": "متخصص",
       "attar": "عطارة",
-      "bodySpray": "بخاخ جسم",
+      "bodySpray": "سبراي كامل",
       "regionOrigin": "المنطقة / الأصل",
       "allRegions": "جميع المناطق",
       "uae": "الإمارات",

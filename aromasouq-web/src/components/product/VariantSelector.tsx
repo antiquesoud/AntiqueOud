@@ -148,7 +148,7 @@ export function VariantSelector({
 
       {/* Selected variant info */}
       {selectedVariant && (
-        <div className="mt-3 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-lg">
+        <div className="mt-3 p-3 bg-gradient-to-r from-[#ECDBC7]/30 to-[#B3967D]/20 border-2 border-[#B3967D]/40 rounded-lg">
           <div className="text-xs sm:text-sm text-gray-700">
             <span className="font-bold">{t("selected")}:</span>{" "}
             <span className="text-gray-800 font-semibold">
@@ -166,7 +166,7 @@ export function VariantSelector({
                 </span>
               </>
             ) : (
-              <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600">
+              <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-[#B3967D] to-[#C9A86A]">
                 {formatCurrency(selectedVariant.price)}
               </span>
             )}

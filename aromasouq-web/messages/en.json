@@ -82,7 +82,7 @@
     "Perfumes": "Perfumes",
     "Our Brand": "Our Brand",
     "Body Mist": "Body Mist",
-    "Body Spray": "Body Spray",
+    "Body Spray": "All over spray",
     "Dehnal Oud": "Dehnal Oud"
   },
   "header": {
@@ -90,15 +90,19 @@
       "freeShipping": "✨ Free shipping on orders over 300 AED"
     },
     "nav": {
+      "home": "Home",
       "allProducts": "All Products",
       "perfumes": "Perfumes",
       "oud": "Oud",
+      "dehnOud": "Dhn oud",
+      "allOverSpray": "All over spray",
       "attars": "Attars",
       "bakhoor": "Bakhoor",
       "giftSets": "Gift Sets",
+      "bestSellers": "Best sellers",
       "about": "About",
       "contact": "Contact",
-      "trackOrder": "Track Order",
+      "trackOrder": "Track order",
       "navigationMenu": "Navigation Menu"
     },
     "search": {
@@ -1064,7 +1068,7 @@
       "similarDNA": "Similar DNA",
       "niche": "Niche",
       "attar": "Attar",
-      "bodySpray": "Body Spray",
+      "bodySpray": "All over spray",
       "bakhoor": "Bakhoor",
       "homeFragrance": "Home Fragrance",
       "giftSet": "Gift Set",
@@ -1932,7 +1936,7 @@
       "SIMILAR_DNA": "Similar DNA Fragrances",
       "NICHE": "Niche Perfumes",
       "ATTAR": "Traditional Attars",
-      "BODY_SPRAY": "Body Sprays"
+      "BODY_SPRAY": "All over sprays"
     },
     "breadcrumbs": {
       "home": "Home",
@@ -1999,7 +2003,7 @@
       "similarDNA": "Similar DNA",
       "niche": "Niche",
       "attar": "Attar",
-      "bodySpray": "Body Spray",
+      "bodySpray": "All over spray",
       "regionOrigin": "Region / Origin",
       "allRegions": "All Regions",
       "uae": "UAE",

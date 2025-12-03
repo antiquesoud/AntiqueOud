@@ -141,9 +141,9 @@ export default function ProductDetailPage() {
                       src={displayImage}
                       alt={product.nameEn}
                       fill
-                      className={isPlaceholder ? "object-contain p-4" : "object-cover"}
+                      className="object-cover"
                     />
-                    
+
                   </div>
                 </Lens>
               )

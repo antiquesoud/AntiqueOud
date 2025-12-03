@@ -69,15 +69,15 @@ export function Header() {
                 <SheetTitle className="sr-only">{tNav('navigationMenu')}</SheetTitle>
                 <nav className="flex flex-col gap-4 mt-8">
                   <Link
-                    href="/track-order"
+                    href="/"
                     className={cn(
                       "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
-                      pathname === '/track-order'
+                      pathname === '/'
                         ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
                         : "hover:bg-gray-50"
                     )}
                   >
-                    {tNav('trackOrder')}
+                    {tNav('home')}
                   </Link>
                   <Link
                     href="/products"
@@ -113,37 +113,48 @@ export function Header() {
                     {tNav('oud')}
                   </Link>
                   <Link
-                    href="/products?categorySlug=attars"
+                    href="/products?categorySlug=dehnal-oud"
                     className={cn(
                       "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
-                      categorySlug === 'attars'
+                      categorySlug === 'dehnal-oud'
                         ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
                         : "hover:bg-gray-50"
                     )}
                   >
-                    {tNav('attars')}
+                    {tNav('dehnOud')}
                   </Link>
                   <Link
-                    href="/products?categorySlug=bakhoor"
+                    href="/products?categorySlug=body-spray"
                     className={cn(
                       "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
-                      categorySlug === 'bakhoor'
+                      categorySlug === 'body-spray'
                         ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
                         : "hover:bg-gray-50"
                     )}
                   >
-                    {tNav('bakhoor')}
+                    {tNav('allOverSpray')}
                   </Link>
                   <Link
-                    href="/products?categorySlug=gift-sets"
+                    href="/products?collection=best-sellers"
                     className={cn(
                       "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
-                      categorySlug === 'gift-sets'
+                      searchParams.get('collection') === 'best-sellers'
                         ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
                         : "hover:bg-gray-50"
                     )}
                   >
-                    {tNav('giftSets')}
+                    {tNav('bestSellers')}
+                  </Link>
+                  <Link
+                    href="/track-order"
+                    className={cn(
+                      "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
+                      pathname === '/track-order'
+                        ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
+                        : "hover:bg-gray-50"
+                    )}
+                  >
+                    {tNav('trackOrder')}
                   </Link>
                 </nav>
               </SheetContent>
@@ -231,17 +242,6 @@ export function Header() {
               )}
             >
               {tNav('bakhoor')}
-            </Link>
-            <Link
-              href="/products?categorySlug=gift-sets"
-              className={cn(
-                "px-4 py-2 text-sm font-bold transition-all rounded-lg",
-                categorySlug === 'gift-sets'
-                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
-                  : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
-              )}
-            >
-              {tNav('giftSets')}
             </Link>
           </nav>
 

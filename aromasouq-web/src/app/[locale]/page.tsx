@@ -6,9 +6,7 @@
 import { HeroSlider } from '@/components/homepage/hero-slider';
 import { ShopByCategory } from '@/components/homepage/shop-by-category';
 import { FlashSale } from '@/components/homepage/flash-sale';
-import { OudCollection } from '@/components/homepage/oud-collection';
 import { BestSellers } from '@/components/homepage/best-sellers';
-import { TrustBadges } from '@/components/homepage/trust-badges';
 import { Testimonials } from '@/components/homepage/testimonials';
 
 // API functions
@@ -37,9 +35,6 @@ export default async function HomePage() {
       {/* Hero Slider */}
       <HeroSlider />
 
-      {/* Trust Badges */}
-      <TrustBadges />
-
       {/* Shop by Category */}
       {categories.length > 0 && <ShopByCategory categories={categories} />}
 
@@ -52,9 +47,6 @@ export default async function HomePage() {
       {featuredProducts.length > 0 && (
         <BestSellers products={featuredProducts} />
       )}
-
-      {/* Oud Collection Showcase */}
-      <OudCollection />
 
       {/* Testimonials */}
       <Testimonials />
