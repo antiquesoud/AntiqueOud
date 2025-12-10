@@ -62,7 +62,7 @@ export interface Region {
 export async function getCategories(): Promise<Category[]> {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
     const res = await fetch(`${API_BASE_URL}/categories`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
