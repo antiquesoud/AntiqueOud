@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
 import { Link, usePathname } from "@/i18n/navigation"
 import { useSearchParams } from "next/navigation"
 import { Search, ShoppingCart, Heart, User, Menu, Coins } from "lucide-react"
@@ -160,29 +161,15 @@ export function Header() {
               </SheetContent>
             </Sheet>
 
-            <Link href="/" className="flex flex-col items-start gap-0 leading-none">
-              <h1
-                className="text-2xl md:text-3xl lg:text-4xl font-black text-[#550000] leading-none"
-                style={{
-                  fontFamily: 'Cairo, Amiri, serif',
-                  letterSpacing: '0.02em',
-                  textShadow: '0 0 1px rgba(85, 0, 0, 0.8), 0 0 2px rgba(85, 0, 0, 0.4)',
-                  fontWeight: 900,
-                  WebkitTextStroke: '0.4px #550000'
-                }}
-              >
-                أنتيك العود
-              </h1>
-              <p
-                className="text-[10px] md:text-xs lg:text-sm text-[#550000] font-bold leading-none mt-0.5"
-                style={{
-                  fontFamily: 'Cairo, Amiri, serif',
-                  letterSpacing: '0.01em',
-                  fontWeight: 700
-                }}
-              >
-                ارث من الماضي وطيب للحاضر
-              </p>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/brandLogo/0001.png"
+                alt="أنتيك العود - ارث من الماضي وطيب للحاضر"
+                width={180}
+                height={50}
+                className="h-10 w-auto sm:h-12 md:h-14 lg:h-16"
+                priority
+              />
             </Link>
           </div>
 

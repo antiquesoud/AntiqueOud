@@ -1,5 +1,6 @@
 'use client';
 
+import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { Instagram, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -26,28 +27,16 @@ export function Footer() {
           {/* About */}
           <div>
             <div className="mb-4">
-              <h3
-                className="text-2xl md:text-3xl font-black text-[#ECDBC7] leading-none"
-                style={{
-                  fontFamily: 'Cairo, Amiri, serif',
-                  letterSpacing: '0.02em',
-                  textShadow: '0 0 1px rgba(236, 219, 199, 0.8), 0 0 2px rgba(236, 219, 199, 0.4)',
-                  fontWeight: 900,
-                  WebkitTextStroke: '0.3px #ECDBC7'
-                }}
-              >
-                أنتيك العود
-              </h3>
-              <p
-                className="text-[10px] md:text-xs text-[#ECDBC7] font-bold leading-tight mt-1"
-                style={{
-                  fontFamily: 'Cairo, Amiri, serif',
-                  letterSpacing: '0.01em',
-                  fontWeight: 700
-                }}
-              >
-                ارث من الماضي وطيب للحاضر
-              </p>
+              <Link href="/" className="flex items-center">
+                <Image
+                  src="/brandLogo/logo 002.png"
+                  alt="أنتيك العود - ارث من الماضي وطيب للحاضر"
+                  width={180}
+                  height={50}
+                  className="h-10 w-auto sm:h-12 md:h-14 lg:h-16"
+                  priority
+                />
+              </Link>
             </div>
             <p className="text-sm text-gray-300 mb-4">
               {t('description')}
