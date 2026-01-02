@@ -1,12 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true, // Enable raw body for Stripe webhooks
   });
+
+  // Compression middleware - reduces response size by 60-80%
+  app.use(compression({
+    threshold: 1024, // Only compress responses > 1KB
+    level: 6,        // Balanced compression (1-9, default 6)
+  }));
 
   // Global validation pipe
   app.useGlobalPipes(

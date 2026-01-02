@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -33,6 +34,12 @@ import { PaymentsModule } from './payments/payments.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+    }),
+    // Global cache module for API response caching
+    CacheModule.register({
+      ttl: 300000,      // Default TTL: 5 minutes (in milliseconds)
+      max: 500,         // Maximum items in cache
+      isGlobal: true,   // Available across all modules
     }),
     PrismaModule,
     SessionModule, // Global session management for guests

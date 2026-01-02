@@ -1073,13 +1073,18 @@ export class ProductsService {
       }
     }
 
+    // Batch fetch all products in a single query (N+1 fix)
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true, price: true },
+    });
+
+    // Create a map for O(1) lookup
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
     // Calculate sale price and discount percent for each product
     const updatePromises = productIds.map(async (productId) => {
-      const product = await this.prisma.product.findUnique({
-        where: { id: productId },
-        select: { price: true },
-      });
-
+      const product = productMap.get(productId);
       if (!product) return null;
 
       let finalSalePrice = salePrice;
@@ -1199,16 +1204,21 @@ export class ProductsService {
       }
     }
 
+    // Batch fetch all products in a single query (N+1 fix)
+    const allProducts = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true, price: true },
+    });
+
+    // Create a map for O(1) lookup
+    const productPriceMap = new Map(allProducts.map((p) => [p.id, p.price]));
+
     // Calculate sale price for each product based on discount percent
     const updatePromises = productIds.map(async (productId) => {
-      const product = await this.prisma.product.findUnique({
-        where: { id: productId },
-        select: { price: true },
-      });
+      const price = productPriceMap.get(productId);
+      if (price === undefined) return null;
 
-      if (!product) return null;
-
-      const salePrice = Math.round(product.price * (1 - discountPercent / 100));
+      const salePrice = Math.round(price * (1 - discountPercent / 100));
 
       return this.prisma.product.update({
         where: { id: productId },

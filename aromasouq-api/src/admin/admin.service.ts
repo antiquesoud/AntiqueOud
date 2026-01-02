@@ -85,26 +85,28 @@ export class AdminService {
       take: 5,
     });
 
-    // Get product details for top products
-    const topProductsWithDetails = await Promise.all(
-      topProducts.map(async (item) => {
-        const product = await this.prisma.product.findUnique({
-          where: { id: item.productId },
-          select: {
-            id: true,
-            name: true,
-            nameAr: true,
-            images: true,
-            price: true,
-          },
-        });
-        return {
-          product,
-          totalSold: item._sum.quantity || 0,
-          orderCount: item._count.productId,
-        };
-      }),
-    );
+    // Batch fetch all product details in a single query (N+1 fix)
+    const productIds = topProducts.map((item) => item.productId);
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: {
+        id: true,
+        name: true,
+        nameAr: true,
+        images: true,
+        price: true,
+      },
+    });
+
+    // Create a map for O(1) lookup
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
+    // Combine without additional queries
+    const topProductsWithDetails = topProducts.map((item) => ({
+      product: productMap.get(item.productId) || null,
+      totalSold: item._sum.quantity || 0,
+      orderCount: item._count.productId,
+    }));
 
     return {
       totalUsers,
