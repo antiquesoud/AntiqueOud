@@ -34,7 +34,7 @@ export class ProductsController {
   ) {}
 
   @Get()
-  findAll(
+  async findAll(
     @Query('categoryId') categoryId?: string,
     @Query('category') category?: string,
     @Query('categorySlug') categorySlug?: string,
@@ -60,7 +60,16 @@ export class ProductsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    return this.productsService.findAll({
+    // Build cache key from query params (only cache non-search queries for 2 min)
+    const cacheKey = search ? null : `products:${categorySlug || category || categoryId || 'all'}:${gender || ''}:${page || 1}:${limit || 20}:${sortBy || 'createdAt'}`;
+
+    // Try to get from cache first (skip for search queries)
+    if (cacheKey) {
+      const cached = await this.cacheManager.get(cacheKey);
+      if (cached) return cached;
+    }
+
+    const result = await this.productsService.findAll({
       categoryId,
       categorySlug: categorySlug || category, // Support both parameters, prioritize categorySlug
       brandId,
@@ -84,6 +93,13 @@ export class ProductsController {
       page: page ? parseInt(page, 10) : undefined,
       limit: limit ? parseInt(limit, 10) : undefined,
     });
+
+    // Cache the result for 2 minutes (non-search queries only)
+    if (cacheKey) {
+      await this.cacheManager.set(cacheKey, result, 120000); // 2 minutes
+    }
+
+    return result;
   }
 
   @Get('featured')
