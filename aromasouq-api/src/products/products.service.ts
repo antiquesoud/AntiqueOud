@@ -120,10 +120,32 @@ export class ProductsService {
 
     const skip = (page - 1) * limit;
 
+    // OPTIMIZED: Use select instead of include for smaller payload
+    // Only fetch fields needed for product list view
     const [products, total] = await Promise.all([
       this.prisma.product.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          name: true,
+          nameAr: true,
+          slug: true,
+          price: true,
+          salePrice: true,
+          compareAtPrice: true,
+          images: true,
+          stock: true,
+          isActive: true,
+          isFeatured: true,
+          isOnSale: true,
+          discountPercent: true,
+          averageRating: true,
+          reviewCount: true,
+          gender: true,
+          concentration: true,
+          scentFamily: true,
+          productType: true,
+          createdAt: true,
           category: {
             select: {
               id: true,
@@ -141,19 +163,22 @@ export class ProductsService {
               logo: true,
             },
           },
-          vendor: {
-            select: {
-              id: true,
-              businessName: true,
-              businessNameAr: true,
-              businessEmail: true,
-              businessPhone: true,
-            },
-          },
+          // REMOVED: vendor - not needed in list view
+          // OPTIMIZED: Only fetch essential variant info, limit to 3
           variants: {
             where: { isActive: true },
+            select: {
+              id: true,
+              name: true,
+              size: true,
+              price: true,
+              salePrice: true,
+              stock: true,
+            },
+            orderBy: { sortOrder: 'asc' },
+            take: 3,
           },
-          videos: true,
+          // REMOVED: videos - not needed in list view
         },
         orderBy: { [sortBy]: sortOrder },
         skip,
