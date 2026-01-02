@@ -136,6 +136,17 @@ export function Header() {
                     {tNav('allOverSpray')}
                   </Link>
                   <Link
+                    href="/products?categorySlug=limited-edition"
+                    className={cn(
+                      "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
+                      categorySlug === 'limited-edition'
+                        ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
+                        : "hover:bg-gray-50"
+                    )}
+                  >
+                    {tNav('limitedEdition')}
+                  </Link>
+                  <Link
                     href="/products?collection=best-sellers"
                     className={cn(
                       "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
@@ -229,6 +240,17 @@ export function Header() {
               )}
             >
               {tNav('bakhoor')}
+            </Link>
+            <Link
+              href="/products?categorySlug=limited-edition"
+              className={cn(
+                "px-4 py-2 text-sm font-bold transition-all rounded-lg",
+                categorySlug === 'limited-edition'
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                  : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
+              )}
+            >
+              {tNav('limitedEdition')}
             </Link>
           </nav>
 

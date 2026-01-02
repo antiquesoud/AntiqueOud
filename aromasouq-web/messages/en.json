@@ -83,7 +83,8 @@
     "Our Brand": "Our Brand",
     "Body Mist": "Body Mist",
     "Body Spray": "All over spray",
-    "Dehnal Oud": "Dehnal Oud"
+    "Dehnal Oud": "Dehnal Oud",
+    "Limited Edition": "Limited Edition"
   },
   "header": {
     "topBar": {
@@ -100,6 +101,7 @@
       "bakhoor": "Bakhoor",
       "giftSets": "Gift Sets",
       "bestSellers": "Best sellers",
+      "limitedEdition": "Limited Edition",
       "about": "About",
       "contact": "Contact",
       "trackOrder": "Track order",

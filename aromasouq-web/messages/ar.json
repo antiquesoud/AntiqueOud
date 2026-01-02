@@ -83,7 +83,8 @@
     "Our Brand": "علامتنا التجارية",
     "Body Mist": "رذاذ الجسم",
     "Body Spray": "سبراي كامل",
-    "Dehnal Oud": "دهن العود"
+    "Dehnal Oud": "دهن العود",
+    "Limited Edition": "إصدار محدود"
   },
   "header": {
     "topBar": {
@@ -100,6 +101,7 @@
       "bakhoor": "بخور",
       "giftSets": "مجموعات هدايا",
       "bestSellers": "الأكثر مبيعاً",
+      "limitedEdition": "إصدار محدود",
       "about": "من نحن",
       "contact": "اتصل بنا",
       "trackOrder": "تتبع الطلب",

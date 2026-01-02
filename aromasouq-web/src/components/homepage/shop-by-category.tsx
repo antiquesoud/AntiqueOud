@@ -11,16 +11,17 @@ import { Category } from '@/lib/api/homepage';
 import { translateCategory } from '@/lib/translation-helpers';
 import { ArabicBorder } from '@/components/ui/arabic-border';
 
-// Mapping categories to images - only 4 categories now
+// Mapping categories to images - 5 categories now
 const categoryImages: Record<string, string> = {
   'oud': '/perfume-images/antik-posts9.jpg', // Oudh - keep same image
   'perfumes': '/perfume-images/antik-posts6.jpg', // Perfume
   'body-spray': '/perfume-images/antik-posts7.jpg', // Body Spray
   'dehnal-oud': '/perfume-images/antik-posts11.jpg', // Dehnal Oud
+  'limited-edition': '/perfume-images/antik-posts2.jpg', // Limited Edition
 };
 
-// Only show these 4 categories (removed attars)
-const allowedCategories = ['oud', 'perfumes', 'body-spray', 'dehnal-oud'];
+// Show these 5 categories
+const allowedCategories = ['oud', 'perfumes', 'body-spray', 'dehnal-oud', 'limited-edition'];
 
 interface ShopByCategoryProps {
   categories: Category[];

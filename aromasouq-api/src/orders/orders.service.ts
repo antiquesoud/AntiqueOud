@@ -106,30 +106,33 @@ export class OrdersService {
       throw new BadRequestException('Order does not belong to user');
     }
 
-    // Add review status for each item
-    const itemsWithReviewStatus = await Promise.all(
-      order.items.map(async (item) => {
-        const review = await this.prisma.review.findUnique({
-          where: {
-            userId_productId: {
-              userId,
-              productId: item.productId,
-            },
-          },
-          select: {
-            id: true,
-            rating: true,
-            createdAt: true,
-          },
-        });
+    // Batch fetch all reviews for this user's products in a single query (N+1 fix)
+    const productIds = order.items.map((item) => item.productId);
+    const reviews = await this.prisma.review.findMany({
+      where: {
+        userId,
+        productId: { in: productIds },
+      },
+      select: {
+        id: true,
+        rating: true,
+        productId: true,
+        createdAt: true,
+      },
+    });
 
-        return {
-          ...item,
-          review: review || null,
-          hasReviewed: !!review,
-        };
-      }),
-    );
+    // Create a map for O(1) lookup
+    const reviewMap = new Map(reviews.map((r) => [r.productId, r]));
+
+    // Add review status to each item without additional queries
+    const itemsWithReviewStatus = order.items.map((item) => {
+      const review = reviewMap.get(item.productId) || null;
+      return {
+        ...item,
+        review,
+        hasReviewed: !!review,
+      };
+    });
 
     return {
       ...order,

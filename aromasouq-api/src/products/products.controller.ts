@@ -9,7 +9,11 @@ import {
   UseGuards,
   Query,
   Req,
+  UseInterceptors,
+  Inject,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL, CacheKey, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import type { Request } from 'express';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -24,7 +28,10 @@ import { UserRole } from '@prisma/client';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @Get()
   findAll(
@@ -80,6 +87,9 @@ export class ProductsController {
   }
 
   @Get('featured')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(1800000) // 30 minutes
+  @CacheKey('featured-products')
   getFeatured(@Query('limit') limit?: string) {
     return this.productsService.getFeaturedProducts(
       limit ? parseInt(limit, 10) : undefined,
@@ -88,36 +98,57 @@ export class ProductsController {
 
   // NEW: Homepage Aggregation Endpoints
   @Get('scent-families')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1 hour
+  @CacheKey('scent-families')
   getScentFamilies() {
     return this.productsService.getScentFamilyAggregation();
   }
 
   @Get('occasions')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1 hour
+  @CacheKey('occasions')
   getOccasions() {
     return this.productsService.getOccasionAggregation();
   }
 
   @Get('regions')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1 hour
+  @CacheKey('regions')
   getRegions() {
     return this.productsService.getRegionAggregation();
   }
 
   @Get('oud-types')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1 hour
+  @CacheKey('oud-types')
   getOudTypes() {
     return this.productsService.getOudTypeAggregation();
   }
 
   @Get('product-types')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1 hour
+  @CacheKey('product-types')
   getProductTypes() {
     return this.productsService.getProductTypeAggregation();
   }
 
   @Get('collections')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1 hour
+  @CacheKey('collections')
   getCollections() {
     return this.productsService.getCollectionAggregation();
   }
 
   @Get('flash-sale')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300000) // 5 minutes (changes frequently)
+  @CacheKey('flash-sale-products')
   getFlashSale(@Query('limit') limit?: string) {
     return this.productsService.getFlashSaleProducts(
       limit ? parseInt(limit, 10) : 10,
@@ -136,6 +167,9 @@ export class ProductsController {
   }
 
   @Get('new-arrivals')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(1800000) // 30 minutes
+  @CacheKey('new-arrivals')
   getNewArrivals(@Query('limit') limit?: string) {
     return this.productsService.getNewArrivals(
       limit ? parseInt(limit, 10) : 10,
@@ -143,6 +177,9 @@ export class ProductsController {
   }
 
   @Get('gender-banners')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1 hour
+  @CacheKey('gender-banners')
   getGenderBanners() {
     return this.productsService.getGenderBanners();
   }

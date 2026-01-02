@@ -7,7 +7,11 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  Inject,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL, CacheKey, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -18,9 +22,15 @@ import { UserRole } from '@prisma/client';
 
 @Controller('brands')
 export class BrandsController {
-  constructor(private readonly brandsService: BrandsService) {}
+  constructor(
+    private readonly brandsService: BrandsService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000) // 1 hour
+  @CacheKey('all-brands')
   findAll() {
     return this.brandsService.findAll();
   }
@@ -38,21 +48,24 @@ export class BrandsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  create(@Body() createBrandDto: CreateBrandDto) {
+  async create(@Body() createBrandDto: CreateBrandDto) {
+    await this.cacheManager.del('all-brands');
     return this.brandsService.create(createBrandDto);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  update(@Param('id') id: string, @Body() updateBrandDto: UpdateBrandDto) {
+  async update(@Param('id') id: string, @Body() updateBrandDto: UpdateBrandDto) {
+    await this.cacheManager.del('all-brands');
     return this.brandsService.update(id, updateBrandDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
+    await this.cacheManager.del('all-brands');
     return this.brandsService.remove(id);
   }
 }

@@ -84,11 +84,12 @@ export class AuthService {
       }
     }
 
-    // Generate JWT token
+    // Generate JWT token with status for optimized validation
     const access_token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
       role: user.role,
+      status: 'ACTIVE', // New users are always active
     });
 
     return {
@@ -137,11 +138,12 @@ export class AuthService {
       }
     }
 
-    // Generate JWT token
+    // Generate JWT token with status for optimized validation
     const access_token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
       role: user.role,
+      status: user.status, // Include status for JWT validation optimization
     });
 
     // Remove password from response
