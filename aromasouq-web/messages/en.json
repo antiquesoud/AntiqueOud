@@ -2304,5 +2304,113 @@
     "fastShippingDesc": "Quick delivery in UAE",
     "genuine": "100% Genuine",
     "genuineDesc": "Verified authentic products"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "introduction": "Welcome to Antique Oud. We are committed to safeguarding your personal data and respecting your privacy. This Privacy Policy describes how we gather, utilize, and disclose information when you visit our website or make a purchase.",
+    "infoCollection": {
+      "title": "Information We Collect",
+      "personalTitle": "Personal Information",
+      "personal1": "Contact details: name, email address, phone number, shipping and billing address",
+      "personal2": "Payment information: credit/debit card details, billing information",
+      "personal3": "Account credentials: username, password, and login details",
+      "nonPersonalTitle": "Non-Personal Information",
+      "nonPersonal1": "Technical information: IP address, browser type, operating system, device identifiers",
+      "nonPersonal2": "Behavioral data: pages visited, time spent on site, click patterns, and site interactions"
+    },
+    "infoUsage": {
+      "title": "How We Use Your Information",
+      "description": "We process your information for the following purposes:",
+      "use1": "Process transactions and manage your orders",
+      "use2": "Communicate with you about your orders and account",
+      "use3": "Improve our services through usage analysis",
+      "use4": "Conduct market research and analytics",
+      "use5": "Send promotional communications (with your consent)",
+      "use6": "Display personalized advertisements",
+      "use7": "Detect and prevent fraudulent activity",
+      "use8": "Comply with legal and regulatory requirements"
+    },
+    "infoSharing": {
+      "title": "Information Sharing",
+      "description": "We may share your information with third-party service providers who assist us with payment processing, shipping and delivery, customer support, and marketing services. These providers are contractually obligated to protect your information and use it only for the purposes we specify."
+    },
+    "dataSecurity": {
+      "title": "Data Security",
+      "description": "We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security."
+    },
+    "yourRights": {
+      "title": "Your Rights",
+      "description": "You have the following rights regarding your personal information:",
+      "right1": "Access and receive a copy of your personal data",
+      "right2": "Request correction of inaccurate information",
+      "right3": "Request deletion of your personal data",
+      "right4": "Opt-out of marketing communications at any time"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "If you have any questions about this Privacy Policy or our data practices, please contact us:",
+      "emailLabel": "Email",
+      "email": "info@antiqueoud.com",
+      "addressLabel": "Address",
+      "address": "Dubai, United Arab Emirates"
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "introduction": "By accessing or using our website and services, you agree to comply with and be bound by the following terms and conditions. Please read these terms carefully before using our website.",
+    "acceptance": {
+      "title": "1. Acceptance of Terms",
+      "description": "By accessing and using this website, you accept and agree to be bound by these Terms of Service, our Privacy Policy, and any additional terms applicable to specific sections of the website or particular products and services."
+    },
+    "useOfWebsite": {
+      "title": "2. Use of the Website",
+      "eligibilityTitle": "Eligibility",
+      "eligibility": "You must be at least 18 years old to use our website and make purchases. By using this website, you represent and warrant that you are at least 18 years of age.",
+      "registrationTitle": "Account Registration",
+      "registration": "When you create an account with us, you must provide accurate, current, and complete information. You are responsible for maintaining the confidentiality of your account and password.",
+      "securityTitle": "Account Security",
+      "security": "You are responsible for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account or any other breach of security."
+    },
+    "orders": {
+      "title": "3. Orders and Payments",
+      "acceptanceTitle": "Order Acceptance",
+      "acceptance": "All orders placed through our website are subject to our acceptance. We reserve the right to refuse or cancel any order for any reason, including but not limited to product availability, errors in pricing, or suspected fraud.",
+      "pricingTitle": "Pricing",
+      "pricing": "All prices are displayed in AED (United Arab Emirates Dirham) and are subject to change without notice. We make every effort to ensure pricing accuracy, but errors may occur.",
+      "paymentsTitle": "Payment",
+      "payments": "By providing payment information, you represent and warrant that you are authorized to use the designated payment method. All payments are processed securely through our payment gateway."
+    },
+    "intellectualProperty": {
+      "title": "4. Intellectual Property",
+      "description": "All content on our website, including text, graphics, logos, images, product descriptions, and software, is the property of Antique Oud and is protected by intellectual property laws. You may not reproduce, distribute, modify, or create derivative works without our prior written consent."
+    },
+    "userContent": {
+      "title": "5. User Content",
+      "description": "When you submit reviews, comments, or other content, you grant us a non-exclusive, royalty-free, perpetual license to use, modify, and display such content. You agree not to submit content that is unlawful, defamatory, obscene, or infringes on the rights of others."
+    },
+    "liability": {
+      "title": "6. Limitation of Liability",
+      "description": "Antique Oud shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the website or purchase of products. Our total liability shall not exceed the amount you paid for the product in question."
+    },
+    "indemnification": {
+      "title": "7. Indemnification",
+      "description": "You agree to indemnify and hold harmless Antique Oud, its officers, directors, employees, and agents from any claims, damages, losses, or expenses arising from your use of the website or violation of these terms."
+    },
+    "governingLaw": {
+      "title": "8. Governing Law",
+      "description": "These Terms of Service shall be governed by and construed in accordance with the laws of the United Arab Emirates. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts of Dubai, UAE."
+    },
+    "changes": {
+      "title": "9. Changes to Terms",
+      "description": "We reserve the right to modify these Terms of Service at any time without prior notice. Changes will be effective immediately upon posting on the website. Your continued use of the website after any changes constitutes your acceptance of the new terms."
+    },
+    "contact": {
+      "title": "10. Contact Us",
+      "description": "If you have any questions about these Terms of Service, please contact us:",
+      "emailLabel": "Email",
+      "email": "info@antiqueoud.com",
+      "addressLabel": "Address",
+      "address": "Dubai, United Arab Emirates"
+    }
   }
 }
