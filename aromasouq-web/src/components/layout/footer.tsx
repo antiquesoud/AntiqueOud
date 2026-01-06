@@ -23,7 +23,7 @@ export function Footer() {
   return (
     <footer className="bg-gradient-to-br from-[#550000] to-[#6B0000] text-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}
           <div>
             <div className="mb-4">
@@ -61,8 +61,17 @@ export function Footer() {
               <li><Link href="/about" className="hover:text-[#ECDBC7] transition-colors">{t('about')}</Link></li>
               <li><Link href="/contact" className="hover:text-[#ECDBC7] transition-colors">{t('contact')}</Link></li>
               <li><Link href="/shipping" className="hover:text-[#ECDBC7] transition-colors">{t('shippingInfo')}</Link></li>
-              <li><Link href="/returns" className="hover:text-[#ECDBC7] transition-colors">{t('returns')}</Link></li>
               <li><Link href="/faq" className="hover:text-[#ECDBC7] transition-colors">{t('faq')}</Link></li>
+            </ul>
+          </div>
+
+          {/* Policies */}
+          <div>
+            <h4 className="font-semibold mb-4">{t('policies')}</h4>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li><Link href="/privacy" className="hover:text-[#ECDBC7] transition-colors">{t('privacy')}</Link></li>
+              <li><Link href="/terms" className="hover:text-[#ECDBC7] transition-colors">{t('termsOfService')}</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-[#ECDBC7] transition-colors">{t('refundPolicy')}</Link></li>
             </ul>
           </div>
 
@@ -84,12 +93,8 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-8 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+        <div className="mt-8 pt-8 border-t border-white/10 flex justify-center items-center text-sm text-gray-400">
           <p>{t('copyright')}</p>
-          <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-[#ECDBC7] transition-colors">{t('privacy')}</Link>
-            <Link href="/terms" className="hover:text-[#ECDBC7] transition-colors">{t('termsOfService')}</Link>
-          </div>
         </div>
       </div>
     </footer>
