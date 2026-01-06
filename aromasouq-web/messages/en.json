@@ -399,6 +399,8 @@
     "shippingInfo": "Shipping Info",
     "returns": "Returns",
     "faq": "FAQ",
+    "policies": "Policies",
+    "refundPolicy": "Refund Policy",
     "newsletter": "Newsletter",
     "newsletterDescription": "Subscribe to get 50 coins and exclusive offers!",
     "yourEmail": "Your email",
@@ -2349,6 +2351,41 @@
     "contact": {
       "title": "Contact Us",
       "description": "If you have any questions about this Privacy Policy or our data practices, please contact us:",
+      "emailLabel": "Email",
+      "email": "info@antiqueoud.com",
+      "addressLabel": "Address",
+      "address": "Dubai, United Arab Emirates"
+    }
+  },
+  "refundPolicy": {
+    "title": "Refund Policy",
+    "overview": "At Antique Oud, customer satisfaction is our top priority. If you are not entirely satisfied with your purchase, we're here to help.",
+    "returnPolicy": {
+      "title": "Return Policy",
+      "eligibilityTitle": "Eligibility Requirements",
+      "eligibility": "To be eligible for a return, items must be unused, unopened, and in their original packaging. Returns must be initiated within 7 days of receiving your order. Proof of purchase is required for all returns.",
+      "nonReturnableTitle": "Non-Returnable Items",
+      "nonReturnable1": "Gift cards",
+      "nonReturnable2": "Personalized or custom-made items",
+      "nonReturnable3": "Final sale or clearance items",
+      "processTitle": "Return Process",
+      "process": "To initiate a return, please email us at info@antiqueoud.com with your order number and reason for return. Upon approval, we will provide you with return authorization and instructions. Please ship items in their original packaging using a trackable shipping method.",
+      "shippingTitle": "Shipping Costs",
+      "shipping": "You are responsible for paying the shipping costs for returning your item(s). Shipping costs are non-refundable. If you receive a refund, the cost of return shipping will be deducted from your refund. Exception: We will cover return shipping costs for defective products or if the return is due to our error."
+    },
+    "refunds": {
+      "title": "Refund Processing",
+      "processing": "Once your return is received and inspected, we will process your refund within 5-7 working days. Approved refunds will be automatically applied to your original payment method within 7 business days.",
+      "partial": "Partial refunds may be granted if items are not in their original condition, are damaged, or have missing parts due to reasons not caused by our error.",
+      "missing": "If you haven't received your refund yet, first check your bank account again. Then contact your credit card company, as it may take some time before your refund is officially posted. If you've done all of this and still have not received your refund, please contact us at info@antiqueoud.com."
+    },
+    "exchanges": {
+      "title": "Exchanges",
+      "description": "We only replace items if they are defective or damaged upon arrival. If you need to exchange an item for the same product, please contact us at info@antiqueoud.com with your order details and photos of the defective or damaged item."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "If you have any questions about our refund policy, please contact us:",
       "emailLabel": "Email",
       "email": "info@antiqueoud.com",
       "addressLabel": "Address",
