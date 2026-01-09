@@ -105,9 +105,10 @@ export const useAuthStore = create<AuthState>()(
         }
       }),
       partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
-      onRehydrateStorage: () => (state) => {
-        // Called when hydration is complete
-        state?.setHasHydrated(true)
+      onRehydrateStorage: () => () => {
+        // Note: We no longer set hasHydrated here because we want to wait
+        // for server verification in AuthHydration component
+        // This prevents premature redirects when localStorage is stale
       },
     }
   )
