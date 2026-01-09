@@ -22,8 +22,7 @@ import { GiftOptionsModal } from '@/components/features/gift-options-modal'
 import { useTranslations } from 'next-intl'
 import { AddressForm } from '@/components/addresses/AddressForm'
 import { useCreateAddress, CreateAddressDto } from '@/hooks/useAddresses'
-import { StripeProvider } from '@/components/payment/StripeProvider'
-import { StripeCardForm } from '@/components/payment/StripeCardForm'
+import { PaymobCheckout } from '@/components/payment/PaymobCheckout'
 
 interface Product {
   id: string
@@ -75,7 +74,7 @@ export default function QuickCheckoutPage() {
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
   const [createdOrderNumber, setCreatedOrderNumber] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [showStripeForm, setShowStripeForm] = useState(false)
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
 
   const createAddressMutation = useCreateAddress()
 
@@ -140,7 +139,7 @@ export default function QuickCheckoutPage() {
         })
 
         setClientSecret(paymentIntent.clientSecret)
-        setShowStripeForm(true)
+        setShowPaymentForm(true)
       } else {
         toast.success(`Order #${order.orderNumber} placed successfully!`)
         router.push(`/order-success?orderId=${order.id}`)
@@ -156,7 +155,7 @@ export default function QuickCheckoutPage() {
   }
 
   const handlePaymentCancel = () => {
-    setShowStripeForm(false)
+    setShowPaymentForm(false)
     setClientSecret(null)
     toast('Payment cancelled')
   }
@@ -594,8 +593,8 @@ export default function QuickCheckoutPage() {
         onSave={setGiftOptions}
       />
 
-      {/* Stripe Payment Modal */}
-      {showStripeForm && clientSecret && (
+      {/* Card Payment Modal */}
+      {showPaymentForm && clientSecret && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
@@ -605,14 +604,13 @@ export default function QuickCheckoutPage() {
                 </p>
               </div>
 
-              <StripeProvider clientSecret={clientSecret}>
-                <StripeCardForm
-                  orderId={createdOrderId!}
-                  total={total}
-                  onSuccess={handlePaymentSuccess}
-                  onCancel={handlePaymentCancel}
-                />
-              </StripeProvider>
+              <PaymobCheckout
+                clientSecret={clientSecret}
+                orderId={createdOrderId!}
+                total={total}
+                onSuccess={handlePaymentSuccess}
+                onCancel={handlePaymentCancel}
+              />
             </div>
           </div>
         </div>

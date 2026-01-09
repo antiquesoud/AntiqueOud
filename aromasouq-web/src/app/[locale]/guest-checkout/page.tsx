@@ -20,8 +20,7 @@ import { apiClient } from "@/lib/api-client"
 import toast from "react-hot-toast"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
-import { StripeProvider } from "@/components/payment/StripeProvider"
-import { StripeCardForm } from "@/components/payment/StripeCardForm"
+import { PaymobCheckout } from "@/components/payment/PaymobCheckout"
 
 // Guest cart types
 interface GuestCartItem {
@@ -86,7 +85,7 @@ export default function GuestCheckoutPage() {
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
   const [createdOrderNumber, setCreatedOrderNumber] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [showStripeForm, setShowStripeForm] = useState(false)
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [guestEmail, setGuestEmail] = useState<string>('')
 
   const steps = [
@@ -94,7 +93,7 @@ export default function GuestCheckoutPage() {
     { id: 2, name: t('steps.delivery'), icon: Truck },
     { id: 3, name: t('steps.payment'), icon: CreditCard },
     { id: 4, name: t('steps.review'), icon: Eye },
-    ...(showStripeForm ? [{ id: 5, name: 'Complete Payment', icon: CreditCard }] : []),
+    ...(showPaymentForm ? [{ id: 5, name: 'Complete Payment', icon: CreditCard }] : []),
   ]
 
   const form = useForm<GuestCheckoutInput>({
@@ -173,7 +172,7 @@ export default function GuestCheckoutPage() {
       setCreatedOrderNumber(order.orderNumber)
       setGuestEmail(data.guestEmail)
 
-      // If online payment, initialize Stripe
+      // If online payment, initialize Paymob
       if (data.paymentMethod === 'ONLINE_PAYMENT') {
         console.log('[Checkout] Creating payment intent for order:', order.id)
 
@@ -190,7 +189,7 @@ export default function GuestCheckoutPage() {
           }
 
           setClientSecret(paymentIntent.clientSecret)
-          setShowStripeForm(true)
+          setShowPaymentForm(true)
           setCurrentStep(5)
 
           console.log('[Checkout] Moved to payment step 5')
@@ -241,7 +240,7 @@ export default function GuestCheckoutPage() {
   }
 
   const handlePaymentCancel = () => {
-    setShowStripeForm(false)
+    setShowPaymentForm(false)
     setClientSecret(null)
     setCurrentStep(4)
     toast('Payment cancelled')
@@ -710,8 +709,8 @@ export default function GuestCheckoutPage() {
                 </motion.div>
               )}
 
-              {/* Step 5: Stripe Payment */}
-              {currentStep === 5 && showStripeForm && clientSecret && (
+              {/* Step 5: Card Payment */}
+              {currentStep === 5 && showPaymentForm && clientSecret && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -722,15 +721,14 @@ export default function GuestCheckoutPage() {
                     </p>
                   </div>
 
-                  <StripeProvider clientSecret={clientSecret}>
-                    <StripeCardForm
-                      orderId={createdOrderId!}
-                      total={cart?.summary.total || 0}
-                      isGuestOrder={true}
-                      onSuccess={handlePaymentSuccess}
-                      onCancel={handlePaymentCancel}
-                    />
-                  </StripeProvider>
+                  <PaymobCheckout
+                    clientSecret={clientSecret}
+                    orderId={createdOrderId!}
+                    total={cart?.summary.total || 0}
+                    isGuestOrder={true}
+                    onSuccess={handlePaymentSuccess}
+                    onCancel={handlePaymentCancel}
+                  />
                 </motion.div>
               )}
             </form>

@@ -1,111 +1,157 @@
-import { useState } from 'react';
-import { useStripe, useElements } from '@stripe/react-stripe-js';
+import { useState, useCallback } from 'react';
 import { apiClient } from '@/lib/api-client';
+import { redirectToHostedCheckout } from '@/lib/paymob';
 import toast from 'react-hot-toast';
+
+interface PaymentIntentResponse {
+  clientSecret: string;
+  intentionId: string;
+}
 
 interface UsePaymentOptions {
   orderId: string;
   isGuestOrder?: boolean;
-  onSuccess: () => void;
+  onSuccess?: () => void;
   onError?: (error: string) => void;
 }
 
-export function usePayment({ orderId, isGuestOrder = false, onSuccess, onError }: UsePaymentOptions) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [isProcessing, setIsProcessing] = useState(false);
+interface UsePaymentReturn {
+  clientSecret: string | null;
+  intentionId: string | null;
+  isLoading: boolean;
+  error: string | null;
+  createPaymentIntent: () => Promise<PaymentIntentResponse | null>;
+  redirectToPayment: () => void;
+  reset: () => void;
+}
+
+/**
+ * Hook for managing Paymob payment flow
+ *
+ * Usage:
+ * 1. Call createPaymentIntent() to get clientSecret
+ * 2. Pass clientSecret to PaymobCheckout component
+ * 3. Or use redirectToPayment() for hosted checkout fallback
+ */
+export function usePayment({
+  orderId,
+  isGuestOrder = false,
+  onSuccess,
+  onError,
+}: UsePaymentOptions): UsePaymentReturn {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [intentionId, setIntentionId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const createPaymentIntent = async () => {
-    try {
-      const endpoint = isGuestOrder ? '/payments/create-intent-guest' : '/payments/create-intent';
-      const response = await apiClient.post<{ clientSecret: string; paymentIntentId: string }>(
-        endpoint,
-        { orderId }
-      );
-
-      setClientSecret(response.clientSecret);
-      return response.clientSecret;
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.message || 'Failed to initialize payment';
-      toast.error(errorMsg);
-      onError?.(errorMsg);
-      throw err;
-    }
-  };
-
-  const processPayment = async () => {
-    if (!stripe || !elements) {
-      toast.error('Payment system not ready');
-      return false;
-    }
-
-    setIsProcessing(true);
+  /**
+   * Create a payment intent with Paymob
+   * Returns clientSecret for use with Pixel SDK
+   */
+  const createPaymentIntent = useCallback(async (): Promise<PaymentIntentResponse | null> => {
+    setIsLoading(true);
+    setError(null);
 
     try {
-      // Step 1: Submit the payment elements for validation
-      console.log('[Payment] Submitting payment elements...');
-      const { error: submitError } = await elements.submit();
+      console.log('[usePayment] Creating payment intent for order:', orderId);
 
-      if (submitError) {
-        console.error('[Payment] Element submission failed:', submitError);
-        toast.error(submitError.message || 'Please check your payment details');
-        onError?.(submitError.message || 'Validation failed');
-        return false;
-      }
+      const endpoint = isGuestOrder
+        ? '/payments/create-intent-guest'
+        : '/payments/create-intent';
 
-      console.log('[Payment] Elements submitted successfully');
-
-      // Step 2: Get or create payment intent
-      const secret = clientSecret || await createPaymentIntent();
-      console.log('[Payment] Confirming payment...');
-
-      // Step 3: Confirm the payment
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        clientSecret: secret,
-        confirmParams: {
-          return_url: `${window.location.origin}/order-success`,
-        },
-        redirect: 'if_required',
+      const response = await apiClient.post<PaymentIntentResponse>(endpoint, {
+        orderId,
       });
 
-      if (error) {
-        console.error('[Payment] Payment confirmation failed:', error);
-        toast.error(error.message || 'Payment failed');
-        onError?.(error.message || 'Payment failed');
-        return false;
-      }
+      console.log('[usePayment] Payment intent created:', response.intentionId);
 
-      if (paymentIntent && paymentIntent.status === 'succeeded') {
-        console.log('[Payment] Payment succeeded:', paymentIntent.id);
+      setClientSecret(response.clientSecret);
+      setIntentionId(response.intentionId);
 
-        await apiClient.post('/payments/confirm', {
-          paymentIntentId: paymentIntent.id,
-        });
-
-        toast.success('Payment successful!');
-        onSuccess();
-        return true;
-      }
-
-      console.warn('[Payment] Payment not completed, status:', paymentIntent?.status);
-      return false;
+      return response;
     } catch (err: any) {
-      console.error('[Payment] Payment processing error:', err);
-      const errorMsg = err.response?.data?.message || 'Payment processing failed';
+      const errorMsg = err.response?.data?.message || 'Failed to initialize payment';
+      console.error('[usePayment] Error creating payment intent:', errorMsg);
+
+      setError(errorMsg);
       toast.error(errorMsg);
       onError?.(errorMsg);
-      return false;
+
+      return null;
     } finally {
-      setIsProcessing(false);
+      setIsLoading(false);
     }
-  };
+  }, [orderId, isGuestOrder, onError]);
+
+  /**
+   * Redirect to Paymob hosted checkout
+   * Use this as fallback if embedded SDK doesn't work
+   */
+  const redirectToPayment = useCallback(() => {
+    if (!clientSecret) {
+      toast.error('Payment not initialized. Please try again.');
+      return;
+    }
+
+    console.log('[usePayment] Redirecting to hosted checkout');
+    redirectToHostedCheckout(clientSecret);
+  }, [clientSecret]);
+
+  /**
+   * Reset payment state
+   */
+  const reset = useCallback(() => {
+    setClientSecret(null);
+    setIntentionId(null);
+    setError(null);
+    setIsLoading(false);
+  }, []);
 
   return {
-    processPayment,
-    createPaymentIntent,
-    isProcessing,
     clientSecret,
+    intentionId,
+    isLoading,
+    error,
+    createPaymentIntent,
+    redirectToPayment,
+    reset,
+  };
+}
+
+/**
+ * Simple hook for just creating payment intents
+ * Without the full state management
+ */
+export function useCreatePaymentIntent() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const createIntent = useCallback(
+    async (orderId: string, isGuestOrder: boolean = false) => {
+      setIsLoading(true);
+
+      try {
+        const endpoint = isGuestOrder
+          ? '/payments/create-intent-guest'
+          : '/payments/create-intent';
+
+        const response = await apiClient.post<PaymentIntentResponse>(endpoint, {
+          orderId,
+        });
+
+        return response;
+      } catch (err: any) {
+        const errorMsg = err.response?.data?.message || 'Failed to create payment intent';
+        toast.error(errorMsg);
+        throw new Error(errorMsg);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
+  return {
+    createIntent,
+    isLoading,
   };
 }

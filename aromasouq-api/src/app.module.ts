@@ -62,7 +62,7 @@ import { PaymentsModule } from './payments/payments.module';
     VendorModule,
     CouponsModule,
     CheckoutModule,
-    PaymentsModule, // Stripe payment integration
+    PaymentsModule, // Paymob UAE payment integration
   ],
   controllers: [AppController],
   providers: [AppService],
