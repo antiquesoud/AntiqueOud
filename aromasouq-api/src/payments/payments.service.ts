@@ -165,11 +165,15 @@ export class PaymentsService {
       },
       special_reference: orderNumber,
       notification_url: this.callbackUrl,
-      redirection_url: `${this.successUrl}/${locale}/order-success?orderId=${orderId}`,
+      // Include guestEmail in redirect URL for guest orders so order-success can fetch the order
+      redirection_url: isGuestOrder
+        ? `${this.successUrl}/${locale}/order-success?orderId=${orderId}&guestEmail=${encodeURIComponent(billingData.email)}`
+        : `${this.successUrl}/${locale}/order-success?orderId=${orderId}`,
       extras: {
         order_id: orderId,
         order_number: orderNumber,
         is_guest_order: isGuestOrder.toString(),
+        guest_email: isGuestOrder ? billingData.email : '',
       },
     };
 

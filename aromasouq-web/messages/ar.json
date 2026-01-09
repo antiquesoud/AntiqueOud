@@ -1540,6 +1540,7 @@
       "delivery": "التسليم",
       "deliveryDesc": "سيتم تسليم طلبك إلى عنوانك",
       "viewOrderDetails": "عرض تفاصيل الطلب",
+      "trackOrder": "تتبع طلبك",
       "continueShopping": "متابعة التسوق",
       "loadingOrder": "جاري تحميل تفاصيل الطلب...",
       "orderNotFound": "لم يتم العثور على الطلب",
@@ -1936,7 +1937,13 @@
       "shipped": "تم الشحن",
       "delivered": "تم التوصيل",
       "cancelled": "ملغى"
-    }
+    },
+    "paymentMethod": "طريقة الدفع",
+    "cashOnDelivery": "الدفع عند الاستلام",
+    "onlinePayment": "الدفع الإلكتروني",
+    "paymentPending": "لم يتم الدفع",
+    "completePaymentMessage": "تم تقديم طلبك ولكن لم يتم الدفع. أكمل الدفع لتأكيد طلبك.",
+    "completePayment": "إكمال الدفع"
   },
   "about": {
     "title": "من نحن",

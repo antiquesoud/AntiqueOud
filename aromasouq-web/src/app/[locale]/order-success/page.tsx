@@ -33,6 +33,9 @@ export default function OrderSuccessPage() {
   const paymobTxnCode = searchParams.get('txn_response_code')
   const paymobMessage = searchParams.get('message') || searchParams.get('error_occured')
 
+  // Guest email passed in URL for guest orders (needed to fetch order)
+  const guestEmail = searchParams.get('guestEmail')
+
   const [order, setOrder] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [paymentState, setPaymentState] = useState<PaymentState>('loading')
@@ -74,10 +77,12 @@ export default function OrderSuccessPage() {
       try {
         data = await apiClient.get(`/orders/${orderId}`)
       } catch (authError: any) {
-        // If 401 and not authenticated, try guest endpoint
-        if (authError?.response?.status === 401) {
+        // If 401 and not authenticated, try guest endpoint with email
+        if (authError?.response?.status === 401 || authError?.response?.status === 403) {
           try {
-            data = await apiClient.get(`/guest-orders/${orderId}`)
+            // Guest orders require email parameter
+            const emailParam = guestEmail ? `?email=${encodeURIComponent(guestEmail)}` : ''
+            data = await apiClient.get(`/guest-orders/${orderId}${emailParam}`)
           } catch (guestError) {
             // Both failed - re-throw the original error
             throw authError
@@ -126,7 +131,7 @@ export default function OrderSuccessPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [orderId, getPaymentStateFromParams])
+  }, [orderId, guestEmail, getPaymentStateFromParams])
 
   // Wait for hydration, then fetch order
   useEffect(() => {
@@ -269,12 +274,22 @@ export default function OrderSuccessPage() {
           </Card>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button asChild className="flex-1 bg-gradient-to-r from-oud-gold to-amber-600 hover:from-oud-gold/90 hover:to-amber-600/90 text-white">
-              <Link href="/checkout">
-                Try Again
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Link>
-            </Button>
+            {/* Show guest-appropriate retry link */}
+            {order?.guestEmail ? (
+              <Button asChild className="flex-1 bg-gradient-to-r from-oud-gold to-amber-600 hover:from-oud-gold/90 hover:to-amber-600/90 text-white">
+                <Link href={`/track-order?orderNumber=${order.orderNumber}&email=${order.guestEmail}`}>
+                  View Order & Retry
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild className="flex-1 bg-gradient-to-r from-oud-gold to-amber-600 hover:from-oud-gold/90 hover:to-amber-600/90 text-white">
+                <Link href="/checkout">
+                  Try Again
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
+              </Button>
+            )}
             <Button asChild variant="outline" className="flex-1">
               <Link href="/products">Continue Shopping</Link>
             </Button>
@@ -320,9 +335,16 @@ export default function OrderSuccessPage() {
               <RefreshCw className="w-4 h-4 mr-2" />
               Check Status
             </Button>
-            <Button asChild variant="outline">
-              <Link href="/account/orders">View My Orders</Link>
-            </Button>
+            {/* Show guest-appropriate link */}
+            {order?.guestEmail ? (
+              <Button asChild variant="outline">
+                <Link href={`/track-order?orderNumber=${order.orderNumber}&email=${order.guestEmail}`}>Track Order</Link>
+              </Button>
+            ) : (
+              <Button asChild variant="outline">
+                <Link href="/account/orders">View My Orders</Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -473,12 +495,22 @@ export default function OrderSuccessPage() {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button asChild className="flex-1 bg-gradient-to-r from-oud-gold to-amber-600 hover:from-oud-gold/90 hover:to-amber-600/90">
-            <Link href={`/account/orders/${order.id}`}>
-              {t('viewOrderDetails')}
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
-          </Button>
+          {/* Show different link based on whether it's a guest order */}
+          {order.guestEmail ? (
+            <Button asChild className="flex-1 bg-gradient-to-r from-oud-gold to-amber-600 hover:from-oud-gold/90 hover:to-amber-600/90">
+              <Link href={`/track-order?orderNumber=${order.orderNumber}&email=${order.guestEmail}`}>
+                {t('trackOrder')}
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild className="flex-1 bg-gradient-to-r from-oud-gold to-amber-600 hover:from-oud-gold/90 hover:to-amber-600/90">
+              <Link href={`/account/orders/${order.id}`}>
+                {t('viewOrderDetails')}
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
+          )}
           <Button asChild variant="outline" className="flex-1">
             <Link href="/products">{t('continueShopping')}</Link>
           </Button>

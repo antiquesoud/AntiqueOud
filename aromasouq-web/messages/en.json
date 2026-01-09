@@ -2141,6 +2141,7 @@
       "delivery": "Delivery",
       "deliveryDesc": "Your order will be delivered to your address",
       "viewOrderDetails": "View Order Details",
+      "trackOrder": "Track Your Order",
       "continueShopping": "Continue Shopping",
       "loadingOrder": "Loading order details...",
       "orderNotFound": "Order not found",
@@ -2215,7 +2216,13 @@
       "shipped": "Shipped",
       "delivered": "Delivered",
       "cancelled": "Cancelled"
-    }
+    },
+    "paymentMethod": "Payment Method",
+    "cashOnDelivery": "Cash on Delivery",
+    "onlinePayment": "Online Payment",
+    "paymentPending": "Payment Not Completed",
+    "completePaymentMessage": "Your order has been placed but payment was not completed. Complete payment to confirm your order.",
+    "completePayment": "Complete Payment"
   },
   "about": {
     "title": "About Us",

@@ -72,11 +72,27 @@ export default function CheckoutPage() {
 
   const isApplePayAvailable = () => {
     if (typeof window === 'undefined') return false
-    // Check for Apple Pay support
-    const hasApplePaySession = !!(window as any).ApplePaySession?.canMakePayments?.()
-    // Also show on Safari (not Chrome) for potential Apple Pay
-    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
-    return hasApplePaySession || isSafari
+
+    // Check for actual Apple Pay support via ApplePaySession API
+    try {
+      if ((window as any).ApplePaySession?.canMakePayments?.()) {
+        return true
+      }
+    } catch (e) {
+      // Ignore errors - some browsers throw when accessing ApplePaySession
+    }
+
+    // Fallback: Show on Safari browsers only (macOS Safari and iOS Safari)
+    // Must exclude all non-Safari browsers that include "Safari" in UA:
+    // - Chrome (desktop), CriOS (Chrome iOS), FxiOS (Firefox iOS), EdgiOS (Edge iOS)
+    const ua = navigator.userAgent
+    const isSafari = /Safari/.test(ua) &&
+      !/Chrome/.test(ua) &&
+      !/CriOS/.test(ua) &&
+      !/FxiOS/.test(ua) &&
+      !/EdgiOS/.test(ua)
+
+    return isSafari
   }
 
   // Payment method options - base configuration
