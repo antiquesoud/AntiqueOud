@@ -1,22 +1,35 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 
 /**
  * Component that handles one-time hydration of the auth store from localStorage
+ * AND verifies authentication with the server
  * This prevents SSR/CSR hydration mismatches and should be mounted once in the root layout
  */
 export function AuthHydration() {
-  const [hydrated, setHydrated] = useState(false)
+  const hasInitialized = useRef(false)
+  const fetchUser = useAuthStore((state) => state.fetchUser)
+  const setHasHydrated = useAuthStore((state) => state.setHasHydrated)
 
   useEffect(() => {
-    // Only hydrate once on client-side mount
-    if (!hydrated && typeof window !== 'undefined') {
+    // Only initialize once on client-side mount
+    if (!hasInitialized.current && typeof window !== 'undefined') {
+      hasInitialized.current = true
+
+      // First rehydrate from localStorage
       useAuthStore.persist.rehydrate()
-      setHydrated(true)
+
+      // Then verify with server - this handles the case where:
+      // 1. localStorage is cleared but cookie is still valid
+      // 2. Cookie has expired but localStorage still has stale data
+      fetchUser().finally(() => {
+        // Mark as hydrated after server verification completes
+        setHasHydrated(true)
+      })
     }
-  }, [hydrated])
+  }, [fetchUser, setHasHydrated])
 
   return null
 }
