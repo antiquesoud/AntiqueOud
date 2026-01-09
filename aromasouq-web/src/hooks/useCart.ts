@@ -32,8 +32,9 @@ export function useCart() {
     mutationFn: (data: { productId: string; variantId?: string; quantity: number }) =>
       apiClient.post<Cart>(`${cartEndpoint}/items`, data),
     onSuccess: () => {
+      // Just invalidate queries - let the calling component show the toast
+      // This prevents duplicate notifications
       queryClient.invalidateQueries({ queryKey: ['cart'] })
-      toast.success('Added to cart')
     },
     onError: () => {
       toast.error('Failed to add to cart')

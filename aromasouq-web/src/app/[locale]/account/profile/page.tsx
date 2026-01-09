@@ -26,7 +26,7 @@ interface ProfileData {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, hasHydrated } = useAuth();
   const t = useTranslations('account.profilePage');
   const tProducts = useTranslations('products');
   const tAccount = useTranslations('account');
@@ -35,14 +35,28 @@ export default function ProfilePage() {
     queryFn: async () => {
       return await apiClient.get('/users/profile');
     },
+    enabled: hasHydrated && isAuthenticated, // Only fetch when authenticated
   });
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated (after hydration)
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    if (hasHydrated && !isAuthenticated) {
       router.push('/login');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [hasHydrated, isAuthenticated, router]);
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "@/i18n/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Check, ShoppingBag, Truck, CreditCard, Eye } from "lucide-react"
+import { Check, ShoppingBag, Truck, CreditCard, Eye, Smartphone, Wallet, Banknote } from "lucide-react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -55,6 +55,19 @@ interface GuestCart {
   }
 }
 
+// Payment method types - match logged-in checkout
+type PaymentMethodType = "card" | "google_pay" | "apple_pay" | "cod"
+
+// Payment method configuration
+interface PaymentOption {
+  id: PaymentMethodType
+  name: string
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+  isAvailable: () => boolean
+  apiValue: string // Value to send to API
+}
+
 // Validation schema for guest checkout
 const guestCheckoutSchema = z.object({
   guestEmail: z.string().email("Invalid email address"),
@@ -68,7 +81,7 @@ const guestCheckoutSchema = z.object({
   apartment: z.string().optional(),
   landmark: z.string().optional(),
   notes: z.string().optional(),
-  paymentMethod: z.enum(["CASH_ON_DELIVERY", "ONLINE_PAYMENT", "BANK_TRANSFER"]),
+  paymentMethod: z.enum(["card", "google_pay", "apple_pay", "cod"]),
 })
 
 type GuestCheckoutInput = z.infer<typeof guestCheckoutSchema>
@@ -87,6 +100,88 @@ export default function GuestCheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [guestEmail, setGuestEmail] = useState<string>('')
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Track client-side mount for device detection
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // Device detection helpers (only run on client)
+  const isGooglePayAvailable = () => {
+    if (typeof window === 'undefined') return false
+    const ua = navigator.userAgent
+    return ua.includes('Chrome') || ua.includes('Android')
+  }
+
+  const isApplePayAvailable = () => {
+    if (typeof window === 'undefined') return false
+
+    // Check for actual Apple Pay support via ApplePaySession API
+    try {
+      if ((window as any).ApplePaySession?.canMakePayments?.()) {
+        return true
+      }
+    } catch (e) {
+      // Ignore errors - some browsers throw when accessing ApplePaySession
+    }
+
+    // Fallback: Show on Safari browsers only (macOS Safari and iOS Safari)
+    // Must exclude all non-Safari browsers that include "Safari" in UA:
+    // - Chrome (desktop), CriOS (Chrome iOS), FxiOS (Firefox iOS), EdgiOS (Edge iOS)
+    const ua = navigator.userAgent
+    const isSafari = /Safari/.test(ua) &&
+      !/Chrome/.test(ua) &&
+      !/CriOS/.test(ua) &&
+      !/FxiOS/.test(ua) &&
+      !/EdgiOS/.test(ua)
+
+    return isSafari
+  }
+
+  // Payment method options - same as logged-in checkout
+  const paymentOptions: PaymentOption[] = useMemo(() => [
+    {
+      id: 'card' as PaymentMethodType,
+      name: t('creditCard'),
+      description: 'Visa, Mastercard, Amex',
+      icon: CreditCard,
+      isAvailable: () => true,
+      apiValue: 'ONLINE_PAYMENT', // Backend expects ONLINE_PAYMENT for card payments
+    },
+    {
+      id: 'google_pay' as PaymentMethodType,
+      name: 'Google Pay',
+      description: t('fastCheckoutGoogle') || 'Fast & secure checkout',
+      icon: Wallet,
+      isAvailable: isGooglePayAvailable,
+      apiValue: 'ONLINE_PAYMENT',
+    },
+    {
+      id: 'apple_pay' as PaymentMethodType,
+      name: 'Apple Pay',
+      description: t('fastCheckoutApple') || 'Fast & secure checkout',
+      icon: Smartphone,
+      isAvailable: isApplePayAvailable,
+      apiValue: 'ONLINE_PAYMENT',
+    },
+    {
+      id: 'cod' as PaymentMethodType,
+      name: t('cashOnDelivery'),
+      description: t('payWhenReceive') || 'Pay when you receive',
+      icon: Banknote,
+      isAvailable: () => true,
+      apiValue: 'CASH_ON_DELIVERY',
+    },
+  ], [t])
+
+  // Filter to only show available payment methods
+  const availablePaymentMethods = useMemo(() => {
+    if (!isMounted) {
+      return paymentOptions.filter(option => option.id === 'card' || option.id === 'cod')
+    }
+    return paymentOptions.filter(option => option.isAvailable())
+  }, [paymentOptions, isMounted])
 
   const steps = [
     { id: 1, name: t('steps.address'), icon: ShoppingBag },
@@ -110,7 +205,7 @@ export default function GuestCheckoutPage() {
       apartment: "",
       landmark: "",
       notes: "",
-      paymentMethod: "CASH_ON_DELIVERY",
+      paymentMethod: "card", // Default to card payment
     },
   })
 
@@ -146,6 +241,11 @@ export default function GuestCheckoutPage() {
       return
     }
 
+    // Map payment method to API value
+    const selectedPaymentOption = paymentOptions.find(p => p.id === data.paymentMethod)
+    const apiPaymentMethod = selectedPaymentOption?.apiValue || 'CASH_ON_DELIVERY'
+    const isOnlinePayment = data.paymentMethod !== 'cod'
+
     // Final submission
     setIsSubmitting(true)
     try {
@@ -163,7 +263,7 @@ export default function GuestCheckoutPage() {
           landmark: data.landmark,
           notes: data.notes,
         },
-        paymentMethod: data.paymentMethod,
+        paymentMethod: apiPaymentMethod,
       }
 
       const order = await apiClient.post<{ id: string; orderNumber: string }>('/guest-orders', orderData)
@@ -173,12 +273,14 @@ export default function GuestCheckoutPage() {
       setGuestEmail(data.guestEmail)
 
       // If online payment, initialize Paymob
-      if (data.paymentMethod === 'ONLINE_PAYMENT') {
-        console.log('[Checkout] Creating payment intent for order:', order.id)
+      if (isOnlinePayment) {
+        console.log('[Checkout] Creating payment intent for order:', order.id, 'method:', data.paymentMethod)
 
         try {
+          // Pass the selected payment method for method-specific checkout
           const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent-guest', {
             orderId: order.id,
+            paymentMethod: data.paymentMethod, // card, google_pay, apple_pay
           })
 
           console.log('[Checkout] Payment intent created successfully')
@@ -199,7 +301,7 @@ export default function GuestCheckoutPage() {
           // Keep the order created, but don't proceed to payment
         }
       } else {
-        // COD or Bank Transfer - complete immediately
+        // COD - complete immediately
         console.log('[Checkout] COD order placed, clearing cart...')
 
         try {
@@ -230,12 +332,13 @@ export default function GuestCheckoutPage() {
 
       console.log('[Checkout] Cart cleared successfully')
       toast.success('Payment successful!')
-      router.push(`/track-order?orderNumber=${createdOrderNumber}&email=${guestEmail}`)
+      // Redirect to order-success page for consistent UX with logged-in users
+      router.push(`/order-success?orderId=${createdOrderId}`)
     } catch (error) {
       console.error('[Checkout] Failed to clear cart:', error)
       // Still redirect even if cart clear fails
       toast.success('Payment successful!')
-      router.push(`/track-order?orderNumber=${createdOrderNumber}&email=${guestEmail}`)
+      router.push(`/order-success?orderId=${createdOrderId}`)
     }
   }
 
@@ -579,38 +682,27 @@ export default function GuestCheckoutPage() {
                             <FormControl>
                               <RadioGroup value={field.value} onValueChange={field.onChange}>
                                 <div className="space-y-3">
-                                  <Label
-                                    htmlFor="cod"
-                                    className="flex items-start gap-3 p-4 border rounded-lg cursor-pointer hover:border-oud-gold transition-colors"
-                                  >
-                                    <RadioGroupItem value="CASH_ON_DELIVERY" id="cod" className="mt-1" />
-                                    <div className="flex-1">
-                                      <p className="font-semibold">{t('cashOnDelivery')}</p>
-                                      <p className="text-sm text-muted-foreground">Pay with cash when you receive your order</p>
-                                    </div>
-                                  </Label>
-
-                                  <Label
-                                    htmlFor="online"
-                                    className="flex items-start gap-3 p-4 border rounded-lg cursor-pointer hover:border-oud-gold transition-colors"
-                                  >
-                                    <RadioGroupItem value="ONLINE_PAYMENT" id="online" className="mt-1" />
-                                    <div className="flex-1">
-                                      <p className="font-semibold">Online Payment</p>
-                                      <p className="text-sm text-muted-foreground">Pay securely with credit/debit card</p>
-                                    </div>
-                                  </Label>
-
-                                  <Label
-                                    htmlFor="bank"
-                                    className="flex items-start gap-3 p-4 border rounded-lg cursor-pointer hover:border-oud-gold transition-colors"
-                                  >
-                                    <RadioGroupItem value="BANK_TRANSFER" id="bank" className="mt-1" />
-                                    <div className="flex-1">
-                                      <p className="font-semibold">Bank Transfer</p>
-                                      <p className="text-sm text-muted-foreground">Transfer directly to our bank account</p>
-                                    </div>
-                                  </Label>
+                                  {availablePaymentMethods.map((option) => {
+                                    const IconComponent = option.icon
+                                    return (
+                                      <Label
+                                        key={option.id}
+                                        htmlFor={option.id}
+                                        className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                                          field.value === option.id
+                                            ? 'border-oud-gold bg-oud-gold/5'
+                                            : 'hover:border-oud-gold'
+                                        }`}
+                                      >
+                                        <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                                        <IconComponent className="w-5 h-5 mt-0.5 text-muted-foreground" />
+                                        <div className="flex-1">
+                                          <p className="font-semibold">{option.name}</p>
+                                          <p className="text-sm text-muted-foreground">{option.description}</p>
+                                        </div>
+                                      </Label>
+                                    )
+                                  })}
                                 </div>
                               </RadioGroup>
                             </FormControl>
@@ -674,9 +766,7 @@ export default function GuestCheckoutPage() {
                       <div>
                         <h3 className="font-semibold mb-2">{t('paymentMethod')}</h3>
                         <p className="text-sm text-muted-foreground">
-                          {form.getValues("paymentMethod") === "CASH_ON_DELIVERY" && t('cashOnDelivery')}
-                          {form.getValues("paymentMethod") === "ONLINE_PAYMENT" && "Online Payment"}
-                          {form.getValues("paymentMethod") === "BANK_TRANSFER" && "Bank Transfer"}
+                          {paymentOptions.find(p => p.id === form.getValues("paymentMethod"))?.name || form.getValues("paymentMethod")}
                         </p>
                       </div>
 
@@ -744,34 +834,57 @@ export default function GuestCheckoutPage() {
             <CardContent className="space-y-4">
               {/* Cart Items */}
               <div className="space-y-3 max-h-64 overflow-y-auto">
-                {cart.items.map((item) => (
-                  <div key={item.id} className="flex gap-3 pb-3 border-b last:border-0">
-                    <div className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
-                      {item.product.images?.[0] && (
+                {cart.items.map((item: any) => {
+                  // Handle different image formats: string, object with url, or array
+                  const getProductImage = () => {
+                    const images = item.product?.images
+                    const image = item.product?.image
+
+                    // Check single image field first (transformed by backend)
+                    if (image && typeof image === 'string' && image.length > 0) {
+                      return image
+                    }
+
+                    // Check images array
+                    if (Array.isArray(images) && images.length > 0) {
+                      const firstImage = images[0]
+                      if (typeof firstImage === 'string') {
+                        return firstImage
+                      }
+                      if (firstImage?.url) {
+                        return firstImage.url
+                      }
+                    }
+
+                    return '/images/placeholder-product.png'
+                  }
+
+                  const productImage = getProductImage()
+                  const productPrice = item.price || item.variant?.price || item.product?.salePrice || item.product?.price || 0
+
+                  return (
+                    <div key={item.id} className="flex gap-3 pb-3 border-b last:border-0 last:pb-0">
+                      <div className="relative w-14 h-14 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
                         <Image
-                          src={item.product.images[0]}
+                          src={productImage}
                           alt={item.product.name}
                           fill
                           className="object-cover"
                         />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{item.product.name}</p>
-                      {item.variant && (
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-medium">
-                            {item.variant.name}
-                          </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{item.product.name}</p>
+                        {item.variant && (
+                          <p className="text-xs text-muted-foreground">{item.variant.name}</p>
+                        )}
+                        <div className="flex justify-between items-center mt-1">
+                          <span className="text-xs text-muted-foreground">Qty: {item.quantity}</span>
+                          <span className="text-sm font-semibold text-oud-gold">{formatCurrency(productPrice * item.quantity)}</span>
                         </div>
-                      )}
-                      <div className="flex justify-between items-center mt-1">
-                        <span className="text-xs text-muted-foreground">Qty: {item.quantity}</span>
-                        <span className="text-sm font-semibold">{formatCurrency(item.price * item.quantity)}</span>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               <Separator />

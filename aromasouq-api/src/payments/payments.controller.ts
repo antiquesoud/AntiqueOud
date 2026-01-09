@@ -23,16 +23,19 @@ export class PaymentsController {
   /**
    * Create Payment Intent - Authenticated Users
    * Endpoint: POST /payments/create-intent (MATCHES CURRENT STRIPE ENDPOINT)
+   *
+   * @param body.orderId - The order ID
+   * @param body.paymentMethod - Optional: 'card' | 'google_pay' | 'apple_pay' (defaults to all methods)
    */
   @Post('create-intent')
   @UseGuards(JwtAuthGuard)
   async createIntent(
     @Req() req: Request,
-    @Body() body: { orderId: string },
+    @Body() body: { orderId: string; paymentMethod?: 'card' | 'google_pay' | 'apple_pay' },
     @Query('locale') locale: string = 'en',
   ) {
     const userId = req.user!['sub']; // Get userId from JWT
-    return this.paymentsService.createPaymentIntent(body.orderId, userId, locale);
+    return this.paymentsService.createPaymentIntent(body.orderId, userId, locale, body.paymentMethod);
   }
 
   /**
@@ -41,12 +44,15 @@ export class PaymentsController {
    *
    * IMPORTANT: Uses SessionService to get sessionToken from cookies
    * NOT from request body!
+   *
+   * @param body.orderId - The order ID
+   * @param body.paymentMethod - Optional: 'card' | 'google_pay' | 'apple_pay' (defaults to all methods)
    */
   @Post('create-intent-guest')
   async createIntentGuest(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-    @Body() body: { orderId: string },
+    @Body() body: { orderId: string; paymentMethod?: 'card' | 'google_pay' | 'apple_pay' },
     @Query('locale') locale: string = 'en',
   ) {
     // Get session token from cookies via SessionService
@@ -61,6 +67,7 @@ export class PaymentsController {
       body.orderId,
       sessionToken,
       locale,
+      body.paymentMethod,
     );
   }
 

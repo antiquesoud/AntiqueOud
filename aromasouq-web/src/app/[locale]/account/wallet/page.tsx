@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
+import { useRouter } from '@/i18n/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -24,6 +25,7 @@ import { format } from 'date-fns'
 import { formatCurrency } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/hooks/useAuth'
 
 interface Wallet {
   id: string
@@ -58,26 +60,38 @@ interface WalletStats {
 
 export default function WalletPage() {
   const t = useTranslations('account.walletPage')
+  const router = useRouter()
+  const { isAuthenticated, hasHydrated } = useAuth()
   const queryClient = useQueryClient()
   const [coinsToRedeem, setCoinsToRedeem] = useState<number>(100)
   const [transactionPage, setTransactionPage] = useState(1)
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [hasHydrated, isAuthenticated, router])
 
   // Fetch wallet data
   const { data: wallet, isLoading: walletLoading } = useQuery<Wallet>({
     queryKey: ['wallet'],
     queryFn: () => apiClient.get('/wallet'),
+    enabled: hasHydrated && isAuthenticated,
   })
 
   // Fetch transactions
   const { data: transactionsData } = useQuery<{ data: Transaction[], meta: { total: number, page: number, limit: number, totalPages: number } }>({
     queryKey: ['wallet-transactions', transactionPage],
     queryFn: () => apiClient.get(`/wallet/transactions?page=${transactionPage}&limit=10`),
+    enabled: hasHydrated && isAuthenticated,
   })
 
   // Fetch stats
   const { data: stats } = useQuery<WalletStats>({
     queryKey: ['wallet-stats'],
     queryFn: () => apiClient.get('/wallet/stats'),
+    enabled: hasHydrated && isAuthenticated,
   })
 
   // Redeem coins mutation
@@ -110,6 +124,17 @@ export default function WalletPage() {
 
   const transactions = transactionsData?.data || []
   const meta = transactionsData?.meta
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    )
+  }
 
   if (walletLoading) {
     return (

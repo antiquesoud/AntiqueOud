@@ -1,7 +1,9 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useParams, useRouter } from '@/i18n/navigation'
 import { useOrder, useCancelOrder } from '@/hooks/useOrders'
+import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,7 +12,8 @@ import { formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { Package, ArrowLeft, MapPin, CreditCard, Truck, Download, Star, MessageSquare } from 'lucide-react'
+import { Package, ArrowLeft, MapPin, CreditCard, Truck, Download, Star, MessageSquare, AlertCircle } from 'lucide-react'
+import PaymobCheckout from '@/components/payment/PaymobCheckout'
 import toast from 'react-hot-toast'
 import { OrderTimeline } from '@/components/orders/OrderTimeline'
 import { useTranslations } from 'next-intl'
@@ -19,7 +22,15 @@ export default function OrderDetailPage() {
   const t = useTranslations('account.orderDetailPage')
   const params = useParams()
   const router = useRouter()
+  const { isAuthenticated, hasHydrated } = useAuth()
   const orderId = params.id as string
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [hasHydrated, isAuthenticated, router])
 
   const { data: order, isLoading } = useOrder(orderId)
   const cancelOrder = useCancelOrder()
@@ -33,6 +44,18 @@ export default function OrderDetailPage() {
     SHIPPED: { label: tOrders('statuses.shipped'), color: 'bg-indigo-100 text-indigo-800' },
     DELIVERED: { label: tOrders('statuses.delivered'), color: 'bg-green-100 text-green-800' },
     CANCELLED: { label: tOrders('statuses.cancelled'), color: 'bg-red-100 text-red-800' },
+  }
+
+  const paymentStatusConfig = {
+    PENDING: { label: tOrders('paymentStatuses.pending'), color: 'bg-orange-100 text-orange-800' },
+    PAID: { label: tOrders('paymentStatuses.paid'), color: 'bg-green-100 text-green-800' },
+    FAILED: { label: tOrders('paymentStatuses.failed'), color: 'bg-red-100 text-red-800' },
+  }
+
+  // Check if order has pending online payment
+  const hasPendingOnlinePayment = (order: any) => {
+    const onlinePaymentMethods = ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET']
+    return onlinePaymentMethods.includes(order?.paymentMethod) && order?.paymentStatus === 'PENDING'
   }
 
   const handleCancelOrder = async () => {
@@ -70,6 +93,17 @@ export default function OrderDetailPage() {
     } catch (error) {
       toast.error(t('failedToDownloadInvoice'))
     }
+  }
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {
@@ -316,15 +350,43 @@ export default function OrderDetailPage() {
           {/* Payment Method */}
           <Card>
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5" />
-                <CardTitle>{t('paymentMethod')}</CardTitle>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" />
+                  <CardTitle>{t('paymentMethod')}</CardTitle>
+                </div>
+                {/* Payment Status Badge */}
+                {order.paymentStatus && (
+                  <Badge className={paymentStatusConfig[order.paymentStatus as keyof typeof paymentStatusConfig]?.color || 'bg-gray-100 text-gray-800'} variant="secondary">
+                    {paymentStatusConfig[order.paymentStatus as keyof typeof paymentStatusConfig]?.label || order.paymentStatus}
+                  </Badge>
+                )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <p className="text-sm">
-                {order.paymentMethod === 'CARD' ? t('creditCard') : t('cashOnDelivery')}
+                {order.paymentMethod === 'CREDIT_CARD' || order.paymentMethod === 'DEBIT_CARD' || order.paymentMethod === 'WALLET'
+                  ? t('creditCard')
+                  : t('cashOnDelivery')}
               </p>
+
+              {/* Pending Payment Alert */}
+              {hasPendingOnlinePayment(order) && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-orange-800">
+                    <AlertCircle className="w-5 h-5" />
+                    <span className="font-medium">{t('paymentPending')}</span>
+                  </div>
+                  <p className="text-sm text-orange-700">
+                    {t('completePaymentMessage')}
+                  </p>
+                  <PaymobCheckout
+                    orderId={order.id}
+                    isGuest={false}
+                    paymentMethod="card"
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
 

@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useOrders } from '@/hooks/useOrders'
+import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from '@/i18n/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,8 +17,19 @@ import { useTranslations } from 'next-intl'
 
 export default function OrdersPage() {
   const t = useTranslations('account.ordersPage')
+  const router = useRouter()
+  const { isAuthenticated, hasHydrated } = useAuth()
   const [page, setPage] = useState(1)
+
+  // Only fetch orders when authenticated
   const { data, isLoading } = useOrders(page, 10)
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [hasHydrated, isAuthenticated, router])
 
   const statusConfig = {
     PENDING: { label: t('statuses.pending'), icon: Clock, color: 'bg-yellow-100 text-yellow-800' },
@@ -25,6 +38,18 @@ export default function OrdersPage() {
     SHIPPED: { label: t('statuses.shipped'), icon: Truck, color: 'bg-indigo-100 text-indigo-800' },
     DELIVERED: { label: t('statuses.delivered'), icon: CheckCircle, color: 'bg-green-100 text-green-800' },
     CANCELLED: { label: t('statuses.cancelled'), icon: XCircle, color: 'bg-red-100 text-red-800' },
+  }
+
+  const paymentStatusConfig = {
+    PENDING: { label: t('paymentStatuses.pending'), color: 'bg-orange-100 text-orange-800' },
+    PAID: { label: t('paymentStatuses.paid'), color: 'bg-green-100 text-green-800' },
+    FAILED: { label: t('paymentStatuses.failed'), color: 'bg-red-100 text-red-800' },
+  }
+
+  // Check if order has pending online payment
+  const hasPendingOnlinePayment = (order: any) => {
+    const onlinePaymentMethods = ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET']
+    return onlinePaymentMethods.includes(order.paymentMethod) && order.paymentStatus === 'PENDING'
   }
 
   const handleDownloadInvoice = async (orderNumber: string, orderId: string) => {
@@ -49,6 +74,17 @@ export default function OrdersPage() {
     } catch (error) {
       toast.error(t('failedToDownloadInvoice'))
     }
+  }
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {
@@ -93,10 +129,18 @@ export default function OrdersPage() {
                       {t('placedOn', { date: format(new Date(order.createdAt), 'MMM dd, yyyy') })}
                     </p>
                   </div>
-                  <Badge className={statusClass} variant="secondary">
-                    <StatusIcon className="w-4 h-4 mr-1" />
-                    {statusConfig[order.orderStatus as keyof typeof statusConfig]?.label || order.orderStatus}
-                  </Badge>
+                  <div className="flex flex-col gap-2 items-end">
+                    <Badge className={statusClass} variant="secondary">
+                      <StatusIcon className="w-4 h-4 mr-1" />
+                      {statusConfig[order.orderStatus as keyof typeof statusConfig]?.label || order.orderStatus}
+                    </Badge>
+                    {/* Show payment status for online payments */}
+                    {hasPendingOnlinePayment(order) && (
+                      <Badge className={paymentStatusConfig.PENDING.color} variant="secondary">
+                        {paymentStatusConfig.PENDING.label}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
 
@@ -169,7 +213,13 @@ export default function OrdersPage() {
                         <Download className="w-4 h-4" />
                       </Button>
                     )}
-                    {order.orderStatus === 'PENDING' && (
+                    {/* Complete Payment button for pending online payments */}
+                    {hasPendingOnlinePayment(order) && (
+                      <Button variant="default" size="sm" asChild className="flex-1 bg-oud-gold hover:bg-oud-gold/90">
+                        <Link href={`/orders/${order.id}`}>{t('completePayment')}</Link>
+                      </Button>
+                    )}
+                    {order.orderStatus === 'PENDING' && !hasPendingOnlinePayment(order) && (
                       <Button variant="destructive" size="sm" className="flex-1">
                         {t('cancelOrder')}
                       </Button>

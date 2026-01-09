@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -9,10 +10,12 @@ import { Label } from '@/components/ui/label'
 import { formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
 import Image from 'next/image'
-import { Package, Clock, CheckCircle, XCircle, Truck, Search, Mail, FileText } from 'lucide-react'
+import { Package, Clock, CheckCircle, XCircle, Truck, Search, Mail, FileText, AlertCircle, CreditCard } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { apiClient } from '@/lib/api-client'
 import toast from 'react-hot-toast'
+import { PaymobCheckout } from '@/components/payment/PaymobCheckout'
+import { useRouter } from '@/i18n/navigation'
 
 const statusConfig = {
   PENDING: { icon: Clock, color: 'bg-yellow-100 text-yellow-800' },
@@ -23,17 +26,33 @@ const statusConfig = {
   CANCELLED: { icon: XCircle, color: 'bg-red-100 text-red-800' },
 }
 
+const paymentStatusConfig = {
+  PENDING: { label: 'Payment Pending', color: 'bg-orange-100 text-orange-800' },
+  PAID: { label: 'Paid', color: 'bg-green-100 text-green-800' },
+  FAILED: { label: 'Payment Failed', color: 'bg-red-100 text-red-800' },
+}
+
 export default function TrackOrderPage() {
   const t = useTranslations('track')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   const [orderNumber, setOrderNumber] = useState('')
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [orderData, setOrderData] = useState<any>(null)
 
-  const handleTrackOrder = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Payment state
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [isInitializingPayment, setIsInitializingPayment] = useState(false)
 
-    if (!orderNumber.trim() || !email.trim()) {
+  // Track order function
+  const handleTrackOrder = useCallback(async (orderNum?: string, orderEmail?: string) => {
+    const trackOrderNumber = orderNum || orderNumber
+    const trackEmail = orderEmail || email
+
+    if (!trackOrderNumber.trim() || !trackEmail.trim()) {
       toast.error(t('fillAllFields') || 'Please fill in all fields')
       return
     }
@@ -42,8 +61,8 @@ export default function TrackOrderPage() {
 
     try {
       const response = await apiClient.post<any>('/orders/track', {
-        orderNumber: orderNumber.trim(),
-        email: email.trim(),
+        orderNumber: trackOrderNumber.trim(),
+        email: trackEmail.trim(),
       })
 
       setOrderData(response)
@@ -58,6 +77,68 @@ export default function TrackOrderPage() {
     } finally {
       setIsLoading(false)
     }
+  }, [orderNumber, email, t])
+
+  // Auto-fill from URL params and auto-track
+  useEffect(() => {
+    const urlOrderNumber = searchParams.get('orderNumber')
+    const urlEmail = searchParams.get('email')
+
+    if (urlOrderNumber && urlEmail) {
+      setOrderNumber(urlOrderNumber)
+      setEmail(urlEmail)
+      // Auto-track the order
+      handleTrackOrder(urlOrderNumber, urlEmail)
+    }
+  }, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleTrackOrder()
+  }
+
+  // Check if order has pending online payment
+  const hasPendingOnlinePayment = (order: any) => {
+    const onlinePaymentMethods = ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET', 'ONLINE_PAYMENT']
+    return onlinePaymentMethods.includes(order?.paymentMethod) && order?.paymentStatus === 'PENDING'
+  }
+
+  // Initialize payment for pending orders
+  const handleCompletePayment = async () => {
+    if (!orderData?.order?.id) return
+
+    setIsInitializingPayment(true)
+    try {
+      // Guest orders use guest payment endpoint
+      const endpoint = orderData.type === 'guest'
+        ? '/payments/create-intent-guest'
+        : '/payments/create-intent'
+
+      const paymentIntent = await apiClient.post<{ clientSecret: string }>(endpoint, {
+        orderId: orderData.order.id,
+      })
+
+      setClientSecret(paymentIntent.clientSecret)
+      setShowPaymentForm(true)
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to initialize payment')
+    } finally {
+      setIsInitializingPayment(false)
+    }
+  }
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentForm(false)
+    setClientSecret(null)
+    toast.success('Payment successful!')
+    // Refresh order data
+    handleTrackOrder()
+  }
+
+  const handlePaymentCancel = () => {
+    setShowPaymentForm(false)
+    setClientSecret(null)
+    toast('Payment cancelled')
   }
 
   const renderOrderStatus = (status: string) => {
@@ -68,6 +149,17 @@ export default function TrackOrderPage() {
       <Badge className={config.color}>
         <Icon className="w-4 h-4 mr-1" />
         {t(`status.${status.toLowerCase()}`) || status}
+      </Badge>
+    )
+  }
+
+  const renderPaymentStatus = (status: string) => {
+    const config = paymentStatusConfig[status as keyof typeof paymentStatusConfig] || paymentStatusConfig.PENDING
+
+    return (
+      <Badge className={config.color}>
+        <CreditCard className="w-4 h-4 mr-1" />
+        {config.label}
       </Badge>
     )
   }
@@ -90,7 +182,7 @@ export default function TrackOrderPage() {
             <CardTitle>{t('enterDetails') || 'Enter Order Details'}</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleTrackOrder} className="space-y-4">
+            <form onSubmit={handleFormSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="orderNumber">
                   <FileText className="w-4 h-4 inline mr-2" />
@@ -139,17 +231,50 @@ export default function TrackOrderPage() {
           </CardContent>
         </Card>
 
-        {orderData && (
+        {orderData && !showPaymentForm && (
           <Card className="mt-8">
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <CardTitle>
                   {t('orderDetails') || 'Order Details'}
                 </CardTitle>
-                {renderOrderStatus(orderData.order.orderStatus)}
+                <div className="flex flex-wrap gap-2">
+                  {renderOrderStatus(orderData.order.orderStatus)}
+                  {/* Show payment status for orders with online payment */}
+                  {orderData.order.paymentMethod !== 'CASH_ON_DELIVERY' && (
+                    renderPaymentStatus(orderData.order.paymentStatus)
+                  )}
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Pending Payment Alert */}
+              {hasPendingOnlinePayment(orderData.order) && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-orange-800">
+                    <AlertCircle className="w-5 h-5" />
+                    <span className="font-medium">{t('paymentPending') || 'Payment Not Completed'}</span>
+                  </div>
+                  <p className="text-sm text-orange-700">
+                    {t('completePaymentMessage') || 'Your order has been placed but payment was not completed. Complete payment to confirm your order.'}
+                  </p>
+                  <Button
+                    onClick={handleCompletePayment}
+                    className="w-full bg-oud-gold hover:bg-oud-gold/90"
+                    disabled={isInitializingPayment}
+                  >
+                    {isInitializingPayment ? (
+                      'Initializing Payment...'
+                    ) : (
+                      <>
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        {t('completePayment') || 'Complete Payment'}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+
               {/* Order Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -182,9 +307,9 @@ export default function TrackOrderPage() {
                 <div className="space-y-4">
                   {orderData.order.items.map((item: any) => (
                     <div key={item.id} className="flex items-center gap-4">
-                      <div className="relative w-16 h-16 flex-shrink-0">
+                      <div className="relative w-16 h-16 flex-shrink-0 bg-gray-100 rounded">
                         <Image
-                          src={item.product.images[0] || '/placeholder.png'}
+                          src={item.product.images?.[0] || '/placeholder.png'}
                           alt={item.product.name}
                           fill
                           className="object-cover rounded"
@@ -226,8 +351,22 @@ export default function TrackOrderPage() {
                 )}
                 <div className="flex justify-between font-bold text-lg border-t pt-2">
                   <span>{t('total') || 'Total'}:</span>
-                  <span>{formatCurrency(orderData.order.total)}</span>
+                  <span className="text-oud-gold">{formatCurrency(orderData.order.total)}</span>
                 </div>
+              </div>
+
+              {/* Payment Method */}
+              <div className="border-t pt-4">
+                <h3 className="font-semibold mb-2">
+                  {t('paymentMethod') || 'Payment Method'}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {orderData.order.paymentMethod === 'CASH_ON_DELIVERY'
+                    ? (t('cashOnDelivery') || 'Cash on Delivery')
+                    : orderData.order.paymentMethod === 'ONLINE_PAYMENT' || orderData.order.paymentMethod === 'CREDIT_CARD'
+                    ? (t('onlinePayment') || 'Online Payment')
+                    : orderData.order.paymentMethod}
+                </p>
               </div>
 
               {/* Shipping Address */}
@@ -239,9 +378,15 @@ export default function TrackOrderPage() {
                   <p className="text-sm text-muted-foreground">
                     {orderData.order.address.fullName}
                     <br />
-                    {orderData.order.address.street}, {orderData.order.address.building}
+                    {orderData.order.address.addressLine1 || orderData.order.address.street}
+                    {orderData.order.address.addressLine2 && (
+                      <>, {orderData.order.address.addressLine2}</>
+                    )}
+                    {orderData.order.address.building && (
+                      <>, {orderData.order.address.building}</>
+                    )}
                     <br />
-                    {orderData.order.address.city}, {orderData.order.address.country}
+                    {orderData.order.address.city}, {orderData.order.address.state || orderData.order.address.country}
                     <br />
                     {t('phone') || 'Phone'}: {orderData.order.address.phone}
                   </p>
@@ -257,7 +402,10 @@ export default function TrackOrderPage() {
                   <p className="text-sm text-muted-foreground">
                     {orderData.order.shippingAddress.fullName}
                     <br />
-                    {orderData.order.shippingAddress.street}, {orderData.order.shippingAddress.building}
+                    {orderData.order.shippingAddress.street}
+                    {orderData.order.shippingAddress.building && (
+                      <>, {orderData.order.shippingAddress.building}</>
+                    )}
                     <br />
                     {orderData.order.shippingAddress.city}, {orderData.order.shippingAddress.country}
                     <br />
@@ -265,6 +413,22 @@ export default function TrackOrderPage() {
                   </p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Payment Form */}
+        {showPaymentForm && clientSecret && orderData && (
+          <Card className="mt-8">
+            <CardContent className="pt-6">
+              <PaymobCheckout
+                clientSecret={clientSecret}
+                orderId={orderData.order.id}
+                total={orderData.order.total}
+                isGuestOrder={orderData.type === 'guest'}
+                onSuccess={handlePaymentSuccess}
+                onCancel={handlePaymentCancel}
+              />
             </CardContent>
           </Card>
         )}

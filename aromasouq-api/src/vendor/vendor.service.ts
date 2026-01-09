@@ -536,12 +536,22 @@ export class VendorService {
     const skip = (page - 1) * limit;
 
     // Build where clause for authenticated user orders
+    // IMPORTANT: Only show orders where:
+    // 1. Payment method is CASH_ON_DELIVERY (always show), OR
+    // 2. Payment has been completed (paymentStatus = PAID) for online payments
     const whereUser: any = {
       items: {
         some: {
           productId: { in: productIds },
         },
       },
+      OR: [
+        { paymentMethod: 'CASH_ON_DELIVERY' },
+        {
+          paymentMethod: { in: ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET'] },
+          paymentStatus: 'PAID',
+        },
+      ],
     };
 
     if (status && status !== 'all') {
@@ -549,12 +559,17 @@ export class VendorService {
     }
 
     // Build where clause for guest orders
+    // Same logic: only show COD orders or paid online orders
     const whereGuest: any = {
       items: {
         some: {
           productId: { in: productIds },
         },
       },
+      OR: [
+        { paymentMethod: 'CASH_ON_DELIVERY' },
+        { paymentStatus: 'PAID' },
+      ],
     };
 
     if (status && status !== 'all') {

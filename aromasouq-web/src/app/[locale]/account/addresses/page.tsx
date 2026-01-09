@@ -1,16 +1,27 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useAddresses, useDeleteAddress, useSetDefaultAddress } from '@/hooks/useAddresses';
+import { useAuth } from '@/hooks/useAuth';
 import { AddressCard } from '@/components/addresses/AddressCard';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { Plus, MapPin, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export default function AddressesPage() {
+  const router = useRouter();
+  const { isAuthenticated, hasHydrated } = useAuth();
   const { data: addresses, isLoading, error } = useAddresses();
   const deleteAddress = useDeleteAddress();
   const setDefault = useSetDefaultAddress();
   const t = useTranslations('account.addressesPage');
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [hasHydrated, isAuthenticated, router]);
 
   const handleDelete = (id: string) => {
     deleteAddress.mutate(id);
@@ -19,6 +30,17 @@ export default function AddressesPage() {
   const handleSetDefault = (id: string) => {
     setDefault.mutate(id);
   };
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

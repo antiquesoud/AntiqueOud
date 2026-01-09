@@ -294,6 +294,10 @@
     "addNewAddress": "Add New Address",
     "creditCard": "Credit / Debit Card",
     "cashOnDelivery": "Cash on Delivery",
+    "fastCheckout": "Fast",
+    "fastCheckoutGoogle": "Fast & secure checkout with Google Pay",
+    "fastCheckoutApple": "Fast & secure checkout with Apple Pay",
+    "payWhenReceive": "Pay when you receive your order",
     "standardDelivery": "Standard Delivery",
     "expressDelivery": "Express Delivery",
     "sameDayDelivery": "Same-Day Delivery",
@@ -630,7 +634,13 @@
         "shipped": "Shipped",
         "delivered": "Delivered",
         "cancelled": "Cancelled"
-      }
+      },
+      "paymentStatuses": {
+        "pending": "Payment Pending",
+        "paid": "Paid",
+        "failed": "Payment Failed"
+      },
+      "completePayment": "Complete Payment"
     },
     "orderDetailPage": {
       "loadingOrder": "Loading order details...",
@@ -667,7 +677,9 @@
       "orderCancelledSuccess": "Order cancelled successfully",
       "orderCancelFailed": "Failed to cancel order",
       "invoiceDownloaded": "Invoice downloaded",
-      "failedToDownloadInvoice": "Failed to download invoice"
+      "failedToDownloadInvoice": "Failed to download invoice",
+      "paymentPending": "Payment Not Completed",
+      "completePaymentMessage": "Your order has been placed but payment was not completed. Please complete the payment to process your order."
     },
     "walletPage": {
       "title": "My Wallet",
@@ -2129,6 +2141,7 @@
       "delivery": "Delivery",
       "deliveryDesc": "Your order will be delivered to your address",
       "viewOrderDetails": "View Order Details",
+      "trackOrder": "Track Your Order",
       "continueShopping": "Continue Shopping",
       "loadingOrder": "Loading order details...",
       "orderNotFound": "Order not found",
@@ -2203,7 +2216,13 @@
       "shipped": "Shipped",
       "delivered": "Delivered",
       "cancelled": "Cancelled"
-    }
+    },
+    "paymentMethod": "Payment Method",
+    "cashOnDelivery": "Cash on Delivery",
+    "onlinePayment": "Online Payment",
+    "paymentPending": "Payment Not Completed",
+    "completePaymentMessage": "Your order has been placed but payment was not completed. Complete payment to confirm your order.",
+    "completePayment": "Complete Payment"
   },
   "about": {
     "title": "About Us",

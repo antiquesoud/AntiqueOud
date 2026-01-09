@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useAddress, useUpdateAddress, CreateAddressDto } from '@/hooks/useAddresses';
+import { useAuth } from '@/hooks/useAuth';
 import { AddressForm } from '@/components/addresses/AddressForm';
 import { useRouter, useParams } from '@/i18n/navigation';
 import { MapPin, ArrowLeft, Loader2 } from 'lucide-react';
@@ -10,8 +12,16 @@ import { useTranslations } from 'next-intl';
 export default function EditAddressPage() {
   const router = useRouter();
   const params = useParams();
+  const { isAuthenticated, hasHydrated } = useAuth();
   const addressId = params.id as string;
   const t = useTranslations('account.editAddressPage');
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [hasHydrated, isAuthenticated, router]);
 
   const { data: address, isLoading, error } = useAddress(addressId);
   const updateAddress = useUpdateAddress();
@@ -30,6 +40,17 @@ export default function EditAddressPage() {
   const handleCancel = () => {
     router.push('/account/addresses');
   };
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -99,32 +99,33 @@ export function PaymobCheckout({
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex gap-3">
+        {/* Action Buttons - Stack on mobile for better visibility */}
+        <div className="flex flex-col gap-3">
           <Button
-            variant="outline"
-            className="flex-1"
-            onClick={onCancel}
-            disabled={isRedirecting}
-          >
-            Cancel
-          </Button>
-          <Button
-            className="flex-1 bg-oud-burgundy hover:bg-oud-burgundy/90"
+            className="w-full bg-gradient-to-r from-oud-gold to-amber-600 hover:from-oud-gold/90 hover:to-amber-600/90 text-white font-semibold py-6 text-lg shadow-lg"
+            size="lg"
             onClick={handlePayment}
             disabled={isRedirecting || Boolean(error)}
           >
             {isRedirecting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Redirecting...
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Redirecting to Payment...
               </>
             ) : (
               <>
-                <ExternalLink className="w-4 h-4 mr-2" />
+                <ExternalLink className="w-5 h-5 mr-2" />
                 Pay {formatCurrency(total)}
               </>
             )}
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full py-4"
+            onClick={onCancel}
+            disabled={isRedirecting}
+          >
+            Cancel
           </Button>
         </div>
 
