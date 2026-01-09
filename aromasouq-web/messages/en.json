@@ -679,7 +679,10 @@
       "invoiceDownloaded": "Invoice downloaded",
       "failedToDownloadInvoice": "Failed to download invoice",
       "paymentPending": "Payment Not Completed",
-      "completePaymentMessage": "Your order has been placed but payment was not completed. Please complete the payment to process your order."
+      "completePaymentMessage": "Your order has been placed but payment was not completed. Please complete the payment to process your order.",
+      "processing": "Processing...",
+      "completePayment": "Complete Payment",
+      "paymentError": "Failed to process payment. Please try again."
     },
     "walletPage": {
       "title": "My Wallet",
