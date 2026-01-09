@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from '@/i18n/navigation'
 import { useOrder, useCancelOrder } from '@/hooks/useOrders'
 import { useAuth } from '@/hooks/useAuth'
@@ -12,8 +12,8 @@ import { formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
-import { Package, ArrowLeft, MapPin, CreditCard, Truck, Download, Star, MessageSquare, AlertCircle } from 'lucide-react'
-import PaymobCheckout from '@/components/payment/PaymobCheckout'
+import { Package, ArrowLeft, MapPin, CreditCard, Truck, Download, Star, MessageSquare, AlertCircle, Loader2, ExternalLink } from 'lucide-react'
+import { redirectToHostedCheckout } from '@/lib/paymob'
 import toast from 'react-hot-toast'
 import { OrderTimeline } from '@/components/orders/OrderTimeline'
 import { useTranslations } from 'next-intl'
@@ -34,6 +34,7 @@ export default function OrderDetailPage() {
 
   const { data: order, isLoading } = useOrder(orderId)
   const cancelOrder = useCancelOrder()
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
 
   const tOrders = useTranslations('account.ordersPage')
 
@@ -54,7 +55,7 @@ export default function OrderDetailPage() {
 
   // Check if order has pending online payment
   const hasPendingOnlinePayment = (order: any) => {
-    const onlinePaymentMethods = ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET']
+    const onlinePaymentMethods = ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET', 'ONLINE_PAYMENT']
     return onlinePaymentMethods.includes(order?.paymentMethod) && order?.paymentStatus === 'PENDING'
   }
 
@@ -92,6 +93,45 @@ export default function OrderDetailPage() {
       toast.success(t('invoiceDownloaded'))
     } catch (error) {
       toast.error(t('failedToDownloadInvoice'))
+    }
+  }
+
+  const handleRetryPayment = async () => {
+    if (!order) return
+
+    try {
+      setIsProcessingPayment(true)
+
+      // Call API to create payment intent
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/create-intent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          orderId: order.id,
+          paymentMethod: 'card',
+        }),
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.message || 'Failed to create payment intent')
+      }
+
+      const data = await res.json()
+
+      if (data.clientSecret) {
+        // Redirect to Paymob hosted checkout
+        redirectToHostedCheckout(data.clientSecret)
+      } else {
+        throw new Error('No client secret received')
+      }
+    } catch (error: any) {
+      console.error('Retry payment error:', error)
+      toast.error(error.message || t('paymentError'))
+      setIsProcessingPayment(false)
     }
   }
 
@@ -365,7 +405,7 @@ export default function OrderDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm">
-                {order.paymentMethod === 'CREDIT_CARD' || order.paymentMethod === 'DEBIT_CARD' || order.paymentMethod === 'WALLET'
+                {['CREDIT_CARD', 'DEBIT_CARD', 'WALLET', 'ONLINE_PAYMENT'].includes(order.paymentMethod as string)
                   ? t('creditCard')
                   : t('cashOnDelivery')}
               </p>
@@ -380,11 +420,23 @@ export default function OrderDetailPage() {
                   <p className="text-sm text-orange-700">
                     {t('completePaymentMessage')}
                   </p>
-                  <PaymobCheckout
-                    orderId={order.id}
-                    isGuest={false}
-                    paymentMethod="card"
-                  />
+                  <Button
+                    className="w-full bg-gradient-to-r from-oud-gold to-amber-600 hover:from-oud-gold/90 hover:to-amber-600/90 text-white"
+                    onClick={handleRetryPayment}
+                    disabled={isProcessingPayment}
+                  >
+                    {isProcessingPayment ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        {t('processing')}
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        {t('completePayment')}
+                      </>
+                    )}
+                  </Button>
                 </div>
               )}
             </CardContent>

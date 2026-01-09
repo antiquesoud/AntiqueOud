@@ -679,7 +679,10 @@
       "invoiceDownloaded": "تم تحميل الفاتورة",
       "failedToDownloadInvoice": "فشل تحميل الفاتورة",
       "paymentPending": "الدفع غير مكتمل",
-      "completePaymentMessage": "تم تقديم طلبك ولكن لم يتم إتمام الدفع. يرجى إتمام الدفع لمعالجة طلبك."
+      "completePaymentMessage": "تم تقديم طلبك ولكن لم يتم إتمام الدفع. يرجى إتمام الدفع لمعالجة طلبك.",
+      "processing": "جارٍ المعالجة...",
+      "completePayment": "إتمام الدفع",
+      "paymentError": "فشل في معالجة الدفع. يرجى المحاولة مرة أخرى."
     },
     "walletPage": {
       "title": "محفظتي",
