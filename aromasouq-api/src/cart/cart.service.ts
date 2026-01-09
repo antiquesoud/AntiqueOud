@@ -75,20 +75,49 @@ export class CartService {
       });
     }
 
-    // Calculate totals
-    const subtotal = cart.items.reduce((sum, item) => {
-      const price = item.variant?.price || item.product.price;
-      return sum + price * item.quantity;
-    }, 0);
+    // Transform items to match frontend expectations (like guest cart)
+    let subtotal = 0;
+    const transformedItems = cart.items.map((item) => {
+      // Use sale price if available, otherwise use regular price
+      // For variants, use variant's sale price or price
+      const price = item.variant?.salePrice || item.variant?.price || item.product.salePrice || item.product.price;
+      const itemTotal = price * item.quantity;
+      subtotal += itemTotal;
 
-    const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+      return {
+        id: item.id,
+        cartId: item.cartId,
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        product: {
+          ...item.product,
+          name: item.product.name,
+          image: item.product.images?.[0] || '', // Frontend expects single image string
+          stockQuantity: item.product.stock, // Frontend expects stockQuantity
+          regularPrice: item.product.price, // Add regularPrice field
+          salePrice: item.product.salePrice, // Add salePrice field
+        },
+        variant: item.variant ? {
+          ...item.variant,
+          name: item.variant.nameAr || item.variant.name,
+          stock: item.variant.stock,
+        } : null,
+        price, // Current effective price
+        itemTotal,
+      };
+    });
+
+    const itemCount = transformedItems.reduce((sum, item) => sum + item.quantity, 0);
     const tax = subtotal * 0.05; // 5% tax
     const shipping = subtotal > 200 ? 0 : 25; // Free shipping over 200 AED
     const total = subtotal + tax + shipping;
     const coinsEarnable = Math.floor(total / 10); // 1 coin per 10 AED
 
     return {
-      ...cart,
+      id: cart.id,
+      userId: cart.userId,
+      items: transformedItems,
       summary: {
         subtotal,
         shipping,
@@ -97,6 +126,8 @@ export class CartService {
         total,
         itemCount,
       },
+      createdAt: cart.createdAt,
+      updatedAt: cart.updatedAt,
     };
   }
 

@@ -41,10 +41,32 @@ export class PaymentsService {
   private readonly applePayIntegrationId = process.env.PAYMOB_APPLE_PAY_INTEGRATION_ID;
 
   /**
-   * Get all enabled payment method integration IDs
-   * Only includes methods that have integration IDs configured
+   * Get payment method integration IDs
+   * If a specific method is requested, return only that one
+   * Otherwise return all enabled methods
+   *
+   * @param selectedMethod - Optional: 'card' | 'google_pay' | 'apple_pay'
    */
-  private getPaymentMethods(): number[] {
+  private getPaymentMethods(selectedMethod?: 'card' | 'google_pay' | 'apple_pay'): number[] {
+    // If a specific method is selected, return only that integration ID
+    if (selectedMethod) {
+      const methodMap: Record<string, string | undefined> = {
+        card: this.cardIntegrationId,
+        google_pay: this.googlePayIntegrationId,
+        apple_pay: this.applePayIntegrationId,
+      };
+
+      const integrationId = methodMap[selectedMethod];
+      if (integrationId) {
+        return [parseInt(integrationId)];
+      }
+      // Fallback to card if selected method not configured
+      if (this.cardIntegrationId) {
+        return [parseInt(this.cardIntegrationId)];
+      }
+    }
+
+    // Return all enabled methods if no specific method selected
     const methods: number[] = [];
 
     if (this.cardIntegrationId) {
@@ -67,6 +89,9 @@ export class PaymentsService {
 
   /**
    * Create payment intention using Paymob Unified Intention API
+   *
+   * @param selectedPaymentMethod - Optional: 'card' | 'google_pay' | 'apple_pay'
+   *                                If provided, only that payment method will be shown
    */
   private async createIntention(
     amount: number,
@@ -78,6 +103,7 @@ export class PaymentsService {
     isGuestOrder: boolean = false,
     shippingCost: number = 0,
     discount: number = 0,
+    selectedPaymentMethod?: 'card' | 'google_pay' | 'apple_pay',
   ): Promise<IntentionResponse> {
     // Build items array - Paymob requires: amount = sum(item.amount * quantity)
     const paymobItems = items.map((item) => ({
@@ -116,7 +142,7 @@ export class PaymentsService {
     const requestBody = {
       amount: calculatedTotal, // Use calculated total to ensure match
       currency: 'AED',
-      payment_methods: this.getPaymentMethods(), // Card, Google Pay, Apple Pay
+      payment_methods: this.getPaymentMethods(selectedPaymentMethod), // Selected method or all
       items: paymobItems,
       billing_data: {
         first_name: billingData.firstName,
@@ -148,9 +174,27 @@ export class PaymentsService {
     };
 
     try {
-      const paymentMethods = this.getPaymentMethods();
+      const paymentMethods = this.getPaymentMethods(selectedPaymentMethod);
+      console.log('[Paymob] ========== PAYMENT INTENTION DEBUG ==========');
       console.log('[Paymob] Creating intention for order:', orderNumber);
-      console.log('[Paymob] Payment methods enabled:', paymentMethods);
+      console.log('[Paymob] Selected payment method:', selectedPaymentMethod);
+      console.log('[Paymob] Integration IDs being used:', paymentMethods);
+      console.log('[Paymob] Config - Card ID:', this.cardIntegrationId);
+      console.log('[Paymob] Config - Google Pay ID:', this.googlePayIntegrationId);
+      console.log('[Paymob] Config - Apple Pay ID:', this.applePayIntegrationId);
+      console.log('[Paymob] API Base URL:', this.baseUrl);
+      console.log('[Paymob] Secret Key (first 20 chars):', this.secretKey?.substring(0, 20) + '...');
+      console.log('[Paymob] Request body:', JSON.stringify(requestBody, null, 2));
+
+      // Validate that we have at least one integration ID
+      if (paymentMethods.length === 0) {
+        throw new Error('No payment integration IDs configured. Please check PAYMOB_CARD_INTEGRATION_ID in environment variables.');
+      }
+
+      // Validate integration IDs are numbers
+      if (paymentMethods.some(id => isNaN(id))) {
+        throw new Error('Invalid payment integration ID format. Integration IDs must be numbers.');
+      }
 
       const response = await fetch(`${this.baseUrl}/v1/intention/`, {
         method: 'POST',
@@ -185,11 +229,14 @@ export class PaymentsService {
   /**
    * CREATE PAYMENT INTENT - For Authenticated Orders
    * Endpoint: POST /payments/create-intent
+   *
+   * @param paymentMethod - Optional: 'card' | 'google_pay' | 'apple_pay'
    */
   async createPaymentIntent(
     orderId: string,
     userId?: string,
     locale: string = 'en',
+    paymentMethod?: 'card' | 'google_pay' | 'apple_pay',
   ) {
     // Get order with correct field names
     const order = await this.prisma.order.findUnique({
@@ -245,6 +292,7 @@ export class PaymentsService {
       false, // isGuestOrder
       order.shippingFee || 0, // Pass shipping fee
       order.discount || 0, // Pass discount
+      paymentMethod, // Selected payment method (card, google_pay, apple_pay)
     );
 
     // Store intention ID
@@ -264,11 +312,14 @@ export class PaymentsService {
    * Endpoint: POST /payments/create-intent-guest
    *
    * IMPORTANT: Guest orders use SEPARATE GuestOrder model, NOT Order
+   *
+   * @param paymentMethod - Optional: 'card' | 'google_pay' | 'apple_pay'
    */
   async createGuestPaymentIntent(
     orderId: string,
     sessionToken: string,
     locale: string = 'en',
+    paymentMethod?: 'card' | 'google_pay' | 'apple_pay',
   ) {
     // Use GuestOrder model (separate from Order)
     const order = await this.prisma.guestOrder.findFirst({
@@ -329,6 +380,7 @@ export class PaymentsService {
       true, // isGuestOrder
       order.shippingFee || 0, // Pass shipping fee
       order.discount || 0, // Pass discount
+      paymentMethod, // Selected payment method (card, google_pay, apple_pay)
     );
 
     // Store intention ID on GuestOrder

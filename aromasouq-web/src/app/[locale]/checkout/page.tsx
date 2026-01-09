@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "@/i18n/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Check } from "lucide-react"
+import { Check, CreditCard, Smartphone, Wallet, Banknote } from "lucide-react"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -27,6 +28,16 @@ import { useTranslations } from "next-intl"
 import { PaymobCheckout } from "@/components/payment/PaymobCheckout"
 
 type DeliveryMethod = "standard" | "express" | "sameDay"
+type PaymentMethodType = "card" | "google_pay" | "apple_pay" | "cod"
+
+// Payment method configuration
+interface PaymentOption {
+  id: PaymentMethodType
+  name: string
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+  isAvailable: () => boolean
+}
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -38,12 +49,77 @@ export default function CheckoutPage() {
 
   const [currentStep, setCurrentStep] = useState(1)
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("standard")
-  const [paymentMethod, setPaymentMethod] = useState("card")
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("card")
   const [coinsToUse, setCoinsToUse] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [showPaymentForm, setShowPaymentForm] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Track client-side mount for device detection
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // Device detection helpers (only run on client)
+  const isGooglePayAvailable = () => {
+    if (typeof window === 'undefined') return false
+    const ua = navigator.userAgent
+    // Show Google Pay on Chrome browser or Android devices
+    return ua.includes('Chrome') || ua.includes('Android')
+  }
+
+  const isApplePayAvailable = () => {
+    if (typeof window === 'undefined') return false
+    // Check for Apple Pay support
+    const hasApplePaySession = !!(window as any).ApplePaySession?.canMakePayments?.()
+    // Also show on Safari (not Chrome) for potential Apple Pay
+    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
+    return hasApplePaySession || isSafari
+  }
+
+  // Payment method options - base configuration
+  const paymentOptions: PaymentOption[] = useMemo(() => [
+    {
+      id: 'card' as PaymentMethodType,
+      name: t('creditCard'),
+      description: 'Visa, Mastercard, Amex',
+      icon: CreditCard,
+      isAvailable: () => true, // Always available
+    },
+    {
+      id: 'google_pay' as PaymentMethodType,
+      name: 'Google Pay',
+      description: t('fastCheckoutGoogle') || 'Fast & secure checkout',
+      icon: Wallet,
+      isAvailable: isGooglePayAvailable,
+    },
+    {
+      id: 'apple_pay' as PaymentMethodType,
+      name: 'Apple Pay',
+      description: t('fastCheckoutApple') || 'Fast & secure checkout',
+      icon: Smartphone,
+      isAvailable: isApplePayAvailable,
+    },
+    {
+      id: 'cod' as PaymentMethodType,
+      name: t('cashOnDelivery'),
+      description: t('payWhenReceive') || 'Pay when you receive',
+      icon: Banknote,
+      isAvailable: () => true, // Always available
+    },
+  ], [t])
+
+  // Filter to only show available payment methods (re-evaluates after mount)
+  const availablePaymentMethods = useMemo(() => {
+    // During SSR or before mount, show only card and COD
+    if (!isMounted) {
+      return paymentOptions.filter(option => option.id === 'card' || option.id === 'cod')
+    }
+    // After mount, properly detect device capabilities
+    return paymentOptions.filter(option => option.isAvailable())
+  }, [paymentOptions, isMounted])
 
   const steps = [
     { id: 1, name: t('steps.address'), key: "address" },
@@ -140,18 +216,22 @@ export default function CheckoutPage() {
       // First, create the address
       const address = await apiClient.post<{ id: string }>('/addresses', data)
 
+      // Determine if this is an online payment method
+      const isOnlinePayment = paymentMethod !== 'cod'
+
       // Then create the order using the address ID
       const order = await apiClient.post<{ id: string; orderNumber: string }>('/orders', {
         addressId: address.id,
-        paymentMethod: paymentMethod === 'card' ? 'CREDIT_CARD' : 'CASH_ON_DELIVERY',
+        paymentMethod: isOnlinePayment ? 'CREDIT_CARD' : 'CASH_ON_DELIVERY',
         coinsToUse,
         couponCode: appliedCoupon?.coupon.code,
       })
 
-      // If card payment, initialize Paymob and show payment form
-      if (paymentMethod === 'card') {
+      // If online payment (card, google_pay, apple_pay), initialize Paymob
+      if (isOnlinePayment) {
         const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent', {
           orderId: order.id,
+          paymentMethod: paymentMethod as 'card' | 'google_pay' | 'apple_pay', // Pass selected method
         })
 
         setCreatedOrderId(order.id)
@@ -566,31 +646,36 @@ export default function CheckoutPage() {
                       )}
 
                       {/* Payment Method */}
-                      <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                      <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as PaymentMethodType)}>
                         <div className="space-y-3">
-                          <Label
-                            htmlFor="card"
-                            className="flex items-start gap-3 p-4 border rounded-lg cursor-pointer hover:border-oud-gold transition-colors"
-                          >
-                            <RadioGroupItem value="card" id="card" className="mt-1" />
-                            <div className="flex-1">
-                              <p className="font-semibold">{t('creditCard')}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Visa, Mastercard, Amex accepted
-                              </p>
-                            </div>
-                          </Label>
-
-                          <Label
-                            htmlFor="cod"
-                            className="flex items-start gap-3 p-4 border rounded-lg cursor-pointer hover:border-oud-gold transition-colors"
-                          >
-                            <RadioGroupItem value="cod" id="cod" className="mt-1" />
-                            <div className="flex-1">
-                              <p className="font-semibold">{t('cashOnDelivery')}</p>
-                              <p className="text-sm text-muted-foreground">Pay when you receive</p>
-                            </div>
-                          </Label>
+                          {availablePaymentMethods.map((option) => {
+                            const IconComponent = option.icon
+                            return (
+                              <Label
+                                key={option.id}
+                                htmlFor={option.id}
+                                className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                                  paymentMethod === option.id
+                                    ? 'border-oud-gold bg-oud-gold/5'
+                                    : 'hover:border-oud-gold'
+                                }`}
+                              >
+                                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                                <IconComponent className="w-5 h-5 mt-0.5 text-muted-foreground" />
+                                <div className="flex-1">
+                                  <p className="font-semibold">{option.name}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {option.description}
+                                  </p>
+                                </div>
+                                {(option.id === 'google_pay' || option.id === 'apple_pay') && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    {t('fastCheckout') || 'Fast'}
+                                  </Badge>
+                                )}
+                              </Label>
+                            )
+                          })}
                         </div>
                       </RadioGroup>
 
@@ -646,8 +731,8 @@ export default function CheckoutPage() {
 
                       <div>
                         <h3 className="font-semibold mb-2">{t('paymentMethod')}</h3>
-                        <p className="text-sm text-muted-foreground capitalize">
-                          {paymentMethod === 'card' ? t('creditCard') : t('cashOnDelivery')}
+                        <p className="text-sm text-muted-foreground">
+                          {availablePaymentMethods.find(m => m.id === paymentMethod)?.name || paymentMethod}
                         </p>
                       </div>
 
@@ -700,6 +785,41 @@ export default function CheckoutPage() {
               <CardTitle>{t('orderSummary')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Cart Items */}
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {cart?.items?.map((item: any) => {
+                  const productImage = item.product?.images?.[0] || '/images/placeholder-product.png'
+                  const productName = item.product?.nameEn || item.product?.name || 'Product'
+                  const productPrice = item.variant?.price || item.product?.salePrice || item.product?.price || 0
+                  return (
+                    <div key={item.id} className="flex gap-3 pb-3 border-b last:border-0 last:pb-0">
+                      <div className="relative w-14 h-14 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                        <Image
+                          src={typeof productImage === 'string' ? productImage : productImage.url || '/images/placeholder-product.png'}
+                          alt={productName}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{productName}</p>
+                        {item.variant && (
+                          <p className="text-xs text-muted-foreground">{item.variant.name}</p>
+                        )}
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-xs text-muted-foreground">Qty: {item.quantity}</span>
+                          <span className="text-sm font-semibold text-oud-gold">
+                            {formatCurrency(productPrice * item.quantity)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <Separator />
+
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>{t('subtotal')} ({cart?.summary?.itemCount || 0} {t('items')}):</span>

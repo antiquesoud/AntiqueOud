@@ -294,6 +294,10 @@
     "addNewAddress": "إضافة عنوان جديد",
     "creditCard": "بطاقة ائتمان / خصم",
     "cashOnDelivery": "الدفع عند الاستلام",
+    "fastCheckout": "سريع",
+    "fastCheckoutGoogle": "دفع سريع وآمن باستخدام Google Pay",
+    "fastCheckoutApple": "دفع سريع وآمن باستخدام Apple Pay",
+    "payWhenReceive": "ادفع عند استلام طلبك",
     "standardDelivery": "توصيل قياسي",
     "expressDelivery": "توصيل سريع",
     "sameDayDelivery": "توصيل في نفس اليوم",
@@ -630,7 +634,13 @@
         "shipped": "تم الشحن",
         "delivered": "تم التوصيل",
         "cancelled": "ملغي"
-      }
+      },
+      "paymentStatuses": {
+        "pending": "الدفع معلق",
+        "paid": "مدفوع",
+        "failed": "فشل الدفع"
+      },
+      "completePayment": "إتمام الدفع"
     },
     "orderDetailPage": {
       "loadingOrder": "جارٍ تحميل تفاصيل الطلب...",
@@ -667,7 +677,9 @@
       "orderCancelledSuccess": "تم إلغاء الطلب بنجاح",
       "orderCancelFailed": "فشل إلغاء الطلب",
       "invoiceDownloaded": "تم تحميل الفاتورة",
-      "failedToDownloadInvoice": "فشل تحميل الفاتورة"
+      "failedToDownloadInvoice": "فشل تحميل الفاتورة",
+      "paymentPending": "الدفع غير مكتمل",
+      "completePaymentMessage": "تم تقديم طلبك ولكن لم يتم إتمام الدفع. يرجى إتمام الدفع لمعالجة طلبك."
     },
     "walletPage": {
       "title": "محفظتي",

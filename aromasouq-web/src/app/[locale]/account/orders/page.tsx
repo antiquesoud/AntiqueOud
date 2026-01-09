@@ -40,6 +40,18 @@ export default function OrdersPage() {
     CANCELLED: { label: t('statuses.cancelled'), icon: XCircle, color: 'bg-red-100 text-red-800' },
   }
 
+  const paymentStatusConfig = {
+    PENDING: { label: t('paymentStatuses.pending'), color: 'bg-orange-100 text-orange-800' },
+    PAID: { label: t('paymentStatuses.paid'), color: 'bg-green-100 text-green-800' },
+    FAILED: { label: t('paymentStatuses.failed'), color: 'bg-red-100 text-red-800' },
+  }
+
+  // Check if order has pending online payment
+  const hasPendingOnlinePayment = (order: any) => {
+    const onlinePaymentMethods = ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET']
+    return onlinePaymentMethods.includes(order.paymentMethod) && order.paymentStatus === 'PENDING'
+  }
+
   const handleDownloadInvoice = async (orderNumber: string, orderId: string) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/invoice`, {
@@ -117,10 +129,18 @@ export default function OrdersPage() {
                       {t('placedOn', { date: format(new Date(order.createdAt), 'MMM dd, yyyy') })}
                     </p>
                   </div>
-                  <Badge className={statusClass} variant="secondary">
-                    <StatusIcon className="w-4 h-4 mr-1" />
-                    {statusConfig[order.orderStatus as keyof typeof statusConfig]?.label || order.orderStatus}
-                  </Badge>
+                  <div className="flex flex-col gap-2 items-end">
+                    <Badge className={statusClass} variant="secondary">
+                      <StatusIcon className="w-4 h-4 mr-1" />
+                      {statusConfig[order.orderStatus as keyof typeof statusConfig]?.label || order.orderStatus}
+                    </Badge>
+                    {/* Show payment status for online payments */}
+                    {hasPendingOnlinePayment(order) && (
+                      <Badge className={paymentStatusConfig.PENDING.color} variant="secondary">
+                        {paymentStatusConfig.PENDING.label}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
 
@@ -193,7 +213,13 @@ export default function OrdersPage() {
                         <Download className="w-4 h-4" />
                       </Button>
                     )}
-                    {order.orderStatus === 'PENDING' && (
+                    {/* Complete Payment button for pending online payments */}
+                    {hasPendingOnlinePayment(order) && (
+                      <Button variant="default" size="sm" asChild className="flex-1 bg-oud-gold hover:bg-oud-gold/90">
+                        <Link href={`/orders/${order.id}`}>{t('completePayment')}</Link>
+                      </Button>
+                    )}
+                    {order.orderStatus === 'PENDING' && !hasPendingOnlinePayment(order) && (
                       <Button variant="destructive" size="sm" className="flex-1">
                         {t('cancelOrder')}
                       </Button>

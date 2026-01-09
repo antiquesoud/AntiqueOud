@@ -121,12 +121,14 @@ export default function CartPage() {
   }
 
   const productImage = (item: any) => {
-    const firstImage = item.product?.images?.[0]
-    if (!firstImage) {
+    // Backend now provides item.product.image as a single string
+    // Also check item.product.images array for backwards compatibility
+    const image = item.product?.image || item.product?.images?.[0]
+    if (!image) {
       // Return random placeholder based on product ID for consistency
       return getRandomPlaceholderImage(item.productId || item.product?.id)
     }
-    return typeof firstImage === 'string' ? firstImage : firstImage.url
+    return typeof image === 'string' ? image : image.url
   }
 
   const productName = (item: any) => {
@@ -138,7 +140,12 @@ export default function CartPage() {
   }
 
   const productPrice = (item: any) => {
-    return item.variant?.price || item.product?.salePrice || item.product?.regularPrice || 0
+    // Backend now returns transformed data with:
+    // - item.price: the effective price for this item
+    // - item.product.regularPrice: the base price
+    // - item.product.salePrice: the sale price (if on sale)
+    // Priority: item.price > variant price > salePrice > regularPrice > price > 0
+    return item.price || item.variant?.price || item.product?.salePrice || item.product?.regularPrice || item.product?.price || 0
   }
 
   return (

@@ -28,9 +28,18 @@ class ApiClient {
             return Promise.reject(error)
           }
 
-          // Unauthorized - clear auth state and optionally redirect
+          // Unauthorized - handle based on current page context
           if (typeof window !== 'undefined') {
             const currentPath = window.location.pathname
+
+            // Pages that handle their own auth logic - don't interfere
+            const selfHandledPaths = ['/order-success', '/payment-failed', '/payment-cancelled', '/checkout']
+            const isSelfHandledPath = selfHandledPaths.some(path => currentPath.includes(path))
+
+            // Don't clear auth or redirect for pages that handle their own auth
+            if (isSelfHandledPath) {
+              return Promise.reject(error)
+            }
 
             // Clear auth from localStorage to prevent stale data
             try {
@@ -57,7 +66,7 @@ class ApiClient {
             }
 
             // Public paths that don't need authentication (including cart and checkout for guest users)
-            const publicPaths = ['/', '/login', '/register', '/become-vendor', '/products', '/brands', '/categories', '/cart', '/guest-checkout']
+            const publicPaths = ['/', '/login', '/register', '/become-vendor', '/products', '/brands', '/categories', '/cart', '/guest-checkout', '/order-success', '/payment-failed', '/payment-cancelled']
             const isPublicPath = publicPaths.some(path => {
               // Exact match for homepage or starts with for other paths
               if (path === '/') return currentPath === '/' || currentPath.match(/^\/[a-z]{2}$/)

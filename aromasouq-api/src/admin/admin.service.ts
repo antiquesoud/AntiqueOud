@@ -25,8 +25,18 @@ export class AdminService {
       // Total users
       this.prisma.user.count(),
 
-      // Total orders
-      this.prisma.order.count(),
+      // Total orders (only count completed payments for online, all for COD)
+      this.prisma.order.count({
+        where: {
+          OR: [
+            { paymentMethod: 'CASH_ON_DELIVERY' },
+            {
+              paymentMethod: { in: ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET'] },
+              paymentStatus: 'PAID',
+            },
+          ],
+        },
+      }),
 
       // Total products
       this.prisma.product.count(),
@@ -37,9 +47,18 @@ export class AdminService {
         _sum: { total: true },
       }),
 
-      // Pending orders
+      // Pending orders (only for valid orders - COD or paid online)
       this.prisma.order.count({
-        where: { orderStatus: 'PENDING' },
+        where: {
+          orderStatus: 'PENDING',
+          OR: [
+            { paymentMethod: 'CASH_ON_DELIVERY' },
+            {
+              paymentMethod: { in: ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET'] },
+              paymentStatus: 'PAID',
+            },
+          ],
+        },
       }),
 
       // Active users
@@ -65,6 +84,14 @@ export class AdminService {
         createdAt: {
           gte: sevenDaysAgo,
         },
+        // Only count valid orders (COD or paid online)
+        OR: [
+          { paymentMethod: 'CASH_ON_DELIVERY' },
+          {
+            paymentMethod: { in: ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET'] },
+            paymentStatus: 'PAID',
+          },
+        ],
       },
     });
 
@@ -215,9 +242,27 @@ export class AdminService {
   }) {
     const { status, userId, page = 1, limit = 20 } = params || {};
 
-    const where: any = {};
-    if (status) where.orderStatus = status;
-    if (userId) where.userId = userId;
+    // Build base filter
+    const baseFilter: any = {};
+    if (status) baseFilter.orderStatus = status;
+    if (userId) baseFilter.userId = userId;
+
+    // IMPORTANT: Only show orders where:
+    // 1. Payment method is CASH_ON_DELIVERY (always show), OR
+    // 2. Payment has been completed (paymentStatus = PAID) for online payments
+    // This prevents showing incomplete online payment orders to admin
+    const where: any = {
+      ...baseFilter,
+      OR: [
+        // Cash on delivery orders - always visible
+        { paymentMethod: 'CASH_ON_DELIVERY' },
+        // Online payment orders - only visible if payment is completed
+        {
+          paymentMethod: { in: ['CREDIT_CARD', 'DEBIT_CARD', 'WALLET'] },
+          paymentStatus: 'PAID',
+        },
+      ],
+    };
 
     const skip = (page - 1) * limit;
 

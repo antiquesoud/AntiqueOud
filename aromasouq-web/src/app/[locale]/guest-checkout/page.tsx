@@ -177,8 +177,11 @@ export default function GuestCheckoutPage() {
         console.log('[Checkout] Creating payment intent for order:', order.id)
 
         try {
+          // Don't pass paymentMethod - this will show ALL payment options on Paymob
+          // (Card, Google Pay, Apple Pay) - Paymob filters by device automatically
           const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent-guest', {
             orderId: order.id,
+            // paymentMethod not passed = all methods shown on Paymob
           })
 
           console.log('[Checkout] Payment intent created successfully')
