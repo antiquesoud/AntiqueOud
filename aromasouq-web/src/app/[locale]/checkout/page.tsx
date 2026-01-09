@@ -24,8 +24,7 @@ import { formatCurrency } from "@/lib/utils"
 import { apiClient } from "@/lib/api-client"
 import toast from "react-hot-toast"
 import { useTranslations } from "next-intl"
-import { StripeProvider } from "@/components/payment/StripeProvider"
-import { StripeCardForm } from "@/components/payment/StripeCardForm"
+import { PaymobCheckout } from "@/components/payment/PaymobCheckout"
 
 type DeliveryMethod = "standard" | "express" | "sameDay"
 
@@ -44,14 +43,14 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  const [showStripeForm, setShowStripeForm] = useState(false)
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
 
   const steps = [
     { id: 1, name: t('steps.address'), key: "address" },
     { id: 2, name: t('steps.delivery'), key: "delivery" },
     { id: 3, name: t('steps.payment'), key: "payment" },
     { id: 4, name: t('steps.review'), key: "review" },
-    ...(showStripeForm ? [{ id: 5, name: 'Complete Payment', key: "stripe-payment" }] : []),
+    ...(showPaymentForm ? [{ id: 5, name: 'Complete Payment', key: "card-payment" }] : []),
   ]
 
   // Redirect if cart is empty
@@ -149,7 +148,7 @@ export default function CheckoutPage() {
         couponCode: appliedCoupon?.coupon.code,
       })
 
-      // If card payment, initialize Stripe and show payment form
+      // If card payment, initialize Paymob and show payment form
       if (paymentMethod === 'card') {
         const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent', {
           orderId: order.id,
@@ -157,7 +156,7 @@ export default function CheckoutPage() {
 
         setCreatedOrderId(order.id)
         setClientSecret(paymentIntent.clientSecret)
-        setShowStripeForm(true)
+        setShowPaymentForm(true)
         setCurrentStep(5)
       } else {
         // COD - complete order immediately
@@ -178,7 +177,7 @@ export default function CheckoutPage() {
   }
 
   const handlePaymentCancel = () => {
-    setShowStripeForm(false)
+    setShowPaymentForm(false)
     setClientSecret(null)
     setCurrentStep(4)
     toast('Payment cancelled')
@@ -675,20 +674,19 @@ export default function CheckoutPage() {
                 </motion.div>
               )}
 
-              {/* Step 5: Stripe Payment */}
-              {currentStep === 5 && showStripeForm && clientSecret && (
+              {/* Step 5: Card Payment */}
+              {currentStep === 5 && showPaymentForm && clientSecret && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <StripeProvider clientSecret={clientSecret}>
-                    <StripeCardForm
-                      orderId={createdOrderId!}
-                      total={finalTotal}
-                      onSuccess={handlePaymentSuccess}
-                      onCancel={handlePaymentCancel}
-                    />
-                  </StripeProvider>
+                  <PaymobCheckout
+                    clientSecret={clientSecret}
+                    orderId={createdOrderId!}
+                    total={finalTotal}
+                    onSuccess={handlePaymentSuccess}
+                    onCancel={handlePaymentCancel}
+                  />
                 </motion.div>
               )}
             </form>

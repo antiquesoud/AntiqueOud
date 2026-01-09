@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    rawBody: true, // Enable raw body for Stripe webhooks
+    rawBody: true, // Enable raw body for Paymob webhooks
   });
 
   // Compression middleware - reduces response size by 60-80%

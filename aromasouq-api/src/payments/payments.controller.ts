@@ -4,8 +4,7 @@ import {
   Body,
   Req,
   Res,
-  Headers,
-  RawBodyRequest,
+  Query,
   UseGuards,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -13,74 +12,69 @@ import type { Request, Response } from 'express';
 import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SessionService } from '../session/session.service';
-import Stripe from 'stripe';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(
     private readonly paymentsService: PaymentsService,
-    private readonly sessionService: SessionService,
+    private readonly sessionService: SessionService, // REQUIRED for guest sessions
   ) {}
 
   /**
    * Create Payment Intent - Authenticated Users
+   * Endpoint: POST /payments/create-intent (MATCHES CURRENT STRIPE ENDPOINT)
    */
   @Post('create-intent')
   @UseGuards(JwtAuthGuard)
-  async createIntent(@Req() req: Request, @Body() body: { orderId: string }) {
-    const userId = req.user!['sub'];
-    return this.paymentsService.createPaymentIntent(body.orderId, userId);
+  async createIntent(
+    @Req() req: Request,
+    @Body() body: { orderId: string },
+    @Query('locale') locale: string = 'en',
+  ) {
+    const userId = req.user!['sub']; // Get userId from JWT
+    return this.paymentsService.createPaymentIntent(body.orderId, userId, locale);
   }
 
   /**
    * Create Payment Intent - Guest Orders
+   * Endpoint: POST /payments/create-intent-guest (MATCHES CURRENT STRIPE ENDPOINT)
+   *
+   * IMPORTANT: Uses SessionService to get sessionToken from cookies
+   * NOT from request body!
    */
   @Post('create-intent-guest')
   async createIntentGuest(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Body() body: { orderId: string },
+    @Query('locale') locale: string = 'en',
   ) {
-    const sessionToken = this.sessionService.getOrCreateGuestSession(req.cookies, res);
+    // Get session token from cookies via SessionService
+    const sessionToken = this.sessionService.getOrCreateGuestSession(
+      req.cookies,
+      res,
+    );
     if (!sessionToken) {
       throw new UnauthorizedException('Session token required');
     }
-    return this.paymentsService.createGuestPaymentIntent(body.orderId, sessionToken);
+    return this.paymentsService.createGuestPaymentIntent(
+      body.orderId,
+      sessionToken,
+      locale,
+    );
   }
 
   /**
-   * Confirm Payment Success
-   */
-  @Post('confirm')
-  async confirmPayment(@Body() body: { paymentIntentId: string }) {
-    return this.paymentsService.confirmPayment(body.paymentIntentId);
-  }
-
-  /**
-   * Stripe Webhook Handler
+   * Paymob Webhook Handler
+   * Endpoint: POST /payments/webhook
+   *
+   * Paymob sends transaction data with HMAC signature in query param
    */
   @Post('webhook')
-  async handleWebhook(
-    @Headers('stripe-signature') signature: string,
-    @Req() req: RawBodyRequest<Request>,
-  ) {
-    if (!signature) {
-      throw new UnauthorizedException('Missing stripe-signature header');
+  async handleWebhook(@Body() data: any, @Query('hmac') hmac: string) {
+    if (!hmac) {
+      throw new UnauthorizedException('Missing HMAC signature');
     }
-
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
-    let event: Stripe.Event;
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.rawBody,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET,
-      );
-    } catch (err: any) {
-      throw new UnauthorizedException(`Webhook Error: ${err.message}`);
-    }
-
-    return this.paymentsService.handleWebhook(event);
+    return this.paymentsService.processWebhook(data, hmac);
   }
 }
