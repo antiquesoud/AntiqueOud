@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useOrders } from '@/hooks/useOrders'
+import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from '@/i18n/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,8 +17,19 @@ import { useTranslations } from 'next-intl'
 
 export default function OrdersPage() {
   const t = useTranslations('account.ordersPage')
+  const router = useRouter()
+  const { isAuthenticated, hasHydrated } = useAuth()
   const [page, setPage] = useState(1)
+
+  // Only fetch orders when authenticated
   const { data, isLoading } = useOrders(page, 10)
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [hasHydrated, isAuthenticated, router])
 
   const statusConfig = {
     PENDING: { label: t('statuses.pending'), icon: Clock, color: 'bg-yellow-100 text-yellow-800' },
@@ -49,6 +62,17 @@ export default function OrdersPage() {
     } catch (error) {
       toast.error(t('failedToDownloadInvoice'))
     }
+  }
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {

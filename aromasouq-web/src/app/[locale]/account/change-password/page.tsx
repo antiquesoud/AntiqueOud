@@ -2,14 +2,23 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ChangePasswordPage() {
   const router = useRouter();
+  const { isAuthenticated, hasHydrated } = useAuth();
   const t = useTranslations('account.changePasswordPage');
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [hasHydrated, isAuthenticated, router]);
 
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -62,6 +71,17 @@ export default function ChangePasswordPage() {
       newPassword: formData.newPassword,
     });
   };
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto py-12 px-4">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-12 px-4">

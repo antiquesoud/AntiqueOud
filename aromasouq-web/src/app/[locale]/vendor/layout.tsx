@@ -28,14 +28,24 @@ export default function VendorLayout({
 }) {
   const t = useTranslations('vendor.layout')
   const tCommon = useTranslations('common')
-  const { user, isAuthenticated, isVendor, logout } = useAuth()
+  const { user, isAuthenticated, isVendor, hasHydrated, logout } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isAuthenticated || !isVendor) {
+    // Only check auth after hydration is complete
+    if (hasHydrated && (!isAuthenticated || !isVendor)) {
       router.push('/login')
     }
-  }, [isAuthenticated, isVendor, router])
+  }, [hasHydrated, isAuthenticated, isVendor, router])
+
+  // Show loading state while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+      </div>
+    )
+  }
 
   if (!isAuthenticated || !isVendor) {
     return null

@@ -1,9 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { useRouter } from '@/i18n/navigation';
 import { Coins, TrendingUp, TrendingDown, History, ShoppingBag, Star, Gift, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/hooks/useAuth';
 
 interface CoinsHistoryData {
   balance: number;
@@ -20,13 +23,23 @@ interface CoinsHistoryData {
 }
 
 export default function CoinsHistoryPage() {
+  const router = useRouter();
+  const { isAuthenticated, hasHydrated } = useAuth();
   const t = useTranslations('account.coinsHistoryPage');
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [hasHydrated, isAuthenticated, router]);
 
   const { data, isLoading } = useQuery<CoinsHistoryData>({
     queryKey: ['coins-history'],
     queryFn: async () => {
       return await apiClient.get('/users/coins-history?limit=50');
     },
+    enabled: hasHydrated && isAuthenticated,
   });
 
   const getTransactionIcon = (type: string) => {
@@ -55,6 +68,17 @@ export default function CoinsHistoryPage() {
     };
     return labels[source] || source;
   };
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto py-12 px-4">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <div className="container mx-auto py-12 px-4">{t('loading')}</div>;

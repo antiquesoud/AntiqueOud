@@ -25,7 +25,7 @@ import { useTranslations } from 'next-intl'
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, isAuthenticated, isAdmin, logout } = useAuth()
+  const { user, isAuthenticated, isAdmin, hasHydrated, logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const t = useTranslations('admin.layout')
   const tCommon = useTranslations('common')
@@ -43,10 +43,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ]
 
   useEffect(() => {
-    if (!isAuthenticated || !isAdmin) {
+    // Only check auth after hydration is complete
+    if (hasHydrated && (!isAuthenticated || !isAdmin)) {
       router.push('/login')
     }
-  }, [isAuthenticated, isAdmin, router])
+  }, [hasHydrated, isAuthenticated, isAdmin, router])
+
+  // Show loading state while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+      </div>
+    )
+  }
 
   if (!isAuthenticated || !isAdmin) {
     return null

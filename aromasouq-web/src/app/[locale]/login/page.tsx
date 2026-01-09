@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useAuth } from "@/hooks/useAuth"
-import { useAuthStore } from "@/stores/authStore"
 import { loginSchema, type LoginInput } from "@/lib/validations"
 import toast from "react-hot-toast"
 
@@ -32,14 +31,14 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true)
     try {
-      await login(data.email, data.password)
+      // login now returns the user directly
+      const loggedInUser = await login(data.email, data.password)
       toast.success(t("welcomeBack"))
 
-      // Role-based redirect after successful login
-      const currentUser = useAuthStore.getState().user
-      if (currentUser?.role === 'ADMIN') {
+      // Role-based redirect using returned user (more reliable than getState)
+      if (loggedInUser?.role === 'ADMIN') {
         router.push("/admin")
-      } else if (currentUser?.role === 'VENDOR') {
+      } else if (loggedInUser?.role === 'VENDOR') {
         router.push("/vendor")
       } else {
         router.push("/")  // Customer goes to homepage

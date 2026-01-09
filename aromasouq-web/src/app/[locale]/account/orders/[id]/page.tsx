@@ -1,7 +1,9 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useParams, useRouter } from '@/i18n/navigation'
 import { useOrder, useCancelOrder } from '@/hooks/useOrders'
+import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,7 +21,15 @@ export default function OrderDetailPage() {
   const t = useTranslations('account.orderDetailPage')
   const params = useParams()
   const router = useRouter()
+  const { isAuthenticated, hasHydrated } = useAuth()
   const orderId = params.id as string
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [hasHydrated, isAuthenticated, router])
 
   const { data: order, isLoading } = useOrder(orderId)
   const cancelOrder = useCancelOrder()
@@ -70,6 +80,17 @@ export default function OrderDetailPage() {
     } catch (error) {
       toast.error(t('failedToDownloadInvoice'))
     }
+  }
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {

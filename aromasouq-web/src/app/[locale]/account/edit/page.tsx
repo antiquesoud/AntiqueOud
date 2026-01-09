@@ -8,10 +8,12 @@ import { Upload, Save, X } from 'lucide-react';
 import axios from 'axios';
 import { useTranslations } from 'next-intl';
 import { User } from '@/types/user';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function EditProfilePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { isAuthenticated, hasHydrated } = useAuth();
   const t = useTranslations('account.editProfilePage');
   const tCommon = useTranslations('common');
 
@@ -20,7 +22,15 @@ export default function EditProfilePage() {
     queryFn: async () => {
       return await apiClient.get('/users/profile');
     },
+    enabled: hasHydrated && isAuthenticated,
   });
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [hasHydrated, isAuthenticated, router]);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -115,6 +125,17 @@ export default function EditProfilePage() {
       uploadAvatarMutation.mutate(avatarFile);
     }
   };
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto py-12 px-4">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <div className="container mx-auto py-12 px-4">{t('loading')}</div>;
