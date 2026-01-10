@@ -1,7 +1,48 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { API_URL } from './constants'
-import { getAuthToken } from '@/stores/authStore'
-import { getGuestSessionToken, saveGuestSessionFromResponse } from '@/stores/guestSessionStore'
+
+// Read auth token directly from localStorage (avoids circular dependency with authStore)
+function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const storage = localStorage.getItem('auth-storage')
+    if (storage) {
+      const parsed = JSON.parse(storage)
+      return parsed.state?.token || null
+    }
+  } catch {
+    // Silently fail
+  }
+  return null
+}
+
+// Read guest session token directly from localStorage
+function getGuestSessionToken(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const storage = localStorage.getItem('guest-session-storage')
+    if (storage) {
+      const parsed = JSON.parse(storage)
+      return parsed.state?.sessionToken || null
+    }
+  } catch {
+    // Silently fail
+  }
+  return null
+}
+
+// Save guest session token to localStorage
+function saveGuestSessionFromResponse(data: any): void {
+  if (typeof window === 'undefined' || !data?.guest_session) return
+  try {
+    const current = localStorage.getItem('guest-session-storage')
+    const parsed = current ? JSON.parse(current) : { state: {}, version: 0 }
+    parsed.state.sessionToken = data.guest_session
+    localStorage.setItem('guest-session-storage', JSON.stringify(parsed))
+  } catch {
+    // Silently fail
+  }
+}
 
 class ApiClient {
   private client: AxiosInstance

@@ -18,15 +18,20 @@ export function AuthHydration() {
     if (!hasInitialized.current && typeof window !== 'undefined') {
       hasInitialized.current = true
 
-      // First rehydrate from localStorage to get the token
-      useAuthStore.persist.rehydrate()
+      const initializeAuth = async () => {
+        // First rehydrate from localStorage to get the token
+        // This is async - we must wait for it to complete!
+        await useAuthStore.persist.rehydrate()
 
-      // Then verify with server using the token from localStorage
-      // This handles the case where token has expired
-      fetchUser().finally(() => {
+        // Now the store has the token from localStorage
+        // Verify with server to check if token is still valid
+        await fetchUser()
+
         // Mark as hydrated after server verification completes
         setHasHydrated(true)
-      })
+      }
+
+      initializeAuth()
     }
   }, [fetchUser, setHasHydrated])
 
