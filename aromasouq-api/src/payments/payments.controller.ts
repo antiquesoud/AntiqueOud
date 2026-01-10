@@ -59,6 +59,7 @@ export class PaymentsController {
     const sessionToken = this.sessionService.getOrCreateGuestSession(
       req.cookies,
       res,
+      req,
     );
     if (!sessionToken) {
       throw new UnauthorizedException('Session token required');

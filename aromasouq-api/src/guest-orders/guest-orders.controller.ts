@@ -32,6 +32,7 @@ export class GuestOrdersController {
     const sessionToken = this.sessionService.getOrCreateGuestSession(
       req.cookies,
       res,
+      req,
     );
 
     return this.guestOrdersService.create(sessionToken, createOrderDto);

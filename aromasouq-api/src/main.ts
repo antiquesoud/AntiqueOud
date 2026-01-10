@@ -27,9 +27,46 @@ async function bootstrap() {
   // Cookie parser middleware
   app.use(cookieParser());
 
+  // Build allowed origins list for CORS
+  // Support both www and non-www versions, plus localhost for development
+  const allowedOrigins: string[] = [];
+
+  // Add configured frontend URL
+  const frontendUrl = process.env.FRONTEND_URL;
+  if (frontendUrl) {
+    allowedOrigins.push(frontendUrl);
+    // If it's www, also add non-www version and vice versa
+    if (frontendUrl.includes('://www.')) {
+      allowedOrigins.push(frontendUrl.replace('://www.', '://'));
+    } else if (frontendUrl.includes('://') && !frontendUrl.includes('://www.') && !frontendUrl.includes('localhost')) {
+      allowedOrigins.push(frontendUrl.replace('://', '://www.'));
+    }
+  }
+
+  // Always allow localhost for development
+  allowedOrigins.push('http://localhost:3000', 'http://localhost:3002');
+
+  // Add production domains explicitly as fallback
+  allowedOrigins.push('https://www.antiqueoud.com', 'https://antiqueoud.com');
+
+  console.log('Allowed CORS origins:', allowedOrigins);
+
   // CORS configuration for cookie-based auth
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Log rejected origins for debugging
+      console.warn('CORS rejected origin:', origin);
+      return callback(new Error('Not allowed by CORS'), false);
+    },
     credentials: true, // Allow cookies
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
