@@ -1,20 +1,42 @@
 "use client"
 
-import { Link } from "@/i18n/navigation"
+import { useEffect } from "react"
+import { Link, useRouter } from "@/i18n/navigation"
 import { Heart } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/ui/product-card"
 import { useWishlist } from "@/hooks/useWishlist"
 import { useCart } from "@/hooks/useCart"
+import { useAuth } from "@/hooks/useAuth"
 import { useTranslations } from "next-intl"
 
 export default function WishlistPage() {
+  const router = useRouter()
+  const { isAuthenticated, hasHydrated } = useAuth()
   const t = useTranslations('account')
   const tProducts = useTranslations('products')
   const tCommon = useTranslations('common')
   const { wishlist, isLoading, toggleWishlist } = useWishlist()
   const { addToCart } = useCart()
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [hasHydrated, isAuthenticated, router])
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (
