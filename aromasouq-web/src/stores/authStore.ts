@@ -83,9 +83,12 @@ export const useAuthStore = create<AuthState>()(
       fetchUser: async () => {
         set({ isLoading: true })
         try {
+          console.log('[authStore] Calling /auth/me...')
           const response = await apiClient.get<{ user: User }>('/auth/me')
+          console.log('[authStore] /auth/me SUCCESS:', response.user?.email)
           set({ user: response.user, isAuthenticated: true, isLoading: false })
-        } catch (error) {
+        } catch (error: any) {
+          console.log('[authStore] /auth/me FAILED:', error?.response?.status, error?.message)
           set({ user: null, isAuthenticated: false, isLoading: false })
         }
       },
