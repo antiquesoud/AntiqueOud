@@ -76,10 +76,11 @@ export class AuthController {
       });
     }
 
-    // Return user data without token
+    // Return user data WITH token for Authorization header approach
     return {
       message: 'Registration successful',
       user: result.user,
+      access_token: result.access_token,
       cartMerged: result.cartMerged || false,
     };
   }
@@ -96,7 +97,7 @@ export class AuthController {
     // Get cookie settings based on request context
     const cookieSettings = getCookieSettings(req);
 
-    // Set httpOnly cookie with cross-origin support
+    // Set httpOnly cookie with cross-origin support (keep for backward compatibility)
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
       secure: cookieSettings.secure,
@@ -115,10 +116,11 @@ export class AuthController {
       });
     }
 
-    // Return user data without token
+    // Return user data WITH token for Authorization header approach
     return {
       message: 'Login successful',
       user: result.user,
+      access_token: result.access_token,
       cartMerged: result.cartMerged || false,
     };
   }

@@ -17,12 +17,19 @@ import { ConfigService } from '@nestjs/config';
  *
  * For sensitive operations (orders, payments, profile changes), use the
  * ActiveUserGuard which verifies current database status.
+ *
+ * Token extraction order:
+ * 1. Authorization header (Bearer token) - preferred for cross-origin
+ * 2. Cookie (access_token) - fallback for same-origin
  */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
+        // First try Authorization header (works cross-origin)
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        // Fallback to cookie (for same-origin requests)
         (request: Request) => {
           return request?.cookies?.access_token;
         },

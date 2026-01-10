@@ -22,6 +22,7 @@ export class GuestOrdersController {
 
   /**
    * Create a guest order (checkout)
+   * Returns session token for frontend to store
    */
   @Post()
   async create(
@@ -29,13 +30,15 @@ export class GuestOrdersController {
     @Res({ passthrough: true }) res: Response,
     @Body() createOrderDto: CreateGuestOrderDto,
   ) {
-    const sessionToken = this.sessionService.getOrCreateGuestSession(
-      req.cookies,
-      res,
-      req,
-    );
+    const { sessionToken } = this.sessionService.getOrCreateGuestSessionFromRequest(req, res);
 
-    return this.guestOrdersService.create(sessionToken, createOrderDto);
+    const order = await this.guestOrdersService.create(sessionToken, createOrderDto);
+
+    // Return session token so frontend can store it
+    return {
+      ...order,
+      guest_session: sessionToken,
+    };
   }
 
   /**
