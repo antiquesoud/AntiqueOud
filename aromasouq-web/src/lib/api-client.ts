@@ -1,20 +1,6 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { API_URL } from './constants'
-
-// Read auth token directly from localStorage (avoids circular dependency with authStore)
-function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const storage = localStorage.getItem('auth-storage')
-    if (storage) {
-      const parsed = JSON.parse(storage)
-      return parsed.state?.token || null
-    }
-  } catch {
-    // Silently fail
-  }
-  return null
-}
+import { getAuthToken } from './auth-token'
 
 // Read guest session token directly from localStorage
 function getGuestSessionToken(): string | null {

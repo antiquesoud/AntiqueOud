@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { User } from '@/types'
 import { apiClient } from '@/lib/api-client'
+import { getAuthToken } from '@/lib/auth-token'
 
 interface AuthState {
   user: User | null
@@ -116,11 +117,13 @@ export const useAuthStore = create<AuthState>()(
       },
 
       fetchUser: async () => {
-        const { token } = get()
+        // Read token from localStorage (single source of truth)
+        // This avoids timing issues with zustand rehydration
+        const token = getAuthToken()
 
         // If no token, user is definitely not authenticated
         if (!token) {
-          console.log('[authStore] No token found, skipping /auth/me')
+          console.log('[authStore] No token found in localStorage, skipping /auth/me')
           set({ user: null, isAuthenticated: false, isLoading: false })
           return
         }
@@ -166,19 +169,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 )
-
-// Helper function to get the current token (for api-client)
-export const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') return null
-
-  try {
-    const storage = localStorage.getItem('auth-storage')
-    if (storage) {
-      const parsed = JSON.parse(storage)
-      return parsed.state?.token || null
-    }
-  } catch (e) {
-    console.error('Failed to get auth token from storage:', e)
-  }
-  return null
-}
