@@ -1,7 +1,18 @@
 import type { ReactNode } from 'react';
+import type { Metadata } from 'next';
 
-// This is a minimal root layout - just a passthrough
-// The actual layout with i18n, html/body tags is in app/[locale]/layout.tsx
+export const metadata: Metadata = {
+  title: 'Antique Oud',
+  description: 'Finest Traditional Arabic Oud',
+};
+
+// Root layout must have html/body in Next.js 16+
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <html suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        {children}
+      </body>
+    </html>
+  );
 }
