@@ -1,6 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { randomBytes } from 'crypto';
+
+// Helper to get cookie settings based on request context
+function getCookieSettings(req?: Request): { secure: boolean; sameSite: 'lax' | 'none' | 'strict' } {
+  // If no request, check environment variables
+  const origin = req?.headers?.origin || req?.headers?.referer || '';
+  const host = req?.headers?.host || '';
+
+  // Check if request is from localhost
+  const isLocalhostOrigin = origin.includes('localhost') || origin.includes('127.0.0.1');
+  const isLocalhostHost = host.includes('localhost') || host.includes('127.0.0.1');
+
+  // Check if it's production
+  const isProduction = process.env.NODE_ENV === 'production' ||
+                       !!process.env.RAILWAY_ENVIRONMENT ||
+                       origin.includes('antiqueoud.com');
+
+  // Cross-origin requires SameSite=None and Secure
+  const isCrossOrigin = !isLocalhostOrigin || !isLocalhostHost;
+
+  // In production or cross-origin, always use secure + sameSite none
+  const needsCrossOriginCookies = isProduction || isCrossOrigin;
+
+  return {
+    secure: needsCrossOriginCookies,
+    sameSite: needsCrossOriginCookies ? 'none' : 'lax',
+  };
+}
 
 @Injectable()
 export class SessionService {
@@ -20,19 +47,13 @@ export class SessionService {
    * Set guest session cookie
    * Expires in 30 days
    */
-  setGuestSessionCookie(res: Response, sessionToken: string): void {
-    const isProduction = process.env.NODE_ENV === 'production';
-    const frontendUrl = process.env.FRONTEND_URL || '';
-    const isLocalhostFrontend = frontendUrl.includes('localhost');
-
-    // For cross-origin requests (prod), we need sameSite: 'none' and secure: true
-    // For localhost, use 'lax' which works without secure in dev
-    const isCrossOrigin = isProduction && !isLocalhostFrontend;
+  setGuestSessionCookie(res: Response, sessionToken: string, req?: Request): void {
+    const cookieSettings = getCookieSettings(req);
 
     res.cookie('guest_session', sessionToken, {
       httpOnly: true,
-      secure: isCrossOrigin, // Must be true when sameSite is 'none'
-      sameSite: isCrossOrigin ? 'none' : 'lax',
+      secure: cookieSettings.secure,
+      sameSite: cookieSettings.sameSite,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/',
     });
@@ -48,16 +69,13 @@ export class SessionService {
   /**
    * Clear guest session cookie
    */
-  clearGuestSession(res: Response): void {
-    const isProduction = process.env.NODE_ENV === 'production';
-    const frontendUrl = process.env.FRONTEND_URL || '';
-    const isLocalhostFrontend = frontendUrl.includes('localhost');
-    const isCrossOrigin = isProduction && !isLocalhostFrontend;
+  clearGuestSession(res: Response, req?: Request): void {
+    const cookieSettings = getCookieSettings(req);
 
     res.clearCookie('guest_session', {
       httpOnly: true,
-      secure: isCrossOrigin,
-      sameSite: isCrossOrigin ? 'none' : 'lax',
+      secure: cookieSettings.secure,
+      sameSite: cookieSettings.sameSite,
       path: '/',
     });
   }
@@ -67,13 +85,13 @@ export class SessionService {
    * If guest_session cookie exists and is valid, return it
    * Otherwise generate new session and set cookie
    */
-  getOrCreateGuestSession(cookies: any, res: Response): string {
+  getOrCreateGuestSession(cookies: any, res: Response, req?: Request): string {
     let sessionToken = this.getGuestSession(cookies);
 
     // Validate existing token - if invalid or missing, regenerate
     if (!sessionToken || !this.isValidGuestSession(sessionToken)) {
       sessionToken = this.generateGuestSession();
-      this.setGuestSessionCookie(res, sessionToken);
+      this.setGuestSessionCookie(res, sessionToken, req);
     }
 
     return sessionToken;

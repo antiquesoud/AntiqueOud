@@ -31,6 +31,7 @@ export class GuestCartController {
     const sessionToken = this.sessionService.getOrCreateGuestSession(
       req.cookies,
       res,
+      req,
     );
 
     return this.guestCartService.getCartWithTotals(sessionToken);
@@ -48,6 +49,7 @@ export class GuestCartController {
     const sessionToken = this.sessionService.getOrCreateGuestSession(
       req.cookies,
       res,
+      req,
     );
 
     await this.guestCartService.addItem(
@@ -73,6 +75,7 @@ export class GuestCartController {
     const sessionToken = this.sessionService.getOrCreateGuestSession(
       req.cookies,
       res,
+      req,
     );
 
     await this.guestCartService.updateItemQuantity(
@@ -96,6 +99,7 @@ export class GuestCartController {
     const sessionToken = this.sessionService.getOrCreateGuestSession(
       req.cookies,
       res,
+      req,
     );
 
     await this.guestCartService.removeItem(sessionToken, itemId);
@@ -114,6 +118,7 @@ export class GuestCartController {
     const sessionToken = this.sessionService.getOrCreateGuestSession(
       req.cookies,
       res,
+      req,
     );
 
     return this.guestCartService.clearCart(sessionToken);
