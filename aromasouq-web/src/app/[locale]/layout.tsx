@@ -78,12 +78,17 @@ export default async function LocaleLayout({
   // Get text direction for the current locale
   const direction = localeDirections[locale as keyof typeof localeDirections];
 
+  // Set document attributes via script for proper i18n support
   return (
-    <html lang={locale} dir={direction} suppressHydrationWarning>
-      <body
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.lang="${locale}";document.documentElement.dir="${direction}";`,
+        }}
+      />
+      <div
         className={`${inter.variable} ${changa.variable} ${ibmPlexArabic.variable} antialiased min-h-screen`}
         style={{ fontFamily: locale === 'ar' ? 'var(--font-ibm-plex-arabic)' : 'var(--font-inter)' }}
-        suppressHydrationWarning
       >
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>
@@ -101,7 +106,7 @@ export default async function LocaleLayout({
             />
           </QueryProvider>
         </NextIntlClientProvider>
-      </body>
-    </html>
+      </div>
+    </>
   );
 }
