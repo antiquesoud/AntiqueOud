@@ -1,14 +1,16 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useParams, useRouter } from '@/i18n/navigation'
 import { useOrder, useCancelOrder } from '@/hooks/useOrders'
+import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { Package, ArrowLeft, MapPin, CreditCard, Truck, Star, MessageSquare } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -25,10 +27,18 @@ const statusConfig = {
 export default function OrderDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const { isAuthenticated, hasHydrated } = useAuth()
   const orderId = params.id as string
 
   const { data: order, isLoading } = useOrder(orderId)
   const cancelOrder = useCancelOrder()
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [hasHydrated, isAuthenticated, router])
 
   const handleCancelOrder = async () => {
     if (confirm('Are you sure you want to cancel this order?')) {
@@ -39,6 +49,17 @@ export default function OrderDetailPage() {
         toast.error('Failed to cancel order')
       }
     }
+  }
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {

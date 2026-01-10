@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useOrders } from '@/hooks/useOrders'
+import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from '@/i18n/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { Package, Clock, CheckCircle, XCircle, Truck } from 'lucide-react'
 
@@ -21,8 +23,28 @@ const statusConfig = {
 }
 
 export default function OrdersPage() {
+  const router = useRouter()
+  const { isAuthenticated, hasHydrated } = useAuth()
   const [page, setPage] = useState(1)
   const { data, isLoading } = useOrders(page, 10)
+
+  // Redirect to login if not authenticated (after hydration)
+  useEffect(() => {
+    if (hasHydrated && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [hasHydrated, isAuthenticated, router])
+
+  // Show loading while hydrating
+  if (!hasHydrated) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-oud-gold"></div>
+        </div>
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (

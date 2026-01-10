@@ -33,7 +33,8 @@ class ApiClient {
             const currentPath = window.location.pathname
 
             // Pages that handle their own auth logic - don't interfere
-            const selfHandledPaths = ['/order-success', '/payment-failed', '/payment-cancelled', '/checkout']
+            // Account, admin, vendor pages have their own redirect logic in layouts/pages
+            const selfHandledPaths = ['/order-success', '/payment-failed', '/payment-cancelled', '/checkout', '/account', '/admin', '/vendor', '/orders', '/wishlist']
             const isSelfHandledPath = selfHandledPaths.some(path => currentPath.includes(path))
 
             // Don't clear auth or redirect for pages that handle their own auth
