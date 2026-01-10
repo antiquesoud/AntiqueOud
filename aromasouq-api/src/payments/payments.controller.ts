@@ -55,12 +55,8 @@ export class PaymentsController {
     @Body() body: { orderId: string; paymentMethod?: 'card' | 'google_pay' | 'apple_pay' },
     @Query('locale') locale: string = 'en',
   ) {
-    // Get session token from cookies via SessionService
-    const sessionToken = this.sessionService.getOrCreateGuestSession(
-      req.cookies,
-      res,
-      req,
-    );
+    // Get session token from header or cookies via SessionService
+    const { sessionToken } = this.sessionService.getOrCreateGuestSessionFromRequest(req, res);
     if (!sessionToken) {
       throw new UnauthorizedException('Session token required');
     }

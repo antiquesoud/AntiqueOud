@@ -25,20 +25,23 @@ export class GuestCartController {
   /**
    * Get guest cart
    * Creates session if doesn't exist
+   * Returns session token for frontend to store
    */
   @Get()
   async getCart(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const sessionToken = this.sessionService.getOrCreateGuestSession(
-      req.cookies,
-      res,
-      req,
-    );
+    const { sessionToken, isNew } = this.sessionService.getOrCreateGuestSessionFromRequest(req, res);
+    const cart = await this.guestCartService.getCartWithTotals(sessionToken);
 
-    return this.guestCartService.getCartWithTotals(sessionToken);
+    // Always return session token so frontend can store it
+    return {
+      ...cart,
+      guest_session: sessionToken,
+    };
   }
 
   /**
    * Add item to guest cart
+   * Returns session token for frontend to store
    */
   @Post('items')
   async addItem(
@@ -46,11 +49,7 @@ export class GuestCartController {
     @Res({ passthrough: true }) res: Response,
     @Body() addToCartDto: AddToCartDto,
   ) {
-    const sessionToken = this.sessionService.getOrCreateGuestSession(
-      req.cookies,
-      res,
-      req,
-    );
+    const { sessionToken } = this.sessionService.getOrCreateGuestSessionFromRequest(req, res);
 
     await this.guestCartService.addItem(
       sessionToken,
@@ -59,11 +58,18 @@ export class GuestCartController {
       addToCartDto.variantId,
     );
 
-    return this.guestCartService.getCartWithTotals(sessionToken);
+    const cart = await this.guestCartService.getCartWithTotals(sessionToken);
+
+    // Always return session token so frontend can store it
+    return {
+      ...cart,
+      guest_session: sessionToken,
+    };
   }
 
   /**
    * Update cart item quantity
+   * Returns session token for frontend to store
    */
   @Patch('items/:itemId')
   async updateItemQuantity(
@@ -72,11 +78,7 @@ export class GuestCartController {
     @Param('itemId') itemId: string,
     @Body() updateQuantityDto: UpdateQuantityDto,
   ) {
-    const sessionToken = this.sessionService.getOrCreateGuestSession(
-      req.cookies,
-      res,
-      req,
-    );
+    const { sessionToken } = this.sessionService.getOrCreateGuestSessionFromRequest(req, res);
 
     await this.guestCartService.updateItemQuantity(
       sessionToken,
@@ -84,11 +86,18 @@ export class GuestCartController {
       updateQuantityDto.quantity,
     );
 
-    return this.guestCartService.getCartWithTotals(sessionToken);
+    const cart = await this.guestCartService.getCartWithTotals(sessionToken);
+
+    // Always return session token so frontend can store it
+    return {
+      ...cart,
+      guest_session: sessionToken,
+    };
   }
 
   /**
    * Remove item from cart
+   * Returns session token for frontend to store
    */
   @Delete('items/:itemId')
   async removeItem(
@@ -96,31 +105,36 @@ export class GuestCartController {
     @Res({ passthrough: true }) res: Response,
     @Param('itemId') itemId: string,
   ) {
-    const sessionToken = this.sessionService.getOrCreateGuestSession(
-      req.cookies,
-      res,
-      req,
-    );
+    const { sessionToken } = this.sessionService.getOrCreateGuestSessionFromRequest(req, res);
 
     await this.guestCartService.removeItem(sessionToken, itemId);
 
-    return this.guestCartService.getCartWithTotals(sessionToken);
+    const cart = await this.guestCartService.getCartWithTotals(sessionToken);
+
+    // Always return session token so frontend can store it
+    return {
+      ...cart,
+      guest_session: sessionToken,
+    };
   }
 
   /**
    * Clear entire cart
+   * Returns session token for frontend to store
    */
   @Delete()
   async clearCart(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const sessionToken = this.sessionService.getOrCreateGuestSession(
-      req.cookies,
-      res,
-      req,
-    );
+    const { sessionToken } = this.sessionService.getOrCreateGuestSessionFromRequest(req, res);
 
-    return this.guestCartService.clearCart(sessionToken);
+    const result = await this.guestCartService.clearCart(sessionToken);
+
+    // Always return session token so frontend can store it
+    return {
+      ...result,
+      guest_session: sessionToken,
+    };
   }
 }

@@ -1,5 +1,7 @@
-import axios, { AxiosInstance, AxiosError } from 'axios'
+import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { API_URL } from './constants'
+import { getAuthToken } from '@/stores/authStore'
+import { getGuestSessionToken, saveGuestSessionFromResponse } from '@/stores/guestSessionStore'
 
 class ApiClient {
   private client: AxiosInstance
@@ -7,15 +9,41 @@ class ApiClient {
   constructor() {
     this.client = axios.create({
       baseURL: API_URL,
-      withCredentials: true, // Important for cookies
+      withCredentials: true, // Keep for backward compatibility with cookies
       headers: {
         'Content-Type': 'application/json',
       },
     })
 
-    // Response interceptor for error handling
+    // Request interceptor to add Authorization header and guest session header
+    this.client.interceptors.request.use(
+      (config: InternalAxiosRequestConfig) => {
+        const token = getAuthToken()
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+        } else {
+          // If not authenticated, add guest session header for guest cart/checkout
+          const guestSession = getGuestSessionToken()
+          if (guestSession) {
+            config.headers['X-Guest-Session'] = guestSession
+          }
+        }
+        return config
+      },
+      (error) => {
+        return Promise.reject(error)
+      }
+    )
+
+    // Response interceptor for error handling and guest session saving
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        // Save guest session token from API responses
+        if (response.data?.guest_session) {
+          saveGuestSessionFromResponse(response.data)
+        }
+        return response
+      },
       (error: AxiosError) => {
         if (error.response?.status === 401) {
           // Check if this is a guest endpoint - don't redirect for these
@@ -34,11 +62,15 @@ class ApiClient {
 
             // Pages that handle their own auth logic - don't interfere
             // Account, admin, vendor pages have their own redirect logic in layouts/pages
-            const selfHandledPaths = ['/order-success', '/payment-failed', '/payment-cancelled', '/checkout', '/account', '/admin', '/vendor', '/orders', '/wishlist']
+            const selfHandledPaths = ['/order-success', '/payment-failed', '/payment-cancelled', '/checkout', '/account', '/admin', '/vendor', '/orders', '/wishlist', '/auth/me']
             const isSelfHandledPath = selfHandledPaths.some(path => currentPath.includes(path))
 
+            // Also check if the request was to /auth/me - let the authStore handle this
+            const isAuthMeRequest = requestUrl.includes('/auth/me')
+
             // Don't clear auth or redirect for pages that handle their own auth
-            if (isSelfHandledPath) {
+            // or for /auth/me requests (authStore handles these)
+            if (isSelfHandledPath || isAuthMeRequest) {
               return Promise.reject(error)
             }
 
@@ -48,6 +80,7 @@ class ApiClient {
               if (authStorage) {
                 const parsed = JSON.parse(authStorage)
                 parsed.state.user = null
+                parsed.state.token = null
                 parsed.state.isAuthenticated = false
                 localStorage.setItem('auth-storage', JSON.stringify(parsed))
               }

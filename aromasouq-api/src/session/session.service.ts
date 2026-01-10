@@ -60,7 +60,27 @@ export class SessionService {
   }
 
   /**
-   * Get guest session from cookie
+   * Get guest session from header (X-Guest-Session) or cookie
+   * Header takes priority for cross-origin support
+   */
+  getGuestSessionFromRequest(req: Request): string | null {
+    // First try X-Guest-Session header (works cross-origin)
+    const headerSession = req.headers['x-guest-session'] as string | undefined;
+    if (headerSession && this.isValidGuestSession(headerSession)) {
+      return headerSession;
+    }
+
+    // Fallback to cookie (for same-origin or backward compatibility)
+    const cookieSession = req.cookies?.guest_session;
+    if (cookieSession && this.isValidGuestSession(cookieSession)) {
+      return cookieSession;
+    }
+
+    return null;
+  }
+
+  /**
+   * Get guest session from cookie only (legacy method)
    */
   getGuestSession(cookies: any): string | null {
     return cookies?.guest_session || null;
@@ -82,8 +102,27 @@ export class SessionService {
 
   /**
    * Get or create guest session
-   * If guest_session cookie exists and is valid, return it
-   * Otherwise generate new session and set cookie
+   * Checks header first, then cookie, then creates new session
+   * Returns object with session token and whether it was newly created
+   */
+  getOrCreateGuestSessionFromRequest(req: Request, res: Response): { sessionToken: string; isNew: boolean } {
+    // Try to get existing session from header or cookie
+    let sessionToken = this.getGuestSessionFromRequest(req);
+    let isNew = false;
+
+    // If no valid session, create a new one
+    if (!sessionToken) {
+      sessionToken = this.generateGuestSession();
+      this.setGuestSessionCookie(res, sessionToken, req);
+      isNew = true;
+    }
+
+    return { sessionToken, isNew };
+  }
+
+  /**
+   * Legacy method - Get or create guest session (cookie-based)
+   * Kept for backward compatibility
    */
   getOrCreateGuestSession(cookies: any, res: Response, req?: Request): string {
     let sessionToken = this.getGuestSession(cookies);
