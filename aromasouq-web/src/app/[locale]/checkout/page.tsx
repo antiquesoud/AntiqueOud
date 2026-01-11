@@ -170,14 +170,27 @@ export default function CheckoutPage() {
     },
   })
 
+  // Separate test products from regular products for tax/shipping calculation
+  const testProductSubtotal = cart?.items?.reduce((sum: number, item: any) => {
+    if (item.product?.slug?.includes('test')) {
+      const price = item.variant?.price || item.product?.salePrice || item.product?.price || 0
+      return sum + (price * item.quantity)
+    }
+    return sum
+  }, 0) || 0
+
+  const regularProductSubtotal = (cart?.summary?.subtotal || 0) - testProductSubtotal
+  const hasOnlyTestProducts = regularProductSubtotal === 0 && testProductSubtotal > 0
+
   // Calculate shipping cost based on delivery method
+  // Only apply shipping if there are regular products
   const shippingCosts: Record<DeliveryMethod, number> = {
-    standard: (cart?.summary?.subtotal || 0) >= 300 ? 0 : 25,
+    standard: regularProductSubtotal >= 300 ? 0 : 25,
     express: 25,
     sameDay: 50,
   }
 
-  const shippingCost = shippingCosts[deliveryMethod]
+  const shippingCost = hasOnlyTestProducts ? 0 : shippingCosts[deliveryMethod]
 
   // Calculate coupon discount
   const couponDiscount = appliedCoupon?.discountAmount || 0
@@ -192,7 +205,9 @@ export default function CheckoutPage() {
   const coinsDiscount = coinsToUse * 0.1
   const subtotal = cart?.summary?.subtotal || 0
   const totalDiscount = couponDiscount + coinsDiscount
-  const taxAmount = (subtotal - totalDiscount + shippingCost) * 0.05
+  // Only apply tax to regular products (test products are exempt)
+  const taxableAmount = Math.max(0, regularProductSubtotal - totalDiscount + shippingCost)
+  const taxAmount = hasOnlyTestProducts ? 0 : taxableAmount * 0.05
   const finalTotal = subtotal - totalDiscount + shippingCost + taxAmount
 
   // Handler for coupon validation

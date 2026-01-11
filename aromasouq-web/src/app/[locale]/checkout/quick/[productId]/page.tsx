@@ -185,7 +185,10 @@ export default function QuickCheckoutPage() {
     ? product.variants?.find((v) => v.id === selectedVariant)?.price || product.regularPrice
     : product.salePrice || product.regularPrice
 
-  const deliveryCost = deliveryMethod === 'EXPRESS' ? 25 : 15
+  // Check if this is a test product (exempt from tax and shipping)
+  const isTestProduct = product.slug?.includes('test') || false
+
+  const deliveryCost = isTestProduct ? 0 : (deliveryMethod === 'EXPRESS' ? 25 : 15)
   const giftWrappingCost = giftOptions?.giftWrapping
     ? giftOptions.giftWrapping === 'BASIC'
       ? 10
@@ -203,7 +206,8 @@ export default function QuickCheckoutPage() {
   // Coupon discount
   const couponDiscount = appliedCoupon?.discountAmount || 0
 
-  const tax = (subtotal - coinDiscount - couponDiscount + deliveryCost + giftWrappingCost) * 0.05
+  // Test products are exempt from tax
+  const tax = isTestProduct ? 0 : (subtotal - coinDiscount - couponDiscount + deliveryCost + giftWrappingCost) * 0.05
   const total = subtotal - coinDiscount - couponDiscount + deliveryCost + giftWrappingCost + tax
 
   return (
