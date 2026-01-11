@@ -64,7 +64,11 @@ export class CheckoutService {
 
     // Calculate totals
     const subtotal = price * quantity;
-    const shippingFee = deliveryMethod === 'EXPRESS' ? 25 : deliveryMethod === 'STANDARD' ? 15 : 0;
+
+    // Check if this is a test product (exempt from tax and shipping)
+    const isTestProduct = product.slug?.includes('test');
+
+    const shippingFee = isTestProduct ? 0 : (deliveryMethod === 'EXPRESS' ? 25 : deliveryMethod === 'STANDARD' ? 15 : 0);
 
     // Calculate gift wrapping cost
     let giftWrappingCost = 0;
@@ -117,7 +121,8 @@ export class CheckoutService {
     // Total discount = coupon discount + coins discount
     const totalDiscount = couponDiscount + coinsDiscount;
 
-    const tax = (subtotal - totalDiscount + shippingFee + giftWrappingCost) * 0.05;
+    // Test products are exempt from tax
+    const tax = isTestProduct ? 0 : (subtotal - totalDiscount + shippingFee + giftWrappingCost) * 0.05;
     const total = subtotal - totalDiscount + shippingFee + giftWrappingCost + tax;
 
     // Calculate coins to earn

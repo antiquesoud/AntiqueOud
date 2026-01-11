@@ -109,8 +109,14 @@ export class CartService {
     });
 
     const itemCount = transformedItems.reduce((sum, item) => sum + item.quantity, 0);
-    const tax = subtotal * 0.05; // 5% tax
-    const shipping = subtotal > 200 ? 0 : 25; // Free shipping over 200 AED
+
+    // Check if cart contains test product (exempt from tax and shipping)
+    const hasTestProduct = cart.items.some(
+      (item) => item.product.slug?.includes('test')
+    );
+
+    const tax = hasTestProduct ? 0 : subtotal * 0.05; // 5% tax, exempt for test products
+    const shipping = hasTestProduct ? 0 : (subtotal > 200 ? 0 : 25); // Free shipping over 200 AED, exempt for test products
     const total = subtotal + tax + shipping;
     const coinsEarnable = Math.floor(total / 10); // 1 coin per 10 AED
 

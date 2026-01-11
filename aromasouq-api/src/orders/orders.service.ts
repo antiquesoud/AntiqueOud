@@ -237,9 +237,15 @@ export class OrdersService {
       couponId = couponValidation.coupon.id;
     }
 
+    // Check if cart contains test product (exempt from tax and shipping)
+    const hasTestProduct = cart.items.some(
+      (item) => item.product.slug?.includes('test')
+    );
+
     // Calculate tax and shipping (simplified for MVP)
-    const tax = subtotal * 0.05; // 5% tax
-    const shippingFee = subtotal > 200 ? 0 : 25; // Free shipping over 200 AED
+    // Test products are exempt from tax and shipping for testing purposes
+    const tax = hasTestProduct ? 0 : subtotal * 0.05; // 5% tax
+    const shippingFee = hasTestProduct ? 0 : (subtotal > 200 ? 0 : 25); // Free shipping over 200 AED
 
     // Handle coins usage
     let coinsDiscount = 0;
