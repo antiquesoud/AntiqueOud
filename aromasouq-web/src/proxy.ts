@@ -11,10 +11,13 @@ const intlMiddleware = createMiddleware({
 })
 
 // Routes that require authentication
-// Note: /cart and /checkout removed to support guest users with guest-checkout flow
-const protectedRoutes = ['/account', '/orders', '/wishlist']
-const vendorRoutes = ['/vendor']
-const adminRoutes = ['/admin']
+// DISABLED: Cookie-based server-side auth check doesn't work with cross-origin deployments
+// (frontend on antiqueoud.com, backend on railway.app - cookies blocked by browsers)
+// Authentication is handled client-side via localStorage + Bearer tokens.
+// Each protected page has its own useEffect redirect logic after auth hydration.
+const protectedRoutes: string[] = []  // Was: ['/account', '/orders', '/wishlist']
+const vendorRoutes: string[] = []     // Was: ['/vendor']
+const adminRoutes: string[] = []      // Was: ['/admin']
 
 // Routes that should redirect to home if already authenticated
 const authRoutes = ['/login', '/register']
