@@ -788,6 +788,8 @@ export class ProductsService {
     const variant = await this.prisma.productVariant.create({
       data: {
         ...createVariantDto,
+        // Use name as size fallback if size not provided (size is required in DB)
+        size: createVariantDto.size || createVariantDto.name,
         productId,
       },
     });

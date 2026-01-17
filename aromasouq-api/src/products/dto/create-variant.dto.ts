@@ -8,8 +8,9 @@ export class CreateVariantDto {
   @IsString()
   nameAr?: string;
 
+  @IsOptional()
   @IsString()
-  size: string;
+  size?: string;
 
   @IsString()
   sku: string;
