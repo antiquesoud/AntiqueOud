@@ -59,10 +59,20 @@ export function useCart() {
               ...previousCart.items,
               {
                 id: `temp-${Date.now()}`, // Temporary ID until server responds
+                cartId: previousCart.id,
                 productId: newItem.productId,
                 variantId: newItem.variantId,
                 quantity: newItem.quantity,
-                product: { id: newItem.productId, name: 'Loading...', images: [] },
+                product: {
+                  id: newItem.productId,
+                  name: 'Loading...',
+                  slug: '',
+                  image: '',
+                  images: [],
+                  price: 0,
+                  stockQuantity: 999,
+                  coinsToAward: 0,
+                },
               } as CartItem,
             ]
 
