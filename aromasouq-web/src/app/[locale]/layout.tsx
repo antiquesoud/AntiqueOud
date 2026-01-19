@@ -88,7 +88,7 @@ export default async function LocaleLayout({
       />
       <div
         className={`${inter.variable} ${changa.variable} ${ibmPlexArabic.variable} antialiased min-h-screen`}
-        style={{ fontFamily: locale === 'ar' ? 'var(--font-ibm-plex-arabic)' : 'var(--font-inter)' }}
+        style={{ fontFamily: locale === 'ar' ? 'var(--font-ibm-plex-arabic)' : 'var(--font-changa)' }}
       >
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>

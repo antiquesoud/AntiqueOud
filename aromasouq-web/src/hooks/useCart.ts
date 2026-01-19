@@ -5,12 +5,13 @@ import toast from 'react-hot-toast'
 import { useAuthStore } from '@/stores/authStore'
 
 /**
- * Cart Hook with Optimistic Updates
+ * Cart Hook with Optimistic Updates (Industry-Grade)
  *
  * Performance optimizations:
- * - Optimistic updates for instant UI feedback
- * - Rollback on error
- * - Debounced invalidation
+ * - Optimistic updates for instant UI feedback (like Amazon, Shopify)
+ * - Immediate rollback on error
+ * - Fresh data on every mount (staleTime: 0)
+ * - Proper cache cleanup with gcTime
  */
 export function useCart() {
   const queryClient = useQueryClient()
@@ -24,19 +25,68 @@ export function useCart() {
     queryKey: cartQueryKey,
     queryFn: () => apiClient.get<Cart>(cartEndpoint),
     refetchOnWindowFocus: false,
-    retry: false, // Don't retry on error to prevent multiple 401 redirects
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: false,
+    staleTime: 0, // Always fetch fresh - cart data should be accurate
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 min for background updates
   })
 
+  // Optimistic add to cart - instant UI update
   const addToCart = useMutation({
     mutationFn: (data: { productId: string; variantId?: string; quantity: number }) =>
-      apiClient.post<Cart>(`${cartEndpoint}/items`, data),
-    onSuccess: () => {
-      // Just invalidate queries - let the calling component show the toast
-      // This prevents duplicate notifications
-      queryClient.invalidateQueries({ queryKey: ['cart'] })
+      apiClient.post(`${cartEndpoint}/items`, data), // Returns CartItem, not full Cart
+    onMutate: async (newItem) => {
+      // Cancel any outgoing refetches to prevent overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: cartQueryKey })
+
+      // Snapshot the previous cart
+      const previousCart = queryClient.getQueryData<Cart>(cartQueryKey)
+
+      // Optimistically update cart count immediately
+      if (previousCart) {
+        const existingItem = previousCart.items.find(
+          (item: CartItem) =>
+            item.productId === newItem.productId &&
+            item.variantId === newItem.variantId
+        )
+
+        const updatedItems = existingItem
+          ? previousCart.items.map((item: CartItem) =>
+              item.productId === newItem.productId && item.variantId === newItem.variantId
+                ? { ...item, quantity: item.quantity + newItem.quantity }
+                : item
+            )
+          : [
+              ...previousCart.items,
+              {
+                id: `temp-${Date.now()}`, // Temporary ID until server responds
+                productId: newItem.productId,
+                variantId: newItem.variantId,
+                quantity: newItem.quantity,
+                product: { id: newItem.productId, name: 'Loading...', images: [] },
+              } as CartItem,
+            ]
+
+        queryClient.setQueryData<Cart>(cartQueryKey, {
+          ...previousCart,
+          items: updatedItems,
+          summary: {
+            ...previousCart.summary,
+            itemCount: (previousCart.summary?.itemCount || 0) + newItem.quantity,
+          },
+        })
+      }
+
+      return { previousCart }
     },
-    onError: () => {
+    onSuccess: () => {
+      // Server returns CartItem, not full Cart - invalidate to fetch updated cart
+      queryClient.invalidateQueries({ queryKey: cartQueryKey })
+    },
+    onError: (_err, _vars, context) => {
+      // Rollback to previous cart on error
+      if (context?.previousCart) {
+        queryClient.setQueryData(cartQueryKey, context.previousCart)
+      }
       toast.error('Failed to add to cart')
     },
   })
@@ -144,28 +194,62 @@ export function useCart() {
   const clearCart = useMutation({
     mutationFn: () => apiClient.delete(cartEndpoint),
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: cartQueryKey })
+      // Cancel all cart queries immediately
+      await queryClient.cancelQueries({ queryKey: ['cart'] })
       const previousCart = queryClient.getQueryData<Cart>(cartQueryKey)
 
-      // Optimistically clear
-      if (previousCart) {
-        queryClient.setQueryData<Cart>(cartQueryKey, {
-          ...previousCart,
-          items: [],
-        })
+      // Immediately clear cart in cache - zero items
+      const emptyCart: Cart = {
+        id: previousCart?.id || '',
+        items: [],
+        summary: {
+          subtotal: 0,
+          shipping: 0,
+          tax: 0,
+          total: 0,
+          itemCount: 0,
+          coinsEarnable: 0,
+        },
       }
+
+      // Set empty cart for both user and guest to ensure UI updates
+      queryClient.setQueryData<Cart>(['cart', 'user'], emptyCart)
+      queryClient.setQueryData<Cart>(['cart', 'guest'], emptyCart)
 
       return { previousCart }
     },
     onError: (_err, _vars, context) => {
+      // Only rollback if there was a previous cart
       if (context?.previousCart) {
         queryClient.setQueryData(cartQueryKey, context.previousCart)
       }
     },
     onSettled: () => {
+      // Final sync - invalidate all cart queries
       queryClient.invalidateQueries({ queryKey: ['cart'] })
     },
   })
+
+  // Immediate cart clear without API call (for after successful purchase)
+  const clearCartImmediate = () => {
+    const emptyCart: Cart = {
+      id: '',
+      items: [],
+      summary: {
+        subtotal: 0,
+        shipping: 0,
+        tax: 0,
+        total: 0,
+        itemCount: 0,
+        coinsEarnable: 0,
+      },
+    }
+    // Clear both user and guest carts immediately
+    queryClient.setQueryData<Cart>(['cart', 'user'], emptyCart)
+    queryClient.setQueryData<Cart>(['cart', 'guest'], emptyCart)
+    // Then invalidate to sync with server
+    queryClient.invalidateQueries({ queryKey: ['cart'] })
+  }
 
   return {
     cart,
@@ -176,6 +260,7 @@ export function useCart() {
     updateCartItem: updateCartItem.mutate,
     removeFromCart: removeFromCart.mutate,
     clearCart: clearCart.mutate,
+    clearCartImmediate, // For instant clear after purchase
     itemCount: cart?.summary?.itemCount || 0,
   }
 }

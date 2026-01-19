@@ -92,17 +92,6 @@ export function Header() {
                     {tNav('allProducts')}
                   </Link>
                   <Link
-                    href="/products?categorySlug=perfumes"
-                    className={cn(
-                      "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
-                      categorySlug === 'perfumes'
-                        ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
-                        : "hover:bg-gray-50"
-                    )}
-                  >
-                    {tNav('perfumes')}
-                  </Link>
-                  <Link
                     href="/products?categorySlug=oud"
                     className={cn(
                       "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
@@ -122,18 +111,51 @@ export function Header() {
                         : "hover:bg-gray-50"
                     )}
                   >
-                    {tNav('dehnOud')}
+                    {tNav('dehnalOud')}
                   </Link>
                   <Link
-                    href="/products?categorySlug=body-spray"
+                    href="/products?categorySlug=perfumes"
                     className={cn(
                       "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
-                      categorySlug === 'body-spray'
+                      categorySlug === 'perfumes'
+                        ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
+                        : "hover:bg-gray-50"
+                    )}
+                  >
+                    {tNav('perfumes')}
+                  </Link>
+                  <Link
+                    href="/products?categorySlug=all-over-spray"
+                    className={cn(
+                      "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
+                      categorySlug === 'all-over-spray'
                         ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
                         : "hover:bg-gray-50"
                     )}
                   >
                     {tNav('allOverSpray')}
+                  </Link>
+                  <Link
+                    href="/products?categorySlug=air-freshener"
+                    className={cn(
+                      "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
+                      categorySlug === 'air-freshener'
+                        ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
+                        : "hover:bg-gray-50"
+                    )}
+                  >
+                    {tNav('airFreshener')}
+                  </Link>
+                  <Link
+                    href="/products?categorySlug=dakhoon-oud-muattar"
+                    className={cn(
+                      "text-base font-semibold py-2 px-4 rounded-lg transition-colors",
+                      categorySlug === 'dakhoon-oud-muattar'
+                        ? "bg-gradient-to-r from-amber-50 to-orange-50 text-[var(--color-oud-gold)]"
+                        : "hover:bg-gray-50"
+                    )}
+                  >
+                    {tNav('dakhoonOudMuattar')}
                   </Link>
                   <Link
                     href="/products?categorySlug=limited-edition"
@@ -185,11 +207,11 @@ export function Header() {
           </div>
 
           {/* Desktop Navigation - Centered */}
-          <nav className="hidden lg:flex items-center justify-center gap-1 flex-1">
+          <nav className="hidden lg:flex items-center justify-center gap-0.5 flex-1">
             <Link
               href="/products"
               className={cn(
-                "px-4 py-2 text-sm font-bold transition-all rounded-lg",
+                "px-2 py-1.5 text-xs font-bold transition-all rounded-md whitespace-nowrap",
                 pathname === '/products' && !categorySlug
                   ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
                   : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
@@ -198,20 +220,9 @@ export function Header() {
               {tNav('allProducts')}
             </Link>
             <Link
-              href="/products?categorySlug=perfumes"
-              className={cn(
-                "px-4 py-2 text-sm font-bold transition-all rounded-lg",
-                categorySlug === 'perfumes'
-                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
-                  : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
-              )}
-            >
-              {tNav('perfumes')}
-            </Link>
-            <Link
               href="/products?categorySlug=oud"
               className={cn(
-                "px-4 py-2 text-sm font-bold transition-all rounded-lg",
+                "px-2 py-1.5 text-xs font-bold transition-all rounded-md whitespace-nowrap",
                 categorySlug === 'oud'
                   ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
                   : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
@@ -220,31 +231,64 @@ export function Header() {
               {tNav('oud')}
             </Link>
             <Link
-              href="/products?categorySlug=attars"
+              href="/products?categorySlug=dehnal-oud"
               className={cn(
-                "px-4 py-2 text-sm font-bold transition-all rounded-lg",
-                categorySlug === 'attars'
+                "px-2 py-1.5 text-xs font-bold transition-all rounded-md whitespace-nowrap",
+                categorySlug === 'dehnal-oud'
                   ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
                   : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
               )}
             >
-              {tNav('attars')}
+              {tNav('dehnalOud')}
             </Link>
             <Link
-              href="/products?categorySlug=bakhoor"
+              href="/products?categorySlug=perfumes"
               className={cn(
-                "px-4 py-2 text-sm font-bold transition-all rounded-lg",
-                categorySlug === 'bakhoor'
+                "px-2 py-1.5 text-xs font-bold transition-all rounded-md whitespace-nowrap",
+                categorySlug === 'perfumes'
                   ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
                   : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
               )}
             >
-              {tNav('bakhoor')}
+              {tNav('perfumes')}
+            </Link>
+            <Link
+              href="/products?categorySlug=all-over-spray"
+              className={cn(
+                "px-2 py-1.5 text-xs font-bold transition-all rounded-md whitespace-nowrap",
+                categorySlug === 'all-over-spray'
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                  : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
+              )}
+            >
+              {tNav('allOverSpray')}
+            </Link>
+            <Link
+              href="/products?categorySlug=air-freshener"
+              className={cn(
+                "px-2 py-1.5 text-xs font-bold transition-all rounded-md whitespace-nowrap",
+                categorySlug === 'air-freshener'
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                  : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
+              )}
+            >
+              {tNav('airFreshener')}
+            </Link>
+            <Link
+              href="/products?categorySlug=dakhoon-oud-muattar"
+              className={cn(
+                "px-2 py-1.5 text-xs font-bold transition-all rounded-md whitespace-nowrap",
+                categorySlug === 'dakhoon-oud-muattar'
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
+                  : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"
+              )}
+            >
+              {tNav('dakhoonOudMuattar')}
             </Link>
             <Link
               href="/products?categorySlug=limited-edition"
               className={cn(
-                "px-4 py-2 text-sm font-bold transition-all rounded-lg",
+                "px-2 py-1.5 text-xs font-bold transition-all rounded-md whitespace-nowrap",
                 categorySlug === 'limited-edition'
                   ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md"
                   : "text-gray-700 hover:bg-amber-50 hover:text-[var(--color-oud-gold)]"

@@ -11,17 +11,19 @@ import { Category } from '@/lib/api/homepage';
 import { translateCategory } from '@/lib/translation-helpers';
 import { ArabicBorder } from '@/components/ui/arabic-border';
 
-// Mapping categories to images - 5 categories now
+// Mapping categories to images - 7 client categories
 const categoryImages: Record<string, string> = {
-  'oud': '/perfume-images/antik-posts9.jpg', // Oudh - keep same image
-  'perfumes': '/perfume-images/antik-posts6.jpg', // Perfume
-  'body-spray': '/perfume-images/antik-posts7.jpg', // Body Spray
-  'dehnal-oud': '/perfume-images/antik-posts11.jpg', // Dehnal Oud
-  'limited-edition': '/perfume-images/antik-posts2.jpg', // Limited Edition
+  'oud': '/perfume-images/antik-posts9.jpg',
+  'dehnal-oud': '/perfume-images/antik-posts11.jpg',
+  'perfumes': '/perfume-images/antik-posts6.jpg',
+  'all-over-spray': '/perfume-images/antik-posts7.jpg',
+  'air-freshener': '/perfume-images/antik-posts8.jpg',
+  'dakhoon-oud-muattar': '/perfume-images/antik-posts10.jpg',
+  'limited-edition': '/perfume-images/antik-posts2.jpg',
 };
 
-// Show these 5 categories
-const allowedCategories = ['oud', 'perfumes', 'body-spray', 'dehnal-oud', 'limited-edition'];
+// Show these 7 client categories (in order)
+const allowedCategories = ['oud', 'dehnal-oud', 'perfumes', 'all-over-spray', 'air-freshener', 'dakhoon-oud-muattar', 'limited-edition'];
 
 interface ShopByCategoryProps {
   categories: Category[];
@@ -31,10 +33,10 @@ export function ShopByCategory({ categories }: ShopByCategoryProps) {
   const t = useTranslations('homepage.categories');
   const tCategories = useTranslations('categories');
 
-  // Debug: Log categories
-  console.log('All categories received:', categories.map(c => c.slug));
-  const filteredCategories = categories.filter((category) => allowedCategories.includes(category.slug));
-  console.log('Filtered categories:', filteredCategories.map(c => c.slug));
+  // Filter and sort categories according to allowedCategories order
+  const filteredCategories = categories
+    .filter((category) => allowedCategories.includes(category.slug))
+    .sort((a, b) => allowedCategories.indexOf(a.slug) - allowedCategories.indexOf(b.slug));
 
   return (
     <div className="relative overflow-hidden bg-white py-16 mb-0">
@@ -58,7 +60,8 @@ export function ShopByCategory({ categories }: ShopByCategoryProps) {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-[1200px] mx-auto">
           {filteredCategories.map((category) => {
-            const categoryImage = categoryImages[category.slug] || '/perfume-images/antik-posts2.jpg';
+            // Use database image if available, fallback to hardcoded mapping
+            const categoryImage = category.image || categoryImages[category.slug] || '/perfume-images/antik-posts2.jpg';
 
             return (
               <Link

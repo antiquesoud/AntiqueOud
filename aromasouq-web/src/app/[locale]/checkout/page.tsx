@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "@/i18n/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Check, CreditCard, Smartphone, Wallet, Banknote } from "lucide-react"
+import { Check, CreditCard, Banknote } from "lucide-react"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -28,7 +28,7 @@ import { useTranslations } from "next-intl"
 import { PaymobCheckout } from "@/components/payment/PaymobCheckout"
 
 type DeliveryMethod = "standard" | "express" | "sameDay"
-type PaymentMethodType = "card" | "google_pay" | "apple_pay" | "cod"
+type PaymentMethodType = "pay_online" | "cod"
 
 // Payment method configuration
 interface PaymentOption {
@@ -43,99 +43,40 @@ export default function CheckoutPage() {
   const router = useRouter()
   const t = useTranslations('checkout')
   const tCommon = useTranslations('common')
-  const { cart, clearCart } = useCart()
+  const { cart, clearCartImmediate } = useCart()
   const { data: wallet } = useWallet()
   const { validateCoupon, isValidating, resetValidation } = useCoupon()
 
   const [currentStep, setCurrentStep] = useState(1)
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("standard")
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("card")
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("pay_online")
   const [coinsToUse, setCoinsToUse] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [showPaymentForm, setShowPaymentForm] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
+  const [orderCompleted, setOrderCompleted] = useState(false)
 
-  // Track client-side mount for device detection
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  // Device detection helpers (only run on client)
-  const isGooglePayAvailable = () => {
-    if (typeof window === 'undefined') return false
-    const ua = navigator.userAgent
-    // Show Google Pay on Chrome browser or Android devices
-    return ua.includes('Chrome') || ua.includes('Android')
-  }
-
-  const isApplePayAvailable = () => {
-    if (typeof window === 'undefined') return false
-
-    // Check for actual Apple Pay support via ApplePaySession API
-    try {
-      if ((window as any).ApplePaySession?.canMakePayments?.()) {
-        return true
-      }
-    } catch (e) {
-      // Ignore errors - some browsers throw when accessing ApplePaySession
-    }
-
-    // Fallback: Show on Safari browsers only (macOS Safari and iOS Safari)
-    // Must exclude all non-Safari browsers that include "Safari" in UA:
-    // - Chrome (desktop), CriOS (Chrome iOS), FxiOS (Firefox iOS), EdgiOS (Edge iOS)
-    const ua = navigator.userAgent
-    const isSafari = /Safari/.test(ua) &&
-      !/Chrome/.test(ua) &&
-      !/CriOS/.test(ua) &&
-      !/FxiOS/.test(ua) &&
-      !/EdgiOS/.test(ua)
-
-    return isSafari
-  }
-
-  // Payment method options - base configuration
+  // Payment method options
   const paymentOptions: PaymentOption[] = useMemo(() => [
     {
-      id: 'card' as PaymentMethodType,
-      name: t('creditCard'),
-      description: 'Visa, Mastercard, Amex',
+      id: 'pay_online' as PaymentMethodType,
+      name: t('payOnline'),
+      description: t('payOnlineDesc') || 'Visa, Mastercard, Amex',
       icon: CreditCard,
-      isAvailable: () => true, // Always available
-    },
-    {
-      id: 'google_pay' as PaymentMethodType,
-      name: 'Google Pay',
-      description: t('fastCheckoutGoogle') || 'Fast & secure checkout',
-      icon: Wallet,
-      isAvailable: isGooglePayAvailable,
-    },
-    {
-      id: 'apple_pay' as PaymentMethodType,
-      name: 'Apple Pay',
-      description: t('fastCheckoutApple') || 'Fast & secure checkout',
-      icon: Smartphone,
-      isAvailable: isApplePayAvailable,
+      isAvailable: () => true,
     },
     {
       id: 'cod' as PaymentMethodType,
       name: t('cashOnDelivery'),
       description: t('payWhenReceive') || 'Pay when you receive',
       icon: Banknote,
-      isAvailable: () => true, // Always available
+      isAvailable: () => true,
     },
   ], [t])
 
-  // Filter to only show available payment methods (re-evaluates after mount)
-  const availablePaymentMethods = useMemo(() => {
-    // During SSR or before mount, show only card and COD
-    if (!isMounted) {
-      return paymentOptions.filter(option => option.id === 'card' || option.id === 'cod')
-    }
-    // After mount, properly detect device capabilities
-    return paymentOptions.filter(option => option.isAvailable())
-  }, [paymentOptions, isMounted])
+  // All payment methods are always available
+  const availablePaymentMethods = paymentOptions
 
   const steps = [
     { id: 1, name: t('steps.address'), key: "address" },
@@ -145,12 +86,12 @@ export default function CheckoutPage() {
     ...(showPaymentForm ? [{ id: 5, name: 'Complete Payment', key: "card-payment" }] : []),
   ]
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (but not if order was just completed)
   useEffect(() => {
-    if (!cart || !cart.items || cart.items.length === 0) {
+    if (!orderCompleted && (!cart || !cart.items || cart.items.length === 0)) {
       router.push('/cart')
     }
-  }, [cart, router])
+  }, [cart, router, orderCompleted])
 
   // Coupon state
   const [couponCode, setCouponCode] = useState("")
@@ -258,11 +199,11 @@ export default function CheckoutPage() {
         couponCode: appliedCoupon?.coupon.code,
       })
 
-      // If online payment (card, google_pay, apple_pay), initialize Paymob
+      // If online payment, initialize Paymob (always use 'card' - Paymob shows all options)
       if (isOnlinePayment) {
         const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent', {
           orderId: order.id,
-          paymentMethod: paymentMethod as 'card' | 'google_pay' | 'apple_pay', // Pass selected method
+          paymentMethod: 'card', // Paymob will show card, Apple Pay, Google Pay based on device
         })
 
         setCreatedOrderId(order.id)
@@ -272,7 +213,8 @@ export default function CheckoutPage() {
       } else {
         // COD - complete order immediately
         toast.success(`Order #${order.orderNumber} placed successfully!`)
-        clearCart()
+        setOrderCompleted(true)
+        clearCartImmediate()
         router.push(`/order-success?orderId=${order.id}`)
       }
     } catch (error: any) {
@@ -283,7 +225,8 @@ export default function CheckoutPage() {
   }
 
   const handlePaymentSuccess = () => {
-    clearCart()
+    setOrderCompleted(true)
+    clearCartImmediate()
     router.push(`/order-success?orderId=${createdOrderId}`)
   }
 
@@ -699,11 +642,6 @@ export default function CheckoutPage() {
                                     {option.description}
                                   </p>
                                 </div>
-                                {(option.id === 'google_pay' || option.id === 'apple_pay') && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    {t('fastCheckout') || 'Fast'}
-                                  </Badge>
-                                )}
                               </Label>
                             )
                           })}

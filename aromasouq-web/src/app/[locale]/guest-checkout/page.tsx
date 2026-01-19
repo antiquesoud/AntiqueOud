@@ -5,7 +5,7 @@ import { useRouter } from "@/i18n/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Check, ShoppingBag, Truck, CreditCard, Eye, Smartphone, Wallet, Banknote } from "lucide-react"
+import { Check, ShoppingBag, Truck, CreditCard, Eye, Banknote } from "lucide-react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,6 +21,7 @@ import toast from "react-hot-toast"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
 import { PaymobCheckout } from "@/components/payment/PaymobCheckout"
+import { useCart } from "@/hooks/useCart"
 
 // Guest cart types
 interface GuestCartItem {
@@ -56,7 +57,7 @@ interface GuestCart {
 }
 
 // Payment method types - match logged-in checkout
-type PaymentMethodType = "card" | "google_pay" | "apple_pay" | "cod"
+type PaymentMethodType = "pay_online" | "cod"
 
 // Payment method configuration
 interface PaymentOption {
@@ -81,7 +82,7 @@ const guestCheckoutSchema = z.object({
   apartment: z.string().optional(),
   landmark: z.string().optional(),
   notes: z.string().optional(),
-  paymentMethod: z.enum(["card", "google_pay", "apple_pay", "cod"]),
+  paymentMethod: z.enum(["pay_online", "cod"]),
 })
 
 type GuestCheckoutInput = z.infer<typeof guestCheckoutSchema>
@@ -90,6 +91,7 @@ export default function GuestCheckoutPage() {
   const router = useRouter()
   const t = useTranslations('checkout')
   const tCommon = useTranslations('common')
+  const { clearCartImmediate } = useCart()
 
   const [currentStep, setCurrentStep] = useState(1)
   const [cart, setCart] = useState<GuestCart | null>(null)
@@ -100,69 +102,16 @@ export default function GuestCheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [guestEmail, setGuestEmail] = useState<string>('')
-  const [isMounted, setIsMounted] = useState(false)
+  const [orderCompleted, setOrderCompleted] = useState(false)
 
-  // Track client-side mount for device detection
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  // Device detection helpers (only run on client)
-  const isGooglePayAvailable = () => {
-    if (typeof window === 'undefined') return false
-    const ua = navigator.userAgent
-    return ua.includes('Chrome') || ua.includes('Android')
-  }
-
-  const isApplePayAvailable = () => {
-    if (typeof window === 'undefined') return false
-
-    // Check for actual Apple Pay support via ApplePaySession API
-    try {
-      if ((window as any).ApplePaySession?.canMakePayments?.()) {
-        return true
-      }
-    } catch (e) {
-      // Ignore errors - some browsers throw when accessing ApplePaySession
-    }
-
-    // Fallback: Show on Safari browsers only (macOS Safari and iOS Safari)
-    // Must exclude all non-Safari browsers that include "Safari" in UA:
-    // - Chrome (desktop), CriOS (Chrome iOS), FxiOS (Firefox iOS), EdgiOS (Edge iOS)
-    const ua = navigator.userAgent
-    const isSafari = /Safari/.test(ua) &&
-      !/Chrome/.test(ua) &&
-      !/CriOS/.test(ua) &&
-      !/FxiOS/.test(ua) &&
-      !/EdgiOS/.test(ua)
-
-    return isSafari
-  }
-
-  // Payment method options - same as logged-in checkout
+  // Payment method options - simplified to Pay Online and COD
   const paymentOptions: PaymentOption[] = useMemo(() => [
     {
-      id: 'card' as PaymentMethodType,
-      name: t('creditCard'),
-      description: 'Visa, Mastercard, Amex',
+      id: 'pay_online' as PaymentMethodType,
+      name: t('payOnline'),
+      description: t('payOnlineDesc') || 'Visa, Mastercard, Amex, Apple Pay, Google Pay',
       icon: CreditCard,
       isAvailable: () => true,
-      apiValue: 'ONLINE_PAYMENT', // Backend expects ONLINE_PAYMENT for card payments
-    },
-    {
-      id: 'google_pay' as PaymentMethodType,
-      name: 'Google Pay',
-      description: t('fastCheckoutGoogle') || 'Fast & secure checkout',
-      icon: Wallet,
-      isAvailable: isGooglePayAvailable,
-      apiValue: 'ONLINE_PAYMENT',
-    },
-    {
-      id: 'apple_pay' as PaymentMethodType,
-      name: 'Apple Pay',
-      description: t('fastCheckoutApple') || 'Fast & secure checkout',
-      icon: Smartphone,
-      isAvailable: isApplePayAvailable,
       apiValue: 'ONLINE_PAYMENT',
     },
     {
@@ -175,13 +124,8 @@ export default function GuestCheckoutPage() {
     },
   ], [t])
 
-  // Filter to only show available payment methods
-  const availablePaymentMethods = useMemo(() => {
-    if (!isMounted) {
-      return paymentOptions.filter(option => option.id === 'card' || option.id === 'cod')
-    }
-    return paymentOptions.filter(option => option.isAvailable())
-  }, [paymentOptions, isMounted])
+  // All payment methods are always available
+  const availablePaymentMethods = paymentOptions
 
   const steps = [
     { id: 1, name: t('steps.address'), icon: ShoppingBag },
@@ -205,7 +149,7 @@ export default function GuestCheckoutPage() {
       apartment: "",
       landmark: "",
       notes: "",
-      paymentMethod: "card", // Default to card payment
+      paymentMethod: "pay_online", // Default to online payment
     },
   })
 
@@ -227,13 +171,13 @@ export default function GuestCheckoutPage() {
     fetchCart()
   }, [router])
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (but not if order was just completed)
   useEffect(() => {
-    if (!isLoading && (!cart || !cart.items || cart.items.length === 0)) {
+    if (!orderCompleted && !isLoading && (!cart || !cart.items || cart.items.length === 0)) {
       toast.error('Your cart is empty')
       router.push('/products')
     }
-  }, [cart, isLoading, router])
+  }, [cart, isLoading, router, orderCompleted])
 
   const onSubmit = async (data: GuestCheckoutInput) => {
     if (currentStep < 4) {
@@ -274,13 +218,13 @@ export default function GuestCheckoutPage() {
 
       // If online payment, initialize Paymob
       if (isOnlinePayment) {
-        console.log('[Checkout] Creating payment intent for order:', order.id, 'method:', data.paymentMethod)
+        console.log('[Checkout] Creating payment intent for order:', order.id)
 
         try {
-          // Pass the selected payment method for method-specific checkout
+          // Always use 'card' - Paymob will show all payment options (card, Apple Pay, Google Pay)
           const paymentIntent = await apiClient.post<{ clientSecret: string }>('/payments/create-intent-guest', {
             orderId: order.id,
-            paymentMethod: data.paymentMethod, // card, google_pay, apple_pay
+            paymentMethod: 'card',
           })
 
           console.log('[Checkout] Payment intent created successfully')
@@ -303,14 +247,11 @@ export default function GuestCheckoutPage() {
       } else {
         // COD - complete immediately
         console.log('[Checkout] COD order placed, clearing cart...')
+        setOrderCompleted(true)
+        clearCartImmediate() // Instant UI update
 
-        try {
-          await apiClient.delete('/guest-cart')
-          console.log('[Checkout] Cart cleared successfully')
-        } catch (error) {
-          console.error('[Checkout] Failed to clear cart:', error)
-          // Continue anyway
-        }
+        // Also clear server-side
+        apiClient.delete('/guest-cart').catch(() => {})
 
         toast.success(`Order #${order.orderNumber} placed successfully!`)
         router.push(`/track-order?orderNumber=${order.orderNumber}&email=${data.guestEmail}`)
@@ -323,23 +264,15 @@ export default function GuestCheckoutPage() {
     }
   }
 
-  const handlePaymentSuccess = async () => {
-    try {
-      console.log('[Checkout] Payment successful, clearing cart...')
+  const handlePaymentSuccess = () => {
+    setOrderCompleted(true)
+    clearCartImmediate() // Instant UI update
 
-      // Clear the guest cart
-      await apiClient.delete('/guest-cart')
+    // Also clear server-side (fire and forget)
+    apiClient.delete('/guest-cart').catch(() => {})
 
-      console.log('[Checkout] Cart cleared successfully')
-      toast.success('Payment successful!')
-      // Redirect to order-success page for consistent UX with logged-in users
-      router.push(`/order-success?orderId=${createdOrderId}`)
-    } catch (error) {
-      console.error('[Checkout] Failed to clear cart:', error)
-      // Still redirect even if cart clear fails
-      toast.success('Payment successful!')
-      router.push(`/order-success?orderId=${createdOrderId}`)
-    }
+    toast.success('Payment successful!')
+    router.push(`/order-success?orderId=${createdOrderId}`)
   }
 
   const handlePaymentCancel = () => {

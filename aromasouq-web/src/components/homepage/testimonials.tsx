@@ -148,12 +148,12 @@ export function Testimonials() {
           </div>
 
           <h2 className="text-3xl md:text-4xl text-[#550000] font-bold mb-2">
-            {locale === 'ar' ? 'ماذا يقول عملاؤنا' : 'What Our Customers Say'}
+            {locale === 'ar' ? 'آراء عملائنا' : 'What Our Customers Say'}
           </h2>
 
           <p className="text-base text-gray-600">
             {locale === 'ar'
-              ? 'تجارب حقيقية من عملائنا الكرام'
+              ? 'من تجربة عملائنا… ما يثبت جودة ما نصنعه.'
               : 'Real experiences from our valued customers'
             }
           </p>

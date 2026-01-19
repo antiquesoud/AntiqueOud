@@ -11,6 +11,7 @@ import { apiClient } from '@/lib/api-client'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { useAuthStore } from '@/stores/authStore'
 import { useQueryClient } from '@tanstack/react-query'
+import { useCart } from '@/hooks/useCart'
 
 type PaymentState = 'success' | 'pending' | 'failed' | 'cancelled' | 'loading' | 'error'
 
@@ -24,6 +25,7 @@ export default function OrderSuccessPage() {
   const hasHydrated = useAuthStore((state) => state._hasHydrated)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const queryClient = useQueryClient()
+  const { clearCartImmediate } = useCart()
   const cartClearedRef = useRef(false)
 
   // Check Paymob redirect parameters
@@ -164,27 +166,16 @@ export default function OrderSuccessPage() {
     if (paymentState === 'success' && !cartClearedRef.current) {
       cartClearedRef.current = true
 
-      const clearCart = async () => {
-        try {
-          // Try to clear authenticated cart first
-          if (isAuthenticated) {
-            await apiClient.delete('/cart')
-          } else {
-            // Try guest cart
-            await apiClient.delete('/guest-cart')
-          }
-          // Invalidate cart queries to update UI
-          queryClient.invalidateQueries({ queryKey: ['cart'] })
-          console.log('[OrderSuccess] Cart cleared successfully')
-        } catch (error) {
-          // Cart might already be empty or cleared by webhook - ignore
-          console.log('[OrderSuccess] Cart clear skipped (may already be empty):', error)
-        }
-      }
+      // Instantly clear cart in UI
+      clearCartImmediate()
 
-      clearCart()
+      // Also clear server-side (fire and forget)
+      const endpoint = isAuthenticated ? '/cart' : '/guest-cart'
+      apiClient.delete(endpoint).catch(() => {
+        console.log('[OrderSuccess] Server cart clear skipped (may already be empty)')
+      })
     }
-  }, [paymentState, isAuthenticated, queryClient])
+  }, [paymentState, isAuthenticated, clearCartImmediate])
 
   // Show loading while hydrating or fetching
   if (!hasHydrated || isLoading) {
@@ -468,7 +459,7 @@ export default function OrderSuccessPage() {
               <div>
                 <p className="font-medium">{t('confirmation')}</p>
                 <p className="text-sm text-gray-600">
-                  {t('confirmationDesc').replace('{email}', order.user?.email || order.guestEmail || 'your email')}
+                  {t('confirmationDesc', { email: order.user?.email || order.guestEmail || 'your email' })}
                 </p>
               </div>
             </div>

@@ -32,8 +32,9 @@ async function main() {
       slug: 'limited-edition',
       description: 'Exclusive limited edition collections and gift sets',
       descriptionAr: 'مجموعات حصرية وهدايا محدودة الإصدار',
+      image: '/perfume-images/antik-posts2.jpg',
       icon: '✨',
-      sortOrder: 11,
+      sortOrder: 7,
       isActive: true,
     },
   });
@@ -45,10 +46,10 @@ async function main() {
   const oudCategory = await prisma.category.findUnique({ where: { slug: 'oud' } });
   const dehnalOudCategory = await prisma.category.findUnique({ where: { slug: 'dehnal-oud' } });
   const perfumesCategory = await prisma.category.findUnique({ where: { slug: 'perfumes' } });
-  const bodySprayCategory = await prisma.category.findUnique({ where: { slug: 'body-spray' } });
+  const allOverSprayCategory = await prisma.category.findUnique({ where: { slug: 'all-over-spray' } });
 
-  if (!oudCategory || !dehnalOudCategory || !perfumesCategory || !bodySprayCategory) {
-    throw new Error('Missing required categories. Run seed-no-products.ts first.');
+  if (!oudCategory || !dehnalOudCategory || !perfumesCategory || !allOverSprayCategory) {
+    throw new Error('Missing required categories. Run seed.ts first.');
   }
 
   console.log('✅ Found all required categories');
@@ -886,7 +887,7 @@ async function main() {
   // ========== BODY SPRAY (ALL OVER SPRAYS) - 5 Products ==========
   console.log('\n📦 All Over Sprays - 5 products:');
 
-  const bodySprayProducts = [
+  const allOverSprayProducts = [
     {
       name: 'Chic',
       nameAr: 'شيك',
@@ -898,7 +899,7 @@ async function main() {
       sku: 'SPRAY-CHIC',
       stock: 80,
       images: [],
-      categoryId: bodySprayCategory.id,
+      categoryId: allOverSprayCategory.id,
       brandId: antiqueOudBrand.id,
       vendorId: vendor.id,
       size: '100ml',
@@ -928,7 +929,7 @@ async function main() {
       sku: 'SPRAY-HIYAM',
       stock: 75,
       images: [],
-      categoryId: bodySprayCategory.id,
+      categoryId: allOverSprayCategory.id,
       brandId: antiqueOudBrand.id,
       vendorId: vendor.id,
       size: '100ml',
@@ -958,7 +959,7 @@ async function main() {
       sku: 'SPRAY-FAJR',
       stock: 90,
       images: [],
-      categoryId: bodySprayCategory.id,
+      categoryId: allOverSprayCategory.id,
       brandId: antiqueOudBrand.id,
       vendorId: vendor.id,
       size: '100ml',
@@ -988,7 +989,7 @@ async function main() {
       sku: 'SPRAY-GHARAM',
       stock: 70,
       images: [],
-      categoryId: bodySprayCategory.id,
+      categoryId: allOverSprayCategory.id,
       brandId: antiqueOudBrand.id,
       vendorId: vendor.id,
       size: '100ml',
@@ -1018,7 +1019,7 @@ async function main() {
       sku: 'SPRAY-GHAZAL',
       stock: 85,
       images: [],
-      categoryId: bodySprayCategory.id,
+      categoryId: allOverSprayCategory.id,
       brandId: antiqueOudBrand.id,
       vendorId: vendor.id,
       size: '100ml',
@@ -1039,7 +1040,7 @@ async function main() {
     },
   ];
 
-  for (const product of bodySprayProducts) {
+  for (const product of allOverSprayProducts) {
     await createProduct(product);
   }
 
@@ -1146,7 +1147,7 @@ async function main() {
   // ====================================
   // SUMMARY
   // ====================================
-  const totalProducts = oudProducts.length + oudOilProducts.length + perfumeProducts.length + bodySprayProducts.length + limitedEditionProducts.length;
+  const totalProducts = oudProducts.length + oudOilProducts.length + perfumeProducts.length + allOverSprayProducts.length + limitedEditionProducts.length;
 
   console.log('\n' + '='.repeat(70));
   console.log('🎉 SEED COMPLETE!');
@@ -1158,7 +1159,7 @@ async function main() {
   console.log(`    • Oud (Agarwood): ${oudProducts.length}`);
   console.log(`    • Oud Oils (Dehn Al Oud): ${oudOilProducts.length}`);
   console.log(`    • Perfumes: ${perfumeProducts.length}`);
-  console.log(`    • All Over Sprays: ${bodySprayProducts.length}`);
+  console.log(`    • All Over Sprays: ${allOverSprayProducts.length}`);
   console.log(`    • Limited Edition: ${limitedEditionProducts.length}`);
   console.log('='.repeat(70));
 }
