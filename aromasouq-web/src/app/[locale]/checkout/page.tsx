@@ -26,6 +26,7 @@ import { apiClient } from "@/lib/api-client"
 import toast from "react-hot-toast"
 import { useTranslations } from "next-intl"
 import { PaymobCheckout } from "@/components/payment/PaymobCheckout"
+import { getFirstProductImage } from "@/lib/image-utils"
 
 type DeliveryMethod = "standard" | "express" | "sameDay"
 type PaymentMethodType = "pay_online" | "cod"
@@ -757,16 +758,16 @@ export default function CheckoutPage() {
               {/* Cart Items */}
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {cart?.items?.map((item: any) => {
-                  const productImage = item.product?.images?.[0] || '/images/placeholder-product.png'
                   const productName = item.product?.nameEn || item.product?.name || 'Product'
                   const productPrice = item.variant?.price || item.product?.salePrice || item.product?.price || 0
                   return (
                     <div key={item.id} className="flex gap-3 pb-3 border-b last:border-0 last:pb-0">
                       <div className="relative w-14 h-14 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
                         <Image
-                          src={typeof productImage === 'string' ? productImage : productImage.url || '/images/placeholder-product.png'}
+                          src={getFirstProductImage(item.product, 'thumbnail')}
                           alt={productName}
                           fill
+                          sizes="56px"
                           className="object-cover"
                         />
                       </div>

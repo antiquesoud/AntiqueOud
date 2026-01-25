@@ -95,7 +95,7 @@ export default function ProductDetailPage() {
   const currentPrice = salePrice || basePrice
   const savings = salePrice ? basePrice - salePrice : 0
   const currentStock = selectedVariantData?.stock ?? product.stockQuantity
-  const currentImageUrl = getProductImageUrl(product, selectedImage)
+  const currentImageUrl = getProductImageUrl(product, selectedImage, 'large')
   const productHasImages = hasProductImages(product)
 
   // Calculate total price with coins
@@ -141,6 +141,8 @@ export default function ProductDetailPage() {
                       src={displayImage}
                       alt={product.nameEn}
                       fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      priority
                       className="object-cover"
                     />
 
@@ -153,7 +155,7 @@ export default function ProductDetailPage() {
             {productHasImages && (
               <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {product.images.map((image, index) => {
-                  const thumbUrl = getProductImageUrl(product, index)
+                  const thumbUrl = getProductImageUrl(product, index, 'thumbnail')
                   return (
                     <button
                       key={image.id || index}

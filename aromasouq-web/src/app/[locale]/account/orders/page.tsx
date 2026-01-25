@@ -14,6 +14,7 @@ import Image from 'next/image'
 import { Package, Clock, CheckCircle, XCircle, Truck, Download } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useTranslations } from 'next-intl'
+import { getFirstProductImage } from '@/lib/image-utils'
 
 export default function OrdersPage() {
   const t = useTranslations('account.ordersPage')
@@ -151,18 +152,13 @@ export default function OrdersPage() {
                     {order.items.map((item) => (
                       <div key={item.id} className="flex gap-4">
                         <div className="relative w-16 h-16 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
-                          {item.product.images?.[0]?.url ? (
-                            <Image
-                              src={item.product.images[0].url}
-                              alt={item.product.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Package className="w-8 h-8 text-gray-400" />
-                            </div>
-                          )}
+                          <Image
+                            src={getFirstProductImage(item.product, 'thumbnail')}
+                            alt={item.product.name}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">{item.product.name}</p>

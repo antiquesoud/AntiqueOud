@@ -17,6 +17,7 @@ import { redirectToHostedCheckout } from '@/lib/paymob'
 import toast from 'react-hot-toast'
 import { OrderTimeline } from '@/components/orders/OrderTimeline'
 import { useTranslations } from 'next-intl'
+import { getFirstProductImage } from '@/lib/image-utils'
 
 export default function OrderDetailPage() {
   const t = useTranslations('account.orderDetailPage')
@@ -205,18 +206,13 @@ export default function OrderDetailPage() {
                 {order.items.map((item) => (
                   <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0 last:pb-0">
                     <div className="relative w-20 h-20 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
-                      {item.product.images?.[0]?.url ? (
-                        <Image
-                          src={item.product.images[0].url}
-                          alt={item.product.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-10 h-10 text-gray-400" />
-                        </div>
-                      )}
+                      <Image
+                        src={getFirstProductImage(item.product, 'thumbnail')}
+                        alt={item.product.name}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                      />
                     </div>
                     <div className="flex-1">
                       <Link
@@ -282,18 +278,13 @@ export default function OrderDetailPage() {
                     <div key={item.id} className="flex items-center justify-between pb-4 border-b last:border-0 last:pb-0">
                       <div className="flex gap-4 flex-1">
                         <div className="relative w-16 h-16 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
-                          {item.product.images?.[0]?.url ? (
-                            <Image
-                              src={item.product.images[0].url}
-                              alt={item.product.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Package className="w-8 h-8 text-gray-400" />
-                            </div>
-                          )}
+                          <Image
+                            src={getFirstProductImage(item.product, 'thumbnail')}
+                            alt={item.product.name}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
                         </div>
                         <div className="flex-1">
                           <p className="font-medium text-sm">{item.product.name}</p>

@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useRouter, Link } from '@/i18n/navigation';
 import { Search, X } from 'lucide-react';
+import { getFirstProductImage } from '@/lib/image-utils';
 
 export function SearchBar() {
   const [query, setQuery] = useState('');
@@ -113,17 +115,15 @@ export function SearchBar() {
                 }}
                 className="flex items-center gap-3 px-3 py-3 hover:bg-gray-50 rounded-lg transition"
               >
-                {product.images && product.images[0] ? (
-                  <img
-                    src={typeof product.images[0] === 'string' ? product.images[0] : product.images[0].url}
+                <div className="relative w-12 h-12 flex-shrink-0">
+                  <Image
+                    src={getFirstProductImage(product, 'thumbnail')}
                     alt={product.nameEn || product.name}
-                    className="w-12 h-12 object-cover rounded"
+                    fill
+                    sizes="48px"
+                    className="object-cover rounded"
                   />
-                ) : (
-                  <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-                    <Search className="w-6 h-6 text-gray-400" />
-                  </div>
-                )}
+                </div>
 
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 truncate">
