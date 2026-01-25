@@ -4,7 +4,11 @@ import {
   ConflictException,
   BadRequestException,
   ForbiddenException,
+  Inject,
+  OnModuleInit,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -14,13 +18,91 @@ import { BulkFlashSaleDto, RemoveFlashSaleDto, SetDiscountPercentDto } from './d
 import { UserRole } from '@prisma/client';
 
 @Injectable()
-export class ProductsService {
-  constructor(private readonly prisma: PrismaService) {}
+export class ProductsService implements OnModuleInit {
+  // In-memory slug-to-id cache (survives within process, extremely fast)
+  private categorySlugCache = new Map<string, string>();
+  private brandSlugCache = new Map<string, string>();
+
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
+
+  /**
+   * Pre-warm slug caches on startup for instant lookups
+   */
+  async onModuleInit() {
+    try {
+      // Load all category slugs
+      const categories = await this.prisma.category.findMany({
+        where: { isActive: true },
+        select: { id: true, slug: true },
+      });
+      categories.forEach((c) => this.categorySlugCache.set(c.slug, c.id));
+      console.log(`✅ Pre-warmed ${categories.length} category slug mappings`);
+
+      // Load all brand slugs
+      const brands = await this.prisma.brand.findMany({
+        where: { isActive: true },
+        select: { id: true, slug: true },
+      });
+      brands.forEach((b) => this.brandSlugCache.set(b.slug, b.id));
+      console.log(`✅ Pre-warmed ${brands.length} brand slug mappings`);
+    } catch (error) {
+      console.error('⚠️ Failed to pre-warm slug caches:', error.message);
+    }
+  }
+
+  /**
+   * Get category ID from slug with caching
+   * Uses in-memory Map for fastest possible lookup
+   */
+  private async getCategoryIdBySlug(slug: string): Promise<string | null> {
+    // Check in-memory cache first (instant)
+    if (this.categorySlugCache.has(slug)) {
+      return this.categorySlugCache.get(slug)!;
+    }
+
+    // Fetch from database and cache
+    const category = await this.prisma.category.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (category) {
+      this.categorySlugCache.set(slug, category.id);
+      return category.id;
+    }
+
+    return null;
+  }
+
+  /**
+   * Get brand ID from slug with caching
+   */
+  private async getBrandIdBySlug(slug: string): Promise<string | null> {
+    if (this.brandSlugCache.has(slug)) {
+      return this.brandSlugCache.get(slug)!;
+    }
+
+    const brand = await this.prisma.brand.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (brand) {
+      this.brandSlugCache.set(slug, brand.id);
+      return brand.id;
+    }
+
+    return null;
+  }
 
   async findAll(params?: {
     categoryId?: string;
     categorySlug?: string;
     brandId?: string;
+    brandSlug?: string;
     vendorId?: string;
     search?: string;
     minPrice?: number;
@@ -46,6 +128,7 @@ export class ProductsService {
       categoryId,
       categorySlug,
       brandId,
+      brandSlug,
       vendorId,
       search,
       minPrice,
@@ -71,20 +154,26 @@ export class ProductsService {
       isActive,
     };
 
-    // Support filtering by category ID or slug
+    // Support filtering by category ID or slug (optimized with caching)
     if (categoryId) {
       where.categoryId = categoryId;
     } else if (categorySlug) {
-      // Find category by slug first
-      const category = await this.prisma.category.findUnique({
-        where: { slug: categorySlug },
-      });
-      if (category) {
-        where.categoryId = category.id;
+      // Use cached slug-to-id lookup (instant after first call)
+      const cachedCategoryId = await this.getCategoryIdBySlug(categorySlug);
+      if (cachedCategoryId) {
+        where.categoryId = cachedCategoryId;
       }
     }
 
-    if (brandId) where.brandId = brandId;
+    // Support filtering by brand ID or slug (optimized with caching)
+    if (brandId) {
+      where.brandId = brandId;
+    } else if (brandSlug) {
+      const cachedBrandId = await this.getBrandIdBySlug(brandSlug);
+      if (cachedBrandId) {
+        where.brandId = cachedBrandId;
+      }
+    }
     if (vendorId) where.vendorId = vendorId;
     if (isFeatured !== undefined) where.isFeatured = isFeatured;
     if (gender) where.gender = gender;

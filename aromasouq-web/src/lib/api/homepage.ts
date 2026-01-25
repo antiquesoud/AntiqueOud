@@ -57,6 +57,52 @@ export interface Region {
   count: number;
 }
 
+export interface HomepageData {
+  categories: Category[];
+  brands: Brand[];
+  featured: Product[];
+  flashSale: Product[];
+  oudProducts: Product[];
+  brandProducts: Product[];
+}
+
+/**
+ * Fetch all homepage data in a single API call (OPTIMIZED)
+ * This reduces 6 API calls to 1, dramatically improving load time
+ */
+export async function getHomepageData(): Promise<HomepageData> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    const res = await fetch(`${API_BASE_URL}/homepage`, {
+      next: { revalidate: 300 }, // Cache for 5 minutes
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      console.warn('Homepage endpoint failed, falling back to individual calls');
+      throw new Error('Homepage endpoint not available');
+    }
+
+    return res.json();
+  } catch (error) {
+    // Fallback to individual calls if combined endpoint fails
+    console.log('Using fallback: fetching homepage data individually');
+    const [categories, brands, featured, flashSale, oudProducts, brandProducts] = await Promise.all([
+      getCategories(),
+      getBrands(),
+      getFeaturedProducts(),
+      getFlashSaleProducts(),
+      getOudProducts(),
+      getOurBrandProducts(),
+    ]);
+
+    return { categories, brands, featured, flashSale, oudProducts, brandProducts };
+  }
+}
+
 /**
  * Fetch all categories
  */

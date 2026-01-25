@@ -1,6 +1,9 @@
 /**
  * Homepage - Antique Oud
  * Main landing page with all featured sections
+ *
+ * OPTIMIZED: Uses single /homepage API call instead of multiple calls
+ * This dramatically reduces cold start impact and improves load time
  */
 
 import { HeroSlider } from '@/components/homepage/hero-slider';
@@ -9,26 +12,14 @@ import { FlashSale } from '@/components/homepage/flash-sale';
 import { BestSellers } from '@/components/homepage/best-sellers';
 import { Testimonials } from '@/components/homepage/testimonials';
 
-// API functions
-import {
-  getCategories,
-  getFlashSaleProducts,
-  getFeaturedProducts,
-} from '@/lib/api/homepage';
+// API functions - using optimized combined endpoint
+import { getHomepageData } from '@/lib/api/homepage';
 
-export const revalidate = 1800; // Revalidate every 30 minutes
+export const revalidate = 300; // Revalidate every 5 minutes (matches backend cache)
 
 export default async function HomePage() {
-  // Fetch all data in parallel for optimal performance
-  const [
-    categories,
-    flashSaleProducts,
-    featuredProducts,
-  ] = await Promise.all([
-    getCategories(),
-    getFlashSaleProducts(),
-    getFeaturedProducts(),
-  ]);
+  // Single API call fetches all homepage data (optimized)
+  const { categories, featured, flashSale } = await getHomepageData();
 
   return (
     <div className="min-h-screen">
@@ -39,13 +30,13 @@ export default async function HomePage() {
       {categories.length > 0 && <ShopByCategory categories={categories} />}
 
       {/* Flash Sale */}
-      {flashSaleProducts.length > 0 && (
-        <FlashSale products={flashSaleProducts} />
+      {flashSale.length > 0 && (
+        <FlashSale products={flashSale} />
       )}
 
       {/* Best Sellers */}
-      {featuredProducts.length > 0 && (
-        <BestSellers products={featuredProducts} />
+      {featured.length > 0 && (
+        <BestSellers products={featured} />
       )}
 
       {/* Testimonials */}

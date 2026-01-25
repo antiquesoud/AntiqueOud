@@ -39,6 +39,7 @@ export class ProductsController {
     @Query('category') category?: string,
     @Query('categorySlug') categorySlug?: string,
     @Query('brandId') brandId?: string,
+    @Query('brandSlug') brandSlug?: string,
     @Query('vendorId') vendorId?: string,
     @Query('search') search?: string,
     @Query('minPrice') minPrice?: string,
@@ -73,6 +74,7 @@ export class ProductsController {
       categoryId,
       categorySlug: categorySlug || category, // Support both parameters, prioritize categorySlug
       brandId,
+      brandSlug,
       vendorId,
       search,
       minPrice: minPrice ? parseFloat(minPrice) : undefined,
