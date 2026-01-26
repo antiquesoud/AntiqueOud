@@ -354,7 +354,10 @@ export default function EditProductPage() {
       // Clean up data - SAME approach as CREATE page
       // Remove empty strings, null, and undefined values before sending to backend
       const cleanedData = Object.fromEntries(
-        Object.entries(data).filter(([_, value]) => {
+        Object.entries(data).filter(([key, value]) => {
+          // IMPORTANT: Exclude 'images' from form submission - images are managed separately
+          // via upload/delete buttons to avoid race conditions that overwrite newly uploaded images
+          if (key === 'images') return false
           // Remove empty strings, null, and undefined
           if (value === '' || value === null || value === undefined) return false
           // Remove zero values for optional numeric fields (but keep stock which can be 0)

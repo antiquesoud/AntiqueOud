@@ -2,7 +2,12 @@ import { Product } from '@/types'
 
 /**
  * Optimize Supabase image URL with transformation parameters
- * This dramatically reduces image size (e.g., 2MB -> 50KB)
+ *
+ * NOTE: Supabase Image Transformations (/render/image/) requires Pro plan
+ * and can cause 403 errors if not properly configured.
+ *
+ * We now return the raw URL and let Next.js Image component handle
+ * optimization, which is free and works reliably.
  */
 export function optimizeSupabaseImage(
   url: string,
@@ -13,32 +18,20 @@ export function optimizeSupabaseImage(
     format?: 'webp' | 'avif' | 'origin'
   } = {}
 ): string {
-  // Only transform Supabase URLs
-  if (!url || !url.includes('supabase.co')) {
+  // Return raw URL - let Next.js Image handle optimization
+  // This avoids 403 errors from Supabase render endpoint
+  if (!url) {
     return url
   }
 
-  const { width = 400, height, quality = 75, format = 'webp' } = options
-
-  // Check if it's a storage URL that can be transformed
-  // Supabase storage URLs: /storage/v1/object/public/bucket/path
-  if (url.includes('/storage/v1/object/public/')) {
-    // Convert to render URL for transformation
-    // From: /storage/v1/object/public/bucket/path
-    // To: /storage/v1/render/image/public/bucket/path?width=X&height=Y
-    const transformedUrl = url.replace(
-      '/storage/v1/object/public/',
-      '/storage/v1/render/image/public/'
+  // If URL already has render/image (legacy), convert back to object URL
+  if (url.includes('/storage/v1/render/image/public/')) {
+    // Strip query params and convert back to regular storage URL
+    const baseUrl = url.split('?')[0]
+    return baseUrl.replace(
+      '/storage/v1/render/image/public/',
+      '/storage/v1/object/public/'
     )
-
-    const params = new URLSearchParams()
-    params.set('width', width.toString())
-    if (height) params.set('height', height.toString())
-    params.set('quality', quality.toString())
-    params.set('format', format)
-    params.set('resize', 'cover')
-
-    return `${transformedUrl}?${params.toString()}`
   }
 
   return url

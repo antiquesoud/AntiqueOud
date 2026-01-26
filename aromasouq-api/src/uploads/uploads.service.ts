@@ -88,10 +88,29 @@ export class UploadsService {
     folder: string,
     originalName: string,
     uniqueId?: string,
+    mimeType?: string,
   ): string {
     const timestamp = Date.now();
     const randomId = uniqueId || uuidv4();
-    const extension = originalName.substring(originalName.lastIndexOf('.'));
+
+    // Extract extension from original name, or derive from MIME type if missing
+    let extension = '';
+    const lastDotIndex = originalName.lastIndexOf('.');
+    if (lastDotIndex !== -1 && lastDotIndex < originalName.length - 1) {
+      extension = originalName.substring(lastDotIndex);
+    } else if (mimeType) {
+      // Derive extension from MIME type for blob files
+      const mimeToExt: Record<string, string> = {
+        'image/jpeg': '.jpg',
+        'image/jpg': '.jpg',
+        'image/png': '.png',
+        'image/gif': '.gif',
+        'image/webp': '.webp',
+        'image/svg+xml': '.svg',
+      };
+      extension = mimeToExt[mimeType] || '.jpg';
+    }
+
     return `${folder}/${randomId}-${timestamp}${extension}`;
   }
 
@@ -134,10 +153,13 @@ export class UploadsService {
     );
 
     // Upload files to Supabase
+    // Note: Path should NOT include "products/" since bucket is already "products"
     const uploadPromises = files.map(async (file) => {
       const filePath = this.generateFilePath(
-        `products/${productId}/images`,
+        `${productId}/images`,
         file.originalname,
+        undefined,
+        file.mimetype,
       );
       return this.supabase.uploadFile(
         BUCKET_NAMES.PRODUCTS,
@@ -268,10 +290,13 @@ export class UploadsService {
     );
 
     // Upload files to Supabase
+    // Note: Path should NOT include "products/" since bucket is already "products"
     const uploadPromises = files.map(async (file, index) => {
       const filePath = this.generateFilePath(
-        `products/reviews/${reviewId}`,
+        `reviews/${reviewId}`,
         file.originalname,
+        undefined,
+        file.mimetype,
       );
       return this.supabase.uploadFile(
         BUCKET_NAMES.PRODUCTS,
