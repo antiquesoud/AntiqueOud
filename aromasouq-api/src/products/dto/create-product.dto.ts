@@ -171,7 +171,6 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['RAMADAN', 'SIGNATURE', 'CELEBRITY', 'MOST_LOVED', 'TRENDING', 'EXCLUSIVE', 'OUD_ROYALE', 'DISCOVERY_BOX', 'INSPIRED_BY'])
   collection?: string;
 
   // NEW FIELDS
