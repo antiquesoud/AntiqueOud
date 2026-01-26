@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Changa, IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
+import { Changa, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -10,28 +10,25 @@ import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import "../globals.css";
 
-// Antique Oud Brand Fonts
+// Antique Oud Brand Fonts - OPTIMIZED: Only essential weights (15 → 6 font files)
 const changa = Changa({
   subsets: ["latin", "arabic"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600", "700"], // Normal, semibold, bold only
   variable: "--font-changa",
   display: "swap",
+  preload: true,
 });
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600", "700"], // Normal, semibold, bold only
   variable: "--font-ibm-plex-arabic",
   display: "swap",
+  preload: true,
 });
 
-// Fallback for English
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-inter",
-  display: "swap",
-});
+// Removed Inter font - Changa handles Latin text
+// This eliminates 5 font file downloads
 
 // Keep for compatibility
 const notoArabic = ibmPlexArabic; // Alias for backward compatibility
@@ -78,16 +75,29 @@ export default async function LocaleLayout({
   // Get text direction for the current locale
   const direction = localeDirections[locale as keyof typeof localeDirections];
 
+  // Preconnect hints for faster resource loading
+  const apiOrigin = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || '';
+  const supabaseOrigin = 'https://lnnxoqazgkwqquphxbym.supabase.co';
+
   // Set document attributes via script for proper i18n support
   return (
     <>
+      {/* Early preconnect hints for critical resources */}
+      {apiOrigin && (
+        <>
+          <link rel="preconnect" href={apiOrigin} />
+          <link rel="dns-prefetch" href={apiOrigin} />
+        </>
+      )}
+      <link rel="preconnect" href={supabaseOrigin} />
+      <link rel="dns-prefetch" href={supabaseOrigin} />
       <script
         dangerouslySetInnerHTML={{
           __html: `document.documentElement.lang="${locale}";document.documentElement.dir="${direction}";`,
         }}
       />
       <div
-        className={`${inter.variable} ${changa.variable} ${ibmPlexArabic.variable} antialiased min-h-screen`}
+        className={`${changa.variable} ${ibmPlexArabic.variable} antialiased min-h-screen`}
         style={{ fontFamily: locale === 'ar' ? 'var(--font-ibm-plex-arabic)' : 'var(--font-changa)' }}
       >
         <NextIntlClientProvider messages={messages}>

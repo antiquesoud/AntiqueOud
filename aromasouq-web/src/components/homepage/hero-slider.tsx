@@ -1,6 +1,7 @@
 /**
  * Hero Slider Component
  * Main banner section with carousel of perfume images
+ * OPTIMIZED: Uses Next.js Image for proper preloading and lazy loading
  */
 
 'use client';
@@ -8,6 +9,7 @@
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const carouselImages = [
   '/perfume-images/antik-posts2.jpg',
@@ -32,19 +34,24 @@ export function HeroSlider() {
 
   return (
     <div className="relative h-[400px] sm:h-[500px] md:h-[550px] overflow-hidden mb-0">
-      {/* Carousel Background Images */}
+      {/* Carousel Background Images - Using Next.js Image for optimization */}
       {carouselImages.map((image, index) => (
         <div
           key={image}
           className={`absolute inset-0 transition-opacity duration-1000 ${
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
-          style={{
-            backgroundImage: `url(${image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
         >
+          <Image
+            src={image}
+            alt={`Hero slide ${index + 1}`}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority={index === 0} // Only preload first image
+            loading={index === 0 ? 'eager' : 'lazy'}
+            quality={80}
+          />
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-black/50"></div>
         </div>

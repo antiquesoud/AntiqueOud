@@ -25,8 +25,9 @@ export function useCart() {
     queryKey: cartQueryKey,
     queryFn: () => apiClient.get<Cart>(cartEndpoint),
     refetchOnWindowFocus: false,
+    refetchOnMount: false, // Don't refetch on every component mount
     retry: false,
-    staleTime: 0, // Always fetch fresh - cart data should be accurate
+    staleTime: 2 * 60 * 1000, // 2 minutes - cart updates via optimistic mutations
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 min for background updates
   })
 

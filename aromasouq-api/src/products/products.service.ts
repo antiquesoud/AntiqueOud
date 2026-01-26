@@ -978,21 +978,51 @@ export class ProductsService implements OnModuleInit {
    */
   getVariantPresets(productType: string) {
     const presets: Record<string, any[]> = {
+      // Oud (Agarwood chips) - 1, 3, 10 Tola
       OUD: [
-        { name: '3 Grams', nameAr: '3 غرام', size: '3gm', defaultPrice: 0, stock: 0 },
-        { name: '6 Grams', nameAr: '6 غرام', size: '6gm', defaultPrice: 0, stock: 0 },
-        { name: '12 Grams', nameAr: '12 غرام', size: '12gm', defaultPrice: 0, stock: 0 },
+        { name: '1 Tola', nameAr: '1 تولة', size: '1-tola', defaultPrice: 0, stock: 0 },
+        { name: '3 Tola', nameAr: '3 تولة', size: '3-tola', defaultPrice: 0, stock: 0 },
+        { name: '10 Tola', nameAr: '10 تولة', size: '10-tola', defaultPrice: 0, stock: 0 },
       ],
+      // Dehnal Oud (Oud Oil) - 1, 3, 10 Tola
+      DEHNAL_OUD: [
+        { name: '1 Tola', nameAr: '1 تولة', size: '1-tola', defaultPrice: 0, stock: 0 },
+        { name: '3 Tola', nameAr: '3 تولة', size: '3-tola', defaultPrice: 0, stock: 0 },
+        { name: '10 Tola', nameAr: '10 تولة', size: '10-tola', defaultPrice: 0, stock: 0 },
+      ],
+      // Niche products (same as Oud)
+      NICHE: [
+        { name: '1 Tola', nameAr: '1 تولة', size: '1-tola', defaultPrice: 0, stock: 0 },
+        { name: '3 Tola', nameAr: '3 تولة', size: '3-tola', defaultPrice: 0, stock: 0 },
+        { name: '10 Tola', nameAr: '10 تولة', size: '10-tola', defaultPrice: 0, stock: 0 },
+      ],
+      // Perfumes - 50ml, 100ml, 150ml options for new products
       PERFUME: [
         { name: '50 ML', nameAr: '50 مل', size: '50ml', defaultPrice: 0, stock: 0 },
         { name: '100 ML', nameAr: '100 مل', size: '100ml', defaultPrice: 0, stock: 0 },
         { name: '150 ML', nameAr: '150 مل', size: '150ml', defaultPrice: 0, stock: 0 },
       ],
-      ATTAR: [
-        { name: '3 ML', nameAr: '3 مل', size: '3ml', defaultPrice: 0, stock: 0 },
-        { name: '6 ML', nameAr: '6 مل', size: '6ml', defaultPrice: 0, stock: 0 },
-        { name: '12 ML', nameAr: '12 مل', size: '12ml', defaultPrice: 0, stock: 0 },
+      // Our Brand perfumes - same as PERFUME
+      OUR_BRAND: [
+        { name: '50 ML', nameAr: '50 مل', size: '50ml', defaultPrice: 0, stock: 0 },
+        { name: '100 ML', nameAr: '100 مل', size: '100ml', defaultPrice: 0, stock: 0 },
+        { name: '150 ML', nameAr: '150 مل', size: '150ml', defaultPrice: 0, stock: 0 },
       ],
+      // Body Spray / All Over Spray - 100ml
+      BODY_SPRAY: [
+        { name: '100 ML', nameAr: '100 مل', size: '100ml', defaultPrice: 0, stock: 0 },
+      ],
+      // Gift Sets / Limited Edition - 1 piece
+      GIFT_SET: [
+        { name: '1 Piece', nameAr: 'قطعة واحدة', size: '1-piece', defaultPrice: 0, stock: 0 },
+      ],
+      // Attar - 1, 3, 10 Tola
+      ATTAR: [
+        { name: '1 Tola', nameAr: '1 تولة', size: '1-tola', defaultPrice: 0, stock: 0 },
+        { name: '3 Tola', nameAr: '3 تولة', size: '3-tola', defaultPrice: 0, stock: 0 },
+        { name: '10 Tola', nameAr: '10 تولة', size: '10-tola', defaultPrice: 0, stock: 0 },
+      ],
+      // Bakhoor (kept for future use)
       BAKHOOR: [
         { name: '40 Grams', nameAr: '40 غرام', size: '40gm', defaultPrice: 0, stock: 0 },
         { name: '100 Grams', nameAr: '100 غرام', size: '100gm', defaultPrice: 0, stock: 0 },

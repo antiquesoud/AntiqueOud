@@ -1,13 +1,11 @@
 "use client"
 
-import React from "react"
+import React, { Suspense, useMemo } from "react"
 import Image from "next/image"
 import { Link, usePathname } from "@/i18n/navigation"
 import { useSearchParams } from "next/navigation"
-import { Search, ShoppingCart, Heart, User, Menu, Coins } from "lucide-react"
+import { ShoppingCart, Heart, User, Menu, Coins } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,17 +20,16 @@ import { cn } from "@/lib/utils"
 import { useTranslations, useLocale } from "next-intl"
 import { useDirection } from "@/lib/rtl-utils"
 import { LanguageSwitcher } from "@/components/language-switcher"
-// import { SearchBar } from "@/components/SearchBar"
-// import { CoinsWidget } from "@/components/layout/CoinsWidget"
 
-export function Header() {
+// Inner component that uses useSearchParams (wrapped in Suspense)
+function HeaderContent() {
   const tTopBar = useTranslations('header.topBar')
   const tNav = useTranslations('header.nav')
   const tUser = useTranslations('header.user')
   const locale = useLocale()
   const { isRTL } = useDirection()
   const { user, isAuthenticated, logout } = useAuth()
-  const { cart, itemCount } = useCart()
+  const { itemCount } = useCart()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const categorySlug = searchParams.get('categorySlug')
@@ -394,5 +391,42 @@ export function Header() {
         </div>
       </div>
     </header>
+  )
+}
+
+// Minimal fallback header shell (renders instantly without JS)
+function HeaderFallback() {
+  return (
+    <header className="sticky top-0 z-50 w-full bg-white shadow-md border-b-[6px] border-[#550000]" style={{
+      borderImage: 'linear-gradient(to right, #550000, #6B0000, #550000) 1',
+      boxShadow: '0 6px 8px -1px rgba(85, 0, 0, 0.2), 0 3px 5px -1px rgba(85, 0, 0, 0.12)'
+    }}>
+      <div className="bg-gradient-to-r from-[#550000] to-[#6B0000] text-white">
+        <div className="container mx-auto px-4 py-2.5 h-9"></div>
+      </div>
+      <div className="container mx-auto px-4 py-5">
+        <div className="flex items-center justify-between gap-8">
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/brandLogo/0001.png"
+              alt="Antique Oud"
+              width={180}
+              height={50}
+              className="h-10 w-auto sm:h-12 md:h-14 lg:h-16"
+              priority
+            />
+          </Link>
+        </div>
+      </div>
+    </header>
+  )
+}
+
+// Main export with Suspense boundary for faster initial render
+export function Header() {
+  return (
+    <Suspense fallback={<HeaderFallback />}>
+      <HeaderContent />
+    </Suspense>
   )
 }
