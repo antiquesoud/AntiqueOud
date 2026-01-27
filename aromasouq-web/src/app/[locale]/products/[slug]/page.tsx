@@ -17,7 +17,7 @@ import { useCart } from "@/hooks/useCart"
 import { useAuth } from "@/hooks/useAuth"
 import { useWishlist } from "@/hooks/useWishlist"
 import { useWallet } from "@/hooks/useWallet"
-import { formatCurrency, calculateDiscount } from "@/lib/utils"
+import { formatCurrency } from "@/lib/utils"
 import { getProductImageUrl, hasProductImages, getRandomPlaceholderImage, isPlaceholderImage } from "@/lib/image-utils"
 import { ReviewStats } from "@/components/reviews/ReviewStats"
 import { ReviewList } from "@/components/reviews/ReviewList"
@@ -88,12 +88,9 @@ export default function ProductDetailPage() {
     )
   }
 
-  // Use variant price and stock if a variant is selected, otherwise use product price and stock
-  const basePrice = selectedVariantData?.price ?? product.regularPrice
-  const salePrice = selectedVariantData?.salePrice ?? product.salePrice // Use variant sale price if available
-  const discount = salePrice ? calculateDiscount(basePrice, salePrice) : 0
-  const currentPrice = salePrice || basePrice
-  const savings = salePrice ? basePrice - salePrice : 0
+  // Use variant price and stock if a variant is selected, otherwise use product base price
+  // Ignore salePrice/compareAtPrice for now - just show the actual price
+  const currentPrice = selectedVariantData?.price ?? product.regularPrice
   const currentStock = selectedVariantData?.stock ?? product.stockQuantity
   const currentImageUrl = getProductImageUrl(product, selectedImage, 'large')
   const productHasImages = hasProductImages(product)
@@ -217,16 +214,6 @@ export default function ProductDetailPage() {
                 <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000]">
                   {formatCurrency(currentPrice)}
                 </span>
-                {product.salePrice && discount > 0 && (
-                  <>
-                    <span className="text-lg sm:text-xl lg:text-2xl text-gray-400 line-through font-bold">
-                      {formatCurrency(product.regularPrice)}
-                    </span>
-                    <Badge className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-white text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-1.5 font-black shadow-lg border-2 border-[#D4AF37]/30">
-                      -{discount}% {t('offBadge')}
-                    </Badge>
-                  </>
-                )}
               </div>
             </div>
 

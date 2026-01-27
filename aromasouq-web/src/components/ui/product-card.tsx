@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { GlareCard } from "@/components/aceternity/glare-card"
 import { ProductImagePlaceholder } from "@/components/ui/product-image-placeholder"
-import { cn, formatCurrency, calculateDiscount } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
 import { getFirstProductImage } from "@/lib/image-utils"
 import { Product } from "@/types"
 import { useTranslations, useLocale } from "next-intl"
@@ -45,9 +45,8 @@ export function ProductCard({
 
   // Handle both API response formats
   const hasVideo = showVideo && product.videos && product.videos.length > 0
-  const regularPrice = (product as any).regularPrice || (product as any).price || 0
-  const salePrice = (product as any).salePrice
-  const discount = salePrice ? calculateDiscount(regularPrice, salePrice) : 0
+  // Show regularPrice (min variant price) - ignore salePrice/compareAtPrice for now
+  const displayPrice = (product as any).regularPrice || (product as any).price || 0
   const stockQuantity = (product as any).stockQuantity || (product as any).stock || 0
   const isLowStock = stockQuantity > 0 && stockQuantity < 5
 
@@ -106,14 +105,6 @@ export function ProductCard({
                   compact ? "text-[8px] py-0.5 px-1.5" : "text-[9px] py-0.5 px-2"
                 )}>
                   {t('new')}
-                </Badge>
-              )}
-              {discount > 0 && (
-                <Badge className={cn(
-                  "bg-gradient-to-br from-[#EF5350] to-[#E57373] border-0 text-white font-bold",
-                  compact ? "text-[8px] py-0.5 px-1.5" : "text-[9px] py-0.5 px-2"
-                )}>
-                  {t('sale')} -{discount}%
                 </Badge>
               )}
               {isLowStock && (
@@ -233,13 +224,8 @@ export function ProductCard({
             {/* Price */}
             <div className={cn("flex items-baseline gap-1.5", compact ? "mt-1.5" : "mt-2")}>
               <span className={cn("font-bold text-[#1A1F2E]", compact ? "text-sm" : "text-base")}>
-                {formatCurrency(salePrice || regularPrice)}
+                {formatCurrency(displayPrice)}
               </span>
-              {salePrice && (
-                <span className={cn("text-gray-400 line-through", compact ? "text-[10px]" : "text-[11px]")}>
-                  {formatCurrency(regularPrice)}
-                </span>
-              )}
             </div>
 
             {/* Coins - Smaller */}

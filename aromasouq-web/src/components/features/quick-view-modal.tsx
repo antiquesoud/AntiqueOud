@@ -55,9 +55,10 @@ export function QuickViewModal({ product, open, onClose }: QuickViewModalProps) 
   if (!product) return null
 
   const isWishlisted = wishlist?.some((p: any) => p.id === product.id) || false
+  // Show variant price if selected, otherwise show regularPrice (ignore salePrice for now)
   const finalPrice = selectedVariant
     ? product.variants?.find((v) => v.id === selectedVariant)?.price || product.regularPrice
-    : product.salePrice || product.regularPrice
+    : product.regularPrice
   const finalStock = selectedVariant
     ? product.variants?.find((v) => v.id === selectedVariant)?.stock || product.stockQuantity
     : product.stockQuantity

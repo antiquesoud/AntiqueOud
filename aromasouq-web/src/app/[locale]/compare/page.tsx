@@ -83,18 +83,21 @@ export default function ComparePage() {
             {/* Price */}
             <tr>
               <td className="p-4 font-medium bg-gray-50">Price</td>
-              {products.map((product) => (
-                <td key={product.id} className="p-4 text-center">
-                  <p className="text-xl font-bold text-oud-gold">
-                    {formatCurrency(product.salePrice || product.regularPrice)}
-                  </p>
-                  {product.salePrice && (
-                    <p className="text-sm text-gray-400 line-through">
-                      {formatCurrency(product.regularPrice)}
+              {products.map((product) => {
+                const isValidDiscount = product.salePrice && product.salePrice < product.regularPrice
+                return (
+                  <td key={product.id} className="p-4 text-center">
+                    <p className="text-xl font-bold text-oud-gold">
+                      {formatCurrency(isValidDiscount ? product.salePrice : product.regularPrice)}
                     </p>
-                  )}
-                </td>
-              ))}
+                    {isValidDiscount && (
+                      <p className="text-sm text-gray-400 line-through">
+                        {formatCurrency(product.regularPrice)}
+                      </p>
+                    )}
+                  </td>
+                )
+              })}
             </tr>
 
             {/* Rating */}

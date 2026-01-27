@@ -131,7 +131,7 @@ export function SearchBar() {
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-sm font-semibold text-purple-600">
-                      AED {(product.salePrice || product.regularPrice || product.price)?.toFixed(2)}
+                      AED {(product.regularPrice || product.price)?.toFixed(2)}
                     </p>
                     {product.brand && (
                       <span className="text-xs text-gray-500">
