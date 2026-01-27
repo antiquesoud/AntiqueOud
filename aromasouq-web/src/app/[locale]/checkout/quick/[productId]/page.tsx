@@ -181,11 +181,10 @@ export default function QuickCheckoutPage() {
     )
   }
 
-  // salePrice only valid if it's LOWER than regularPrice (real discount)
-  const isValidDiscount = product.salePrice && product.salePrice < product.regularPrice
+  // Show variant price if selected, otherwise show regularPrice (ignore salePrice for now)
   const finalPrice = selectedVariant
-    ? product.variants?.find((v) => v.id === selectedVariant)?.price || product.regularPrice
-    : (isValidDiscount ? product.salePrice : product.regularPrice)
+    ? product.variants?.find((v) => v.id === selectedVariant)?.price ?? product.regularPrice ?? 0
+    : product.regularPrice ?? 0
 
   // Check if this is a test product (exempt from tax and shipping)
   const isTestProduct = product.slug?.includes('test') || false
