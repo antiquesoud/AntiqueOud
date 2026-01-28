@@ -93,6 +93,7 @@ export default function EditProductPage() {
   const productId = params.id as string
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("basic")
+  const [isInitialLoad, setIsInitialLoad] = useState(true) // Track if form has been initialized
 
   // Image upload state
   const [selectedImages, setSelectedImages] = useState<File[]>([])
@@ -123,9 +124,10 @@ export default function EditProductPage() {
     queryFn: () => apiClient.get<any[]>('/brands'),
   })
 
-  // Populate form when product data is loaded
+  // Populate form when product data is loaded - ONLY on initial load
+  // This prevents form reset when images are uploaded (which triggers a refetch)
   useEffect(() => {
-    if (product) {
+    if (product && isInitialLoad) {
       form.reset({
         // Basic Info
         name: product.name || "",
@@ -190,8 +192,26 @@ export default function EditProductPage() {
         discountPercent: product.discountPercent || undefined,
         saleEndDate: product.saleEndDate ? new Date(product.saleEndDate).toISOString().split('T')[0] : "",
       })
+      setIsInitialLoad(false) // Mark as initialized, won't reset form again
     }
-  }, [product, form])
+  }, [product, form, isInitialLoad])
+
+  // Auto-generate slug when product name changes
+  const watchedName = form.watch('name')
+  useEffect(() => {
+    // Only auto-generate if form is initialized and name changed
+    if (!isInitialLoad && watchedName) {
+      const generatedSlug = watchedName
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single
+        .substring(0, 100) // Limit length
+
+      form.setValue('slug', generatedSlug, { shouldDirty: true })
+    }
+  }, [watchedName, isInitialLoad, form])
 
   // Get valid existing images - images can be objects with url property or strings
   const getExistingImages = () => {
