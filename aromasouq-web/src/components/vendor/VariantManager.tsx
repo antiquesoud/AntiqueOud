@@ -110,9 +110,7 @@ export function VariantManager({ productId }: VariantManagerProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = () => {
     if (!validate()) return;
 
     if (editingVariant) {
@@ -228,7 +226,7 @@ export function VariantManager({ productId }: VariantManagerProps) {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Variant Name (English) */}
               <div>
@@ -408,7 +406,8 @@ export function VariantManager({ productId }: VariantManagerProps) {
                 Cancel
               </button>
               <button
-                type="submit"
+                type="button"
+                onClick={handleSubmit}
                 disabled={createVariant.isPending || updateVariant.isPending}
                 className="flex-1 px-6 py-3 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -419,7 +418,7 @@ export function VariantManager({ productId }: VariantManagerProps) {
                   : 'Add Variant'}
               </button>
             </div>
-          </form>
+          </div>
         </div>
       )}
 
