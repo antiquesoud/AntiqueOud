@@ -76,8 +76,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const port = process.env.PORT || 3001;
-  await app.listen(port);
+  // Bind to 0.0.0.0 to accept connections from Railway/Docker proxy
+  await app.listen(port, '0.0.0.0');
 
-  console.log(`🚀 AromaSouq API is running on: http://localhost:${port}/api`);
+  console.log(`🚀 AromaSouq API is running on port ${port}`);
 }
 bootstrap();
