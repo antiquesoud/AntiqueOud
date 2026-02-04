@@ -64,8 +64,8 @@ const createProductSchema = z.object({
   sillage: z.string().optional(),
   season: z.string().optional(),
 
-  // Classification (NOW MANDATORY)
-  productType: z.enum(["ORIGINAL", "CLONE", "SIMILAR_DNA", "NICHE", "ATTAR", "BODY_SPRAY", "BAKHOOR", "HOME_FRAGRANCE", "GIFT_SET", "OUR_BRAND"]).optional(),
+  // Classification (Optional - limited options)
+  productType: z.enum(["ORIGINAL", "CLONE", "SIMILAR_DNA", "OTHERS"]).optional(),
   region: z.string().optional(),
   occasion: z.string().optional(),
   oudType: z.string().optional(),
@@ -1191,13 +1191,7 @@ export default function NewProductPage() {
                                 <SelectItem value="ORIGINAL">{t('original')}</SelectItem>
                                 <SelectItem value="CLONE">{t('clone')}</SelectItem>
                                 <SelectItem value="SIMILAR_DNA">{t('similarDNA')}</SelectItem>
-                                <SelectItem value="NICHE">{t('niche')}</SelectItem>
-                                <SelectItem value="ATTAR">Attar</SelectItem>
-                                <SelectItem value="BODY_SPRAY">{t('bodySpray')}</SelectItem>
-                                <SelectItem value="BAKHOOR">{t('bakhoor')}</SelectItem>
-                                <SelectItem value="HOME_FRAGRANCE">{t('homeFragrance')}</SelectItem>
-                                <SelectItem value="GIFT_SET">{t('giftSet')}</SelectItem>
-                                <SelectItem value="OUR_BRAND">{t('ourBrand')}</SelectItem>
+                                <SelectItem value="OTHERS">{t('others')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormDescription>

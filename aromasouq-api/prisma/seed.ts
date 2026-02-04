@@ -264,16 +264,21 @@ async function main() {
     },
   });
 
-  // Category 4: All Over Spray
+  // Category 4: All Over Spray & Room Fresheners (merged with Air Freshener)
   await prisma.category.upsert({
     where: { slug: 'all-over-spray' },
-    update: {},
+    update: {
+      name: 'All Over Spray & Room Fresheners',
+      nameAr: 'بخاخ الجسم ومعطرات الغرف',
+      description: 'Refreshing body sprays and room fresheners for everyday use',
+      descriptionAr: 'بخاخات الجسم ومعطرات الغرف المنعشة للاستخدام اليومي',
+    },
     create: {
-      name: 'All Over Spray',
-      nameAr: 'بخاخ الجسم',
+      name: 'All Over Spray & Room Fresheners',
+      nameAr: 'بخاخ الجسم ومعطرات الغرف',
       slug: 'all-over-spray',
-      description: 'Refreshing all-over body sprays for everyday use',
-      descriptionAr: 'بخاخات الجسم المنعشة للاستخدام اليومي',
+      description: 'Refreshing body sprays and room fresheners for everyday use',
+      descriptionAr: 'بخاخات الجسم ومعطرات الغرف المنعشة للاستخدام اليومي',
       image: '/perfume-images/antik-posts7.jpg',
       icon: '💦',
       sortOrder: 4,
@@ -281,10 +286,12 @@ async function main() {
     },
   });
 
-  // Category 5: Air Freshener
+  // Category 5: Air Freshener (HIDDEN - merged into All Over Spray & Room Fresheners)
   await prisma.category.upsert({
     where: { slug: 'air-freshener' },
-    update: {},
+    update: {
+      isActive: false, // Hidden - merged with All Over Spray
+    },
     create: {
       name: 'Air Freshener',
       nameAr: 'معطر الجو',
@@ -294,14 +301,16 @@ async function main() {
       image: '/perfume-images/antik-posts8.jpg',
       icon: '🏠',
       sortOrder: 5,
-      isActive: true,
+      isActive: false, // Hidden - merged with All Over Spray
     },
   });
 
-  // Category 6: Dakhoon & Oud Muattar
+  // Category 6: Dakhoon & Oud Muattar (HIDDEN for now)
   await prisma.category.upsert({
     where: { slug: 'dakhoon-oud-muattar' },
-    update: {},
+    update: {
+      isActive: false, // Hidden as requested
+    },
     create: {
       name: 'Dakhoon & Oud Muattar',
       nameAr: 'العود المعطر و الدخون',
@@ -311,13 +320,32 @@ async function main() {
       image: '/perfume-images/antik-posts10.jpg',
       icon: '🔥',
       sortOrder: 6,
+      isActive: false, // Hidden as requested
+    },
+  });
+
+  // Category 7: Accessories (NEW)
+  await prisma.category.upsert({
+    where: { slug: 'accessories' },
+    update: {
+      isActive: true,
+    },
+    create: {
+      name: 'Accessories',
+      nameAr: 'الإكسسوارات',
+      slug: 'accessories',
+      description: 'Perfume accessories and related items',
+      descriptionAr: 'إكسسوارات العطور والمنتجات ذات الصلة',
+      image: '/perfume-images/antik-posts12.jpg',
+      icon: '🎁',
+      sortOrder: 7,
       isActive: true,
     },
   });
 
-  // Note: Limited Edition (sortOrder: 7) is created in seed-products.ts
+  // Note: Limited Edition (sortOrder: 8) is created in seed-products.ts
 
-  console.log('✅ Created 6 categories (Limited Edition in seed-products.ts)\n');
+  console.log('✅ Created 7 categories (Limited Edition in seed-products.ts)\n');
 
   // ====================================
   // PRODUCTS & BRANDS
@@ -328,7 +356,7 @@ async function main() {
   console.log('🎉 Database seeding completed successfully!\n');
   console.log('📊 Summary:');
   console.log('  - 6 GCC Currency Rates (AED, SAR, KWD, BHD, OMR, QAR)');
-  console.log('  - 6 Categories (oud, dehnal-oud, perfumes, all-over-spray, air-freshener, dakhoon-oud-muattar)');
+  console.log('  - 7 Categories (oud, dehnal-oud, perfumes, all-over-spray, accessories, + 2 hidden)');
   console.log('  - 2 Users (admin, vendor) with wallets');
   console.log('  - 1 Vendor profile (Antique Oud)');
   console.log('\n🔑 Login credentials:');

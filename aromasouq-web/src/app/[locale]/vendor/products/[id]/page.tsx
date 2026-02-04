@@ -1252,9 +1252,7 @@ export default function EditProductPage() {
                                 <SelectItem value="ORIGINAL">{t('original')}</SelectItem>
                                 <SelectItem value="CLONE">{t('clone')}</SelectItem>
                                 <SelectItem value="SIMILAR_DNA">{t('similarDNA')}</SelectItem>
-                                <SelectItem value="NICHE">{t('niche')}</SelectItem>
-                                <SelectItem value="ATTAR">Attar</SelectItem>
-                                <SelectItem value="BODY_SPRAY">{t('bodySpray')}</SelectItem>
+                                <SelectItem value="OTHERS">{t('others')}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormDescription>

@@ -15,7 +15,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateVariantDto } from './dto/create-variant.dto';
 import { UpdateVariantDto } from './dto/update-variant.dto';
 import { BulkFlashSaleDto, RemoveFlashSaleDto, SetDiscountPercentDto } from './dto/flash-sale.dto';
-import { UserRole } from '@prisma/client';
+import { UserRole, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService implements OnModuleInit {
@@ -540,7 +540,7 @@ export class ProductsService implements OnModuleInit {
           vendorId, // Use the auto-injected/validated vendorId
           brandId, // Use the resolved brandId (from customBrandName or provided brandId)
           isActive: isActiveStatus, // Set active by default for approved vendors
-        },
+        } as Prisma.ProductUncheckedCreateInput,
         include: {
           category: true,
           brand: true,

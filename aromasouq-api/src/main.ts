@@ -63,6 +63,11 @@ async function bootstrap() {
         return callback(null, true);
       }
 
+      // Allow Vercel preview deployments (*.vercel.app)
+      if (origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+
       // Log rejected origins for debugging
       console.warn('CORS rejected origin:', origin);
       return callback(new Error('Not allowed by CORS'), false);

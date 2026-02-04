@@ -93,11 +93,11 @@ export class CreateProductDto {
   @IsString()
   concentration?: string;
 
-  // TIER 1 MANDATORY
-  @IsNotEmpty({ message: 'Gender is required' })
+  // Gender - now optional
+  @IsOptional()
   @IsString()
   @IsIn(['men', 'women', 'unisex'], { message: 'Gender must be men, women, or unisex' })
-  gender: string;
+  gender?: string;
 
   @IsOptional()
   @IsString()
@@ -116,11 +116,11 @@ export class CreateProductDto {
   @IsString()
   baseNotes?: string;
 
-  // TIER 1 MANDATORY
-  @IsNotEmpty({ message: 'Scent family is required' })
+  // Scent Family - now optional
+  @IsOptional()
   @IsString()
   @IsIn(['floral', 'oriental', 'woody', 'fresh', 'citrus', 'fruity', 'spicy', 'aquatic', 'green', 'gourmand', 'musky', 'leather'], { message: 'Invalid scent family' })
-  scentFamily: string;
+  scentFamily?: string;
 
   @IsOptional()
   @IsString()
@@ -149,11 +149,11 @@ export class CreateProductDto {
   @Min(0)
   coinsToAward?: number;
 
-  // NEW: Enhanced Product Classification (Phase 2) - NOW MANDATORY
-  @IsNotEmpty({ message: 'Product type is required' })
+  // Product Type - now optional with limited options
+  @IsOptional()
   @IsString()
-  @IsIn(['ORIGINAL', 'CLONE', 'SIMILAR_DNA', 'NICHE', 'ATTAR', 'BODY_SPRAY', 'BAKHOOR', 'HOME_FRAGRANCE', 'GIFT_SET', 'OUR_BRAND'], { message: 'Invalid product type' })
-  productType: string;
+  @IsIn(['ORIGINAL', 'CLONE', 'SIMILAR_DNA', 'OTHERS'], { message: 'Invalid product type' })
+  productType?: string;
 
   @IsOptional()
   @IsString()

@@ -24,14 +24,21 @@ import { ReviewList } from "@/components/reviews/ReviewList"
 import { useReviewStats } from "@/hooks/useReviews"
 import { apiClient } from "@/lib/api-client"
 import { Link } from "@/i18n/navigation"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { VariantSelector } from "@/components/product/VariantSelector"
 
 export default function ProductDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const locale = useLocale()
   const t = useTranslations('productDetail')
   const tProducts = useTranslations('products')
+
+  // Helper to get localized name
+  const getLocalizedName = (item: any) => {
+    if (!item) return ''
+    return locale === 'ar' && item.nameAr ? item.nameAr : (item.nameEn || item.name || '')
+  }
   const { data: product, isLoading } = useProduct(params.slug as string)
   const { addToCart, addToCartAsync } = useCart()
   const { isAuthenticated } = useAuth()
@@ -110,15 +117,15 @@ export default function ProductDetailPage() {
             {t('home')}
           </Link>
           <span className="text-[#B3967D]">→</span>
-          {product.category?.nameEn && (
+          {product.category && (
             <>
               <Link href={`/products?categorySlug=${product.category.slug}`} className="text-transparent bg-clip-text bg-gradient-to-r from-[#550000] to-[#6B0000] hover:from-[#6B0000] hover:to-[#8B0000] transition-all">
-                {product.category.nameEn}
+                {getLocalizedName(product.category)}
               </Link>
               <span className="text-[#B3967D]">→</span>
             </>
           )}
-          <span className="text-gray-700">{product.nameEn}</span>
+          <span className="text-gray-700">{getLocalizedName(product)}</span>
         </div>
       </div>
 
@@ -136,7 +143,7 @@ export default function ProductDetailPage() {
                   <div className="relative w-full h-[300px] sm:h-[400px] lg:h-[550px] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-[#ECDBC7] via-[#F5E6D3] to-[#ECDBC7] shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white">
                     <Image
                       src={displayImage}
-                      alt={product.nameEn}
+                      alt={getLocalizedName(product)}
                       fill
                       sizes="(max-width: 1024px) 100vw, 50vw"
                       priority
@@ -181,7 +188,7 @@ export default function ProductDetailPage() {
             {/* Title */}
             <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black mb-2 sm:mb-3 leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800">
-                {product.nameEn}
+                {getLocalizedName(product)}
               </span>
             </h1>
 
