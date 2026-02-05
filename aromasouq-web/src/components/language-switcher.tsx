@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { usePathname, useRouter } from '@/i18n/navigation';
+import { usePathname, useRouter, useSearchParams } from '@/i18n/navigation';
 import { Button } from './ui/button';
 import { Globe } from 'lucide-react';
 import {
@@ -17,11 +17,14 @@ export function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { isRTL } = useDirection();
 
   const switchLocale = (newLocale: string) => {
-    // The i18n router automatically handles locale switching
-    router.replace(pathname, { locale: newLocale });
+    // Preserve query parameters when switching locale
+    const queryString = searchParams.toString();
+    const fullPath = queryString ? `${pathname}?${queryString}` : pathname;
+    router.replace(fullPath, { locale: newLocale });
   };
 
   return (

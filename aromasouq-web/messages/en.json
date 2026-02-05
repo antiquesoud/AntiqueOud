@@ -942,6 +942,9 @@
       "cancel": "Cancel",
       "productDeleted": "Product deleted successfully",
       "failedToDelete": "Failed to delete product",
+      "showingProducts": "Showing {from}-{to} of {total} products",
+      "previous": "Previous",
+      "next": "Next",
       "variants": {
         "title": "Product Variants",
         "description": "Manage different sizes and configurations",
