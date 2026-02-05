@@ -79,8 +79,10 @@
     "Dehnal Oud": "Dehnal Oud",
     "Perfumes": "Perfumes",
     "All Over Spray": "All Over Spray",
+    "All Over Spray & Room Fresheners": "All Over Spray & Room Fresheners",
     "Air Freshener": "Air Freshener",
     "Dakhoon & Oud Muattar": "Dakhoon & Oud Muattar",
+    "Accessories": "Accessories",
     "Limited Edition": "Limited Edition"
   },
   "header": {
@@ -1129,6 +1131,7 @@
       "oil": "Oil",
       "rollOn": "Roll-On",
       "sample": "Sample",
+      "giftSet": "Gift Set",
       "priceSegment": "Price Segment",
       "selectPriceSegment": "Select price range (required)",
       "priceSegmentDesc": "What price segment does this product belong to? (Required)",

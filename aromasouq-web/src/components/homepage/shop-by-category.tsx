@@ -11,19 +11,18 @@ import { Category } from '@/lib/api/homepage';
 import { translateCategory } from '@/lib/translation-helpers';
 import { ArabicBorder } from '@/components/ui/arabic-border';
 
-// Mapping categories to images - 7 client categories
+// Mapping categories to images - 6 client categories (Air Freshener & Dakhoon hidden)
 const categoryImages: Record<string, string> = {
   'oud': '/perfume-images/antik-posts9.jpg',
   'dehnal-oud': '/perfume-images/antik-posts11.jpg',
   'perfumes': '/perfume-images/antik-posts6.jpg',
   'all-over-spray': '/perfume-images/antik-posts7.jpg',
-  'air-freshener': '/perfume-images/antik-posts8.jpg',
-  'dakhoon-oud-muattar': '/perfume-images/antik-posts10.jpg',
+  'accessories': '/perfume-images/antik-posts12.jpg',
   'limited-edition': '/perfume-images/antik-posts2.jpg',
 };
 
-// Show these 7 client categories (in order)
-const allowedCategories = ['oud', 'dehnal-oud', 'perfumes', 'all-over-spray', 'air-freshener', 'dakhoon-oud-muattar', 'limited-edition'];
+// Show these 6 client categories (in order) - Air Freshener & Dakhoon hidden
+const allowedCategories = ['oud', 'dehnal-oud', 'perfumes', 'all-over-spray', 'accessories', 'limited-edition'];
 
 interface ShopByCategoryProps {
   categories: Category[];

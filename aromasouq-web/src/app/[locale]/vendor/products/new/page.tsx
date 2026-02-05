@@ -984,7 +984,7 @@ export default function NewProductPage() {
                           name="scentFamily"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('scentFamily')} <span className="text-red-500">*</span></FormLabel>
+                              <FormLabel>{t('scentFamily')}</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger>
@@ -1143,7 +1143,7 @@ export default function NewProductPage() {
                         name="gender"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('gender')} <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel>{t('gender')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -1180,7 +1180,7 @@ export default function NewProductPage() {
                         name="productType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('productType')} <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel>{t('productType')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -1330,7 +1330,7 @@ export default function NewProductPage() {
                         name="format"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('format')} <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel>{t('format')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -1359,7 +1359,7 @@ export default function NewProductPage() {
                         name="priceSegment"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('priceSegment')} <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel>{t('priceSegment')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
