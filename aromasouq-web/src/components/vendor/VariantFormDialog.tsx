@@ -78,22 +78,28 @@ export function VariantFormDialog({
     },
   })
 
-  // Watch size field for auto-SKU generation
-  const sizeValue = form.watch("size")
+  // Watch name field for auto-generation of size and SKU
+  const nameValue = form.watch("name")
 
-  // Auto-generate SKU when size changes (only for new variants)
+  // Auto-generate size (slug) and SKU from name (only for new variants)
   useEffect(() => {
-    if (open && !variant && sizeValue && baseSku) {
-      // Create SKU suffix from size (e.g., "50ml" -> "50ML", "3 grams" -> "3-GRAMS")
-      const suffix = sizeValue.trim().toUpperCase().replace(/\s+/g, "-").substring(0, 20)
-      const generatedSku = `${baseSku}-${suffix}`
+    if (open && !variant && nameValue && baseSku) {
+      // Create size slug from name (e.g., "1 Tola" -> "1-tola", "100 ML" -> "100-ml")
+      const sizeSlug = nameValue.trim().toLowerCase().replace(/\s+/g, "-")
+
+      // Create SKU suffix from name (e.g., "1 Tola" -> "1-TOLA")
+      const skuSuffix = nameValue.trim().toUpperCase().replace(/\s+/g, "-").substring(0, 20)
+      const generatedSku = `${baseSku}-${skuSuffix}`
 
       // Only update if different to avoid infinite loops
+      if (form.getValues("size") !== sizeSlug) {
+        form.setValue("size", sizeSlug)
+      }
       if (form.getValues("sku") !== generatedSku) {
         form.setValue("sku", generatedSku)
       }
     }
-  }, [sizeValue, baseSku, open, variant, form])
+  }, [nameValue, baseSku, open, variant, form])
 
   // Reset form when dialog opens/closes or variant changes
   useEffect(() => {
@@ -125,17 +131,17 @@ export function VariantFormDialog({
   }, [open, variant, baseSku, form])
 
   const handleSubmit = (values: VariantFormValues) => {
-    // Check for duplicate size (excluding current variant if editing)
-    const isDuplicateSize = existingVariants.some(
+    // Check for duplicate name (excluding current variant if editing)
+    const isDuplicateName = existingVariants.some(
       (existingVariant) =>
-        existingVariant.size.toLowerCase().trim() === values.size.toLowerCase().trim() &&
-        (!variant || existingVariant.size !== variant.size)
+        existingVariant.name.toLowerCase().trim() === values.name.toLowerCase().trim() &&
+        (!variant || existingVariant.name !== variant.name)
     )
 
-    if (isDuplicateSize) {
-      form.setError("size", {
+    if (isDuplicateName) {
+      form.setError("name", {
         type: "manual",
-        message: "A variant with this size already exists",
+        message: "A variant with this name already exists",
       })
       return
     }
@@ -208,11 +214,21 @@ export function VariantFormDialog({
                 name="size"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("sizeLabel")}</FormLabel>
+                    <FormLabel>{t("sizeLabel")} (Auto)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 3gm, 50ml" {...field} />
+                      <Input
+                        placeholder="Auto-generated from name"
+                        {...field}
+                        readOnly
+                        className="bg-gray-50 text-gray-600"
+                      />
                     </FormControl>
                     <FormMessage />
+                    {!variant && nameValue && (
+                      <p className="text-xs text-blue-600 mt-1">
+                        ✓ Auto-generated from name
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />
@@ -222,17 +238,19 @@ export function VariantFormDialog({
                 name="sku"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("skuLabel")}</FormLabel>
+                    <FormLabel>{t("skuLabel")} (Auto)</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={baseSku ? `${baseSku}-3GM` : "e.g., OUD001-3GM"}
+                        placeholder={baseSku ? `${baseSku}-...` : "Auto-generated"}
                         {...field}
+                        readOnly
+                        className="bg-gray-50 text-gray-600"
                       />
                     </FormControl>
                     <FormMessage />
-                    {!variant && baseSku && sizeValue && (
+                    {!variant && baseSku && nameValue && (
                       <p className="text-xs text-blue-600 mt-1">
-                        ✓ Auto-generated from size. Base SKU: {baseSku}
+                        ✓ Auto-generated from name. Base: {baseSku}
                       </p>
                     )}
                   </FormItem>

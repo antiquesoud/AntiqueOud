@@ -105,13 +105,10 @@ export function VariantSelector({
                 </div>
               )}
 
-              {/* Size */}
-              <div className="font-black text-sm sm:text-base text-gray-800 mb-1">
-                {variant.size}
+              {/* Variant Name - Single Source of Truth */}
+              <div className="font-black text-sm sm:text-base text-gray-800 mb-2">
+                {variant.name}
               </div>
-
-              {/* Name */}
-              <div className="text-xs text-gray-600 mb-2">{variant.name}</div>
 
               {/* Price */}
               <div className="space-y-1">
@@ -152,7 +149,7 @@ export function VariantSelector({
           <div className="text-xs sm:text-sm text-gray-700">
             <span className="font-bold">{t("selected")}:</span>{" "}
             <span className="text-gray-800 font-semibold">
-              {selectedVariant.name} ({selectedVariant.size})
+              {selectedVariant.name}
             </span>
             {" • "}
             {selectedVariant.salePrice ? (
