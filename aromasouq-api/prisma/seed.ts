@@ -246,14 +246,14 @@ async function main() {
     where: { slug: 'perfumes' },
     update: {
       name: 'Perfumes',
-      nameAr: 'المخلطات و المسك',
+      nameAr: 'عطور',
       description: 'Exclusive perfume blends and musk fragrances',
       descriptionAr: 'مخلطات العطور الحصرية وعطور المسك',
       image: '/perfume-images/antik-posts6.jpg',
     },
     create: {
       name: 'Perfumes',
-      nameAr: 'المخلطات و المسك',
+      nameAr: 'عطور',
       slug: 'perfumes',
       description: 'Exclusive perfume blends and musk fragrances',
       descriptionAr: 'مخلطات العطور الحصرية وعطور المسك',
