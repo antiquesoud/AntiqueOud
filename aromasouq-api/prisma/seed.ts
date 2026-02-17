@@ -268,14 +268,14 @@ async function main() {
   await prisma.category.upsert({
     where: { slug: 'all-over-spray' },
     update: {
-      name: 'All Over Spray & Room Fresheners',
-      nameAr: 'أول أوفر سبراي',
+      name: 'All Over Spray',
+      nameAr: 'All Over Spray',
       description: 'Refreshing body sprays and room fresheners for everyday use',
       descriptionAr: 'بخاخات الجسم ومعطرات الغرف المنعشة للاستخدام اليومي',
     },
     create: {
-      name: 'All Over Spray & Room Fresheners',
-      nameAr: 'أول أوفر سبراي',
+      name: 'All Over Spray',
+      nameAr: 'All Over Spray',
       slug: 'all-over-spray',
       description: 'Refreshing body sprays and room fresheners for everyday use',
       descriptionAr: 'بخاخات الجسم ومعطرات الغرف المنعشة للاستخدام اليومي',
@@ -329,6 +329,7 @@ async function main() {
     where: { slug: 'accessories' },
     update: {
       isActive: true,
+      image: 'https://dygedwxdzyuqjrhtjrem.supabase.co/storage/v1/object/public/products/eab1742b-c388-414e-82d6-acaeb20a293d/images/c9dcdc59-85b5-4103-9a5a-20121700e78f-1770140650422.jpg',
     },
     create: {
       name: 'Accessories',
@@ -336,7 +337,7 @@ async function main() {
       slug: 'accessories',
       description: 'Perfume accessories and related items',
       descriptionAr: 'إكسسوارات العطور والمنتجات ذات الصلة',
-      image: '/categoryImage/_DSC8382.JPG.jpeg',
+      image: 'https://dygedwxdzyuqjrhtjrem.supabase.co/storage/v1/object/public/products/eab1742b-c388-414e-82d6-acaeb20a293d/images/c9dcdc59-85b5-4103-9a5a-20121700e78f-1770140650422.jpg',
       icon: '🎁',
       sortOrder: 7,
       isActive: true,

@@ -17,7 +17,7 @@ const categoryImages: Record<string, string> = {
   'dehnal-oud': '/perfume-images/antik-posts11.jpg',
   'perfumes': '/perfume-images/antik-posts6.jpg',
   'all-over-spray': '/perfume-images/antik-posts7.jpg',
-  'accessories': '/categoryImage/_DSC8382.JPG.jpeg',
+  'accessories': 'https://dygedwxdzyuqjrhtjrem.supabase.co/storage/v1/object/public/products/eab1742b-c388-414e-82d6-acaeb20a293d/images/c9dcdc59-85b5-4103-9a5a-20121700e78f-1770140650422.jpg',
   'limited-edition': '/categoryImage/_DSC8382.JPG.jpeg',
 };
 
