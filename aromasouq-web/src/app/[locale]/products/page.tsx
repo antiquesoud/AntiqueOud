@@ -86,7 +86,7 @@ interface PageContext {
   breadcrumbs: { label: string; href?: string }[];
 }
 
-function getPageContext(filters: any, t: any): PageContext {
+function getPageContext(filters: any, t: any, categories: any[] = [], locale: string = 'en'): PageContext {
   // Priority order: Collection > Gender > Scent Family > Region > Occasion > Oud Type > Product Type
 
   // Collection-specific contexts
@@ -248,12 +248,17 @@ function getPageContext(filters: any, t: any): PageContext {
 
   // Category context
   if (filters.categorySlug) {
-    const categoryTitle = filters.categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+    // Find category from the fetched categories list
+    const category = categories?.find((c: any) => c.slug === filters.categorySlug);
+    // Use Arabic name if locale is Arabic, otherwise use English name
+    const categoryTitle = category
+      ? (locale === 'ar' && category.nameAr ? category.nameAr : category.name)
+      : filters.categorySlug.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
     return {
       title: categoryTitle,
       subtitle: t('contexts.premiumCollection'),
-      icon: "🌹",
+      icon: category?.icon || "🌹",
       gradient: "from-[#C9A86A] to-[#D4A574]",
       description: t('contexts.authenticFragrances'),
       breadcrumbs: [
@@ -298,7 +303,7 @@ export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations('productsPage');
-  const { isRTL } = useDirection();
+  const { isRTL, locale } = useDirection();
   const { addToCart } = useCart();
   const { wishlist, toggleWishlist } = useWishlist();
 
@@ -365,8 +370,8 @@ export default function ProductsPage() {
     collection: true,
   });
 
-  // Get dynamic page context
-  const pageContext = useMemo(() => getPageContext(filters, t), [filters, t]);
+  // Get dynamic page context (pass categories and locale for proper translations)
+  const pageContext = useMemo(() => getPageContext(filters, t, categories as any[], locale), [filters, t, categories, locale]);
 
   const limit = 20;
 
