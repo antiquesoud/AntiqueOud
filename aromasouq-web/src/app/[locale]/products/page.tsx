@@ -370,9 +370,6 @@ export default function ProductsPage() {
     collection: true,
   });
 
-  // Get dynamic page context (pass categories and locale for proper translations)
-  const pageContext = useMemo(() => getPageContext(filters, t, categories as any[], locale), [filters, t, categories, locale]);
-
   const limit = 20;
 
   // Fetch products with filters
@@ -409,6 +406,9 @@ export default function ProductsPage() {
       return await apiClient.get('/brands');
     },
   });
+
+  // Get dynamic page context (pass categories and locale for proper translations)
+  const pageContext = useMemo(() => getPageContext(filters, t, categories as any[], locale), [filters, t, categories, locale]);
 
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = { ...filters, [key]: value };
