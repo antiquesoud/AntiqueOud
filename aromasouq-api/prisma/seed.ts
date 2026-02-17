@@ -269,13 +269,13 @@ async function main() {
     where: { slug: 'all-over-spray' },
     update: {
       name: 'All Over Spray & Room Fresheners',
-      nameAr: 'بخاخ الجسم ومعطرات الغرف',
+      nameAr: 'أول أوفر سبراي',
       description: 'Refreshing body sprays and room fresheners for everyday use',
       descriptionAr: 'بخاخات الجسم ومعطرات الغرف المنعشة للاستخدام اليومي',
     },
     create: {
       name: 'All Over Spray & Room Fresheners',
-      nameAr: 'بخاخ الجسم ومعطرات الغرف',
+      nameAr: 'أول أوفر سبراي',
       slug: 'all-over-spray',
       description: 'Refreshing body sprays and room fresheners for everyday use',
       descriptionAr: 'بخاخات الجسم ومعطرات الغرف المنعشة للاستخدام اليومي',
