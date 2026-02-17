@@ -329,7 +329,7 @@ async function main() {
     where: { slug: 'accessories' },
     update: {
       isActive: true,
-      image: 'https://dygedwxdzyuqjrhtjrem.supabase.co/storage/v1/object/public/products/eab1742b-c388-414e-82d6-acaeb20a293d/images/c9dcdc59-85b5-4103-9a5a-20121700e78f-1770140650422.jpg',
+      image: '/categoryImage/c9dcdc59-85b5-4103-9a5a-20121700e78f-1770140650422.webp',
     },
     create: {
       name: 'Accessories',
@@ -337,7 +337,7 @@ async function main() {
       slug: 'accessories',
       description: 'Perfume accessories and related items',
       descriptionAr: 'إكسسوارات العطور والمنتجات ذات الصلة',
-      image: 'https://dygedwxdzyuqjrhtjrem.supabase.co/storage/v1/object/public/products/eab1742b-c388-414e-82d6-acaeb20a293d/images/c9dcdc59-85b5-4103-9a5a-20121700e78f-1770140650422.jpg',
+      image: '/categoryImage/c9dcdc59-85b5-4103-9a5a-20121700e78f-1770140650422.webp',
       icon: '🎁',
       sortOrder: 7,
       isActive: true,
