@@ -571,11 +571,10 @@ export default function GuestCheckoutPage() {
                       </div>
 
                       <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-                          <p className="text-amber-700 font-medium text-center">
-                            UAE: 30 AED | Gulf: 130 AED
-                          </p>
-                        </div>
-                      )}
+                        <p className="text-amber-700 font-medium text-center">
+                          UAE: 30 AED | Gulf: 130 AED
+                        </p>
+                      </div>
 
                       <div className="flex gap-3">
                         <Button
