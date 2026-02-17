@@ -116,7 +116,7 @@ export class CartService {
     );
 
     const tax = hasTestProduct ? 0 : subtotal * 0.05; // 5% tax, exempt for test products
-    const shipping = hasTestProduct ? 0 : (subtotal > 200 ? 0 : 25); // Free shipping over 200 AED, exempt for test products
+    const shipping = hasTestProduct ? 0 : 30; // UAE default rate (30 AED), actual rate calculated at checkout
     const total = subtotal + tax + shipping;
     const coinsEarnable = Math.floor(total / 10); // 1 coin per 10 AED
 

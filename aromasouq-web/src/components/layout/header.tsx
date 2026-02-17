@@ -42,7 +42,7 @@ function HeaderContent() {
       {/* Top Bar - Promotional */}
       <div className="bg-gradient-to-r from-[#550000] to-[#6B0000] text-white">
         <div className="container mx-auto px-4 py-2.5 flex justify-between items-center text-xs md:text-sm">
-          <p className="font-semibold">Free shipping on orders over 300 AED</p>
+          <p className="font-semibold">✨ Shipping: UAE 30 AED | Gulf 130 AED</p>
           <div className="hidden md:flex gap-4 font-medium">
             <Link href="/track-order" className="hover:text-[#ECDBC7] transition-colors">{tNav('trackOrder')}</Link>
             <Link href="/about" className="hover:text-[#ECDBC7] transition-colors">{tNav('about')}</Link>

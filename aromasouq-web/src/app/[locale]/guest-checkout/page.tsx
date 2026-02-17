@@ -564,16 +564,15 @@ export default function GuestCheckoutPage() {
                             <h3 className="font-semibold text-lg mb-2">{t('standardDelivery')}</h3>
                             <p className="text-muted-foreground mb-2">{t('deliveryTime3to5')}</p>
                             <p className="text-sm font-medium text-oud-gold">
-                              {cart.summary.shipping === 0 ? t('freeShipping') : formatCurrency(cart.summary.shipping)}
+                              {formatCurrency(cart.summary.shipping || 30)}
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      {cart.summary.subtotal >= 200 && (
-                        <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-                          <p className="text-green-700 font-medium text-center">
-                            You've qualified for FREE shipping!
+                      <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                          <p className="text-amber-700 font-medium text-center">
+                            UAE: 30 AED | Gulf: 130 AED
                           </p>
                         </div>
                       )}
@@ -832,7 +831,7 @@ export default function GuestCheckoutPage() {
                 <div className="flex justify-between text-sm">
                   <span>{t('shipping')}:</span>
                   <span className="font-semibold">
-                    {cart.summary.shipping === 0 ? t('freeShipping') : formatCurrency(cart.summary.shipping)}
+                    {formatCurrency(cart.summary.shipping || 30)}
                   </span>
                 </div>
 

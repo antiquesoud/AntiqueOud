@@ -86,7 +86,7 @@
   },
   "header": {
     "topBar": {
-      "freeShipping": "✨ شحن مجاني للطلبات فوق 300 درهم"
+      "shippingRates": "✨ الشحن: الإمارات 30 درهم | الخليج 130 درهم"
     },
     "nav": {
       "home": "الرئيسية",
@@ -257,8 +257,8 @@
     "invalidCoupon": "رمز خصم غير صالح أو منتهي الصلاحية",
     "couponApplied": "تم تطبيق رمز الخصم بنجاح!",
     "itemsInCart": "عناصر في السلة",
-    "freeShipping": "شحن مجاني",
-    "addMoreForFreeShipping": "أضف {amount} أكثر للحصول على شحن مجاني",
+    "shippingUAE": "الشحن: 30 درهم",
+    "shippingGulf": "شحن الخليج: 130 درهم",
     "onlyLeftInStock": "متبقي {count} فقط",
     "youllEarnCoins": "ستربح {count} نقاط!",
     "secureCheckout": "دفع آمن",
@@ -322,7 +322,7 @@
     "fullName": "الاسم الكامل",
     "loading": "جارٍ التحميل...",
     "items": "عناصر",
-    "freeShipping": "مجاناً",
+    "shippingInfo": "الإمارات 30 درهم | الخليج 130 درهم",
     "coinDiscount": "خصم النقاط",
     "subtotal": "المجموع الفرعي",
     "discount": "الخصم",
@@ -537,7 +537,7 @@
     },
     "trust": {
       "authenticProducts": "منتجات أصلية 100%",
-      "freeShipping": "شحن مجاني للطلبات فوق 300 درهم",
+      "shipping": "الإمارات 30 درهم | الخليج 130 درهم",
       "securePayment": "دفع آمن",
       "easyReturns": "إرجاع سهل"
     }

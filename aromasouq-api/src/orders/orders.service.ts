@@ -242,10 +242,13 @@ export class OrdersService {
       (item) => item.product.slug?.includes('test')
     );
 
-    // Calculate tax and shipping (simplified for MVP)
+    // Calculate tax and shipping
     // Test products are exempt from tax and shipping for testing purposes
     const tax = hasTestProduct ? 0 : subtotal * 0.05; // 5% tax
-    const shippingFee = hasTestProduct ? 0 : (subtotal > 200 ? 0 : 25); // Free shipping over 200 AED
+    // Shipping: UAE 30 AED, Gulf countries 130 AED
+    const gulfCountries = ['SAUDI', 'SAUDI ARABIA', 'KSA', 'KUWAIT', 'QATAR', 'OMAN', 'BAHRAIN'];
+    const isGulf = gulfCountries.includes(address.country?.toUpperCase());
+    const shippingFee = hasTestProduct ? 0 : (isGulf ? 130 : 30);
 
     // Handle coins usage
     let coinsDiscount = 0;

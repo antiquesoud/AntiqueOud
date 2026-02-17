@@ -331,19 +331,13 @@ export default function CartPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{t('shipping')}:</span>
                   <span className="font-semibold">
-                    {shipping === 0 ? (
-                      <span className="text-green-600">{t('freeShipping')}</span>
-                    ) : (
-                      formatCurrency(shipping)
-                    )}
+                    {formatCurrency(shipping || 30)}
                   </span>
                 </div>
 
-                {subtotal < 300 && (
-                  <p className="text-xs text-muted-foreground">
-                    {t('addMoreForFreeShipping', { amount: formatCurrency(300 - subtotal) })}
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground">
+                  {t('shippingUAE')} • {t('shippingGulf')}
+                </p>
 
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{t('tax')} (5%):</span>

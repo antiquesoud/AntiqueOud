@@ -86,7 +86,7 @@
   },
   "header": {
     "topBar": {
-      "freeShipping": "✨ Free shipping on orders over 300 AED"
+      "shippingRates": "✨ Shipping: UAE 30 AED | Gulf 130 AED"
     },
     "nav": {
       "home": "Home",
@@ -257,8 +257,8 @@
     "invalidCoupon": "Invalid or expired coupon code",
     "couponApplied": "Coupon applied successfully!",
     "itemsInCart": "items in cart",
-    "freeShipping": "Free Shipping",
-    "addMoreForFreeShipping": "Add {amount} more for free shipping",
+    "shippingUAE": "Shipping: 30 AED",
+    "shippingGulf": "Gulf Shipping: 130 AED",
     "onlyLeftInStock": "Only {count} left in stock",
     "youllEarnCoins": "You'll earn {count} coins!",
     "secureCheckout": "Secure Checkout",
@@ -322,7 +322,7 @@
     "fullName": "Full Name",
     "loading": "Loading...",
     "items": "items",
-    "freeShipping": "FREE",
+    "shippingInfo": "UAE 30 AED | Gulf 130 AED",
     "coinDiscount": "Coin Discount",
     "subtotal": "Subtotal",
     "discount": "Discount",
@@ -537,7 +537,7 @@
     },
     "trust": {
       "authenticProducts": "100% Authentic Products",
-      "freeShipping": "Free Shipping on Orders 300 AED+",
+      "shipping": "UAE 30 AED | Gulf 130 AED",
       "securePayment": "Secure Payment",
       "easyReturns": "Easy Returns"
     }

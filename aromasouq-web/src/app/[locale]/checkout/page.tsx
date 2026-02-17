@@ -443,7 +443,7 @@ export default function CheckoutPage() {
                               </div>
                             </div>
                             <span className="font-semibold">
-                              {subtotal >= 300 ? t('freeShipping') : formatCurrency(25)}
+                              {formatCurrency(30)}
                             </span>
                           </Label>
 
@@ -813,7 +813,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm">
                   <span>{t('shipping')}:</span>
                   <span className="font-semibold">
-                    {shippingCost === 0 ? t('freeShipping') : formatCurrency(shippingCost)}
+                    {formatCurrency(shippingCost || 30)}
                   </span>
                 </div>
 

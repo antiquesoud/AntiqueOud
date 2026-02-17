@@ -68,7 +68,11 @@ export class CheckoutService {
     // Check if this is a test product (exempt from tax and shipping)
     const isTestProduct = product.slug?.includes('test');
 
-    const shippingFee = isTestProduct ? 0 : (deliveryMethod === 'EXPRESS' ? 25 : deliveryMethod === 'STANDARD' ? 15 : 0);
+    // Calculate shipping based on country
+    // UAE: 30 AED, Gulf countries: 130 AED
+    const gulfCountries = ['SAUDI', 'SAUDI ARABIA', 'KSA', 'KUWAIT', 'QATAR', 'OMAN', 'BAHRAIN'];
+    const isGulf = gulfCountries.includes(address.country?.toUpperCase());
+    const shippingFee = isTestProduct ? 0 : (isGulf ? 130 : 30);
 
     // Calculate gift wrapping cost
     let giftWrappingCost = 0;
