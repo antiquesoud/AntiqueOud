@@ -32,9 +32,9 @@ async function main() {
       slug: 'limited-edition',
       description: 'Exclusive limited edition collections and gift sets',
       descriptionAr: 'مجموعات حصرية وهدايا محدودة الإصدار',
-      image: '/perfume-images/antik-posts2.jpg',
+      image: '/categoryImage/_DSC8382.JPG.jpeg',
       icon: '✨',
-      sortOrder: 7,
+      sortOrder: 8,
       isActive: true,
     },
   });

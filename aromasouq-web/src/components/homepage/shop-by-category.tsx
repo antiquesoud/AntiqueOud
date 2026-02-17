@@ -17,8 +17,8 @@ const categoryImages: Record<string, string> = {
   'dehnal-oud': '/perfume-images/antik-posts11.jpg',
   'perfumes': '/perfume-images/antik-posts6.jpg',
   'all-over-spray': '/perfume-images/antik-posts7.jpg',
-  'accessories': '/perfume-images/antik-posts12.jpg',
-  'limited-edition': '/perfume-images/antik-posts2.jpg',
+  'accessories': '/categoryImage/_DSC8382.JPG.jpeg',
+  'limited-edition': '/categoryImage/_DSC8382.JPG.jpeg',
 };
 
 // Show these 6 client categories (in order) - Air Freshener & Dakhoon hidden

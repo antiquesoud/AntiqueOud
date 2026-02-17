@@ -336,7 +336,7 @@ async function main() {
       slug: 'accessories',
       description: 'Perfume accessories and related items',
       descriptionAr: 'إكسسوارات العطور والمنتجات ذات الصلة',
-      image: '/perfume-images/antik-posts12.jpg',
+      image: '/categoryImage/_DSC8382.JPG.jpeg',
       icon: '🎁',
       sortOrder: 7,
       isActive: true,
