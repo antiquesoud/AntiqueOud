@@ -20,38 +20,62 @@ export class GuestOrdersService {
   async create(sessionToken: string, createOrderDto: CreateGuestOrderDto) {
     const { guestEmail, guestPhone, shippingAddress, paymentMethod } = createOrderDto;
 
-    // Get guest cart
+    // Get guest cart with fresh product data
     const cart = await this.guestCartService.getCartWithTotals(sessionToken);
 
     if (!cart.items || cart.items.length === 0) {
       throw new BadRequestException('Cart is empty');
     }
 
-    // Validate stock availability for all cart items
+    // Validate and filter cart items - auto-remove unavailable items
+    const removedItems: string[] = [];
+    const validItems: typeof cart.items = [];
+
     for (const item of cart.items) {
       const product = item.product;
-      const availableStock = item.variant?.stock || product.stock;
+      const availableStock = item.variant?.stock || product.stockQuantity;
+      let isValid = true;
+      let reason = '';
 
-      if (availableStock < item.quantity) {
-        throw new BadRequestException(
-          `Insufficient stock for "${product.name}". Available: ${availableStock}, Requested: ${item.quantity}`,
-        );
-      }
-
+      // Check if product is active
       if (!product.isActive) {
-        throw new BadRequestException(
-          `Product "${product.name}" is no longer available`,
-        );
+        isValid = false;
+        reason = `"${product.name}" is no longer available`;
       }
+      // Check stock
+      else if (availableStock < item.quantity) {
+        isValid = false;
+        reason = `"${product.name}" - insufficient stock`;
+      }
+
+      if (isValid) {
+        validItems.push(item);
+      } else {
+        removedItems.push(reason);
+        // Auto-remove from cart
+        await this.prisma.guestCartItem.delete({ where: { id: item.id } });
+      }
+    }
+
+    // If all items were removed, throw error with details
+    if (validItems.length === 0) {
+      throw new BadRequestException({
+        message: 'All items in your cart are unavailable',
+        removedItems,
+      });
     }
 
     // Generate order number
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-    // Create order with items in a transaction
-    const order = await this.prisma.$transaction(async (tx) => {
-      // Prepare order items
-      const orderItems = cart.items.map((item) => ({
+    // Recalculate totals using validItems only (with fresh prices)
+    let subtotal = 0;
+    const orderItems = validItems.map((item) => {
+      // Use current price from product (fresh from DB)
+      const price = item.variant?.salePrice || item.variant?.price || item.product.salePrice || item.product.regularPrice || item.price;
+      subtotal += price * item.quantity;
+
+      return {
         productId: item.productId,
         variantId: item.variantId,
         productName: item.product.name,
@@ -59,9 +83,17 @@ export class GuestOrdersService {
         variantName: item.variant?.name || null,
         variantNameAr: item.variant?.nameAr || null,
         quantity: item.quantity,
-        price: item.price,
-      }));
+        price,
+      };
+    });
 
+    // Recalculate tax and total
+    const tax = subtotal * 0.05; // 5% tax
+    const shippingFee = cart.summary.shipping; // Keep original shipping
+    const total = subtotal + tax + shippingFee;
+
+    // Create order with items in a transaction
+    const order = await this.prisma.$transaction(async (tx) => {
       // Create guest order
       const newOrder = await tx.guestOrder.create({
         data: {
@@ -71,11 +103,11 @@ export class GuestOrdersService {
           guestPhone,
           shippingAddress: shippingAddress as any, // Type cast for JSON field
           paymentMethod,
-          subtotal: cart.summary.subtotal,
-          tax: cart.summary.tax,
-          shippingFee: cart.summary.shipping,
+          subtotal,
+          tax,
+          shippingFee,
           discount: 0, // Guest orders don't support coupons for now
-          total: cart.summary.total,
+          total,
           orderStatus: 'PENDING',
           paymentStatus: 'PENDING',
           items: {
@@ -99,7 +131,7 @@ export class GuestOrdersService {
       });
 
       // Decrement stock and increment sales for each product
-      for (const item of cart.items) {
+      for (const item of validItems) {
         if (item.variantId) {
           // Update variant stock
           await tx.productVariant.update({
@@ -126,7 +158,11 @@ export class GuestOrdersService {
     // Clear guest cart after successful order
     await this.guestCartService.clearCart(sessionToken);
 
-    return order;
+    // Return order with any removed items warning
+    return {
+      ...order,
+      removedItems: removedItems.length > 0 ? removedItems : undefined,
+    };
   }
 
   /**

@@ -6,29 +6,26 @@ import toast from 'react-hot-toast'
 import { useAuthStore } from '@/stores/authStore'
 
 /**
- * Cart Hook with Optimistic Updates & Debounced Sync
+ * Cart Hook with Optimistic Updates & Debounced Batch Sync
  *
  * Performance optimizations:
- * - Optimistic updates for instant UI feedback
- * - Debounced API calls (batches rapid quantity changes)
- * - Instant toast notifications
- * - Reduced server round-trips
+ * - Optimistic updates for instant UI feedback (like Amazon, Shopify)
+ * - Instant toast notifications on click (not waiting for API)
+ * - Navbar cart count updates immediately
+ * - Debounced batch sync - multiple clicks = 1 API call
+ * - Immediate rollback on error
  */
-
-// Debounce timeout for quantity updates (ms)
-const DEBOUNCE_MS = 500
-
 export function useCart() {
   const queryClient = useQueryClient()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
-  // Refs for debouncing
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const pendingUpdatesRef = useRef<Map<string, number>>(new Map())
-
   // Use different endpoints based on authentication status
   const cartEndpoint = isAuthenticated ? '/cart' : '/guest-cart'
   const cartQueryKey = ['cart', isAuthenticated ? 'user' : 'guest']
+
+  // Refs for debounced batch sync
+  const pendingUpdatesRef = useRef<Map<string, number>>(new Map())
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { data: cart, isLoading } = useQuery({
     queryKey: cartQueryKey,
@@ -40,17 +37,56 @@ export function useCart() {
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 min for background updates
   })
 
-  // Optimistic add to cart - instant UI update + instant toast
+  // Debounced sync function - batches multiple updates into single API call
+  const debouncedSync = useCallback(() => {
+    if (syncTimerRef.current) clearTimeout(syncTimerRef.current)
+
+    syncTimerRef.current = setTimeout(async () => {
+      const updates = Array.from(pendingUpdatesRef.current.entries())
+      if (updates.length === 0) return
+
+      pendingUpdatesRef.current.clear()
+
+      try {
+        // Try batch sync first
+        await apiClient.patch(`${cartEndpoint}/sync`, {
+          items: updates.map(([itemId, quantity]) => ({ itemId, quantity }))
+        })
+      } catch (error: unknown) {
+        // If batch sync fails (404 or other error), fall back to individual calls
+        console.warn('Batch sync failed, falling back to individual calls:', error)
+        for (const [itemId, quantity] of updates) {
+          try {
+            if (quantity === 0) {
+              await apiClient.delete(`${cartEndpoint}/items/${itemId}`)
+            } else {
+              await apiClient.patch(`${cartEndpoint}/items/${itemId}`, { quantity })
+            }
+          } catch (e) {
+            console.error('Individual update failed:', e)
+          }
+        }
+      }
+      // Always sync with server after updates
+      queryClient.invalidateQueries({ queryKey: cartQueryKey })
+    }, 500) // 500ms debounce - faster feedback
+  }, [cartEndpoint, queryClient, cartQueryKey])
+
+  // Optimistic add to cart - instant UI update
   const addToCart = useMutation({
     mutationFn: (data: { productId: string; variantId?: string; quantity: number }) =>
-      apiClient.post(`${cartEndpoint}/items`, data),
+      apiClient.post(`${cartEndpoint}/items`, data), // Returns CartItem, not full Cart
     onMutate: async (newItem) => {
-      // Show toast immediately - don't wait for server
+      // Instant toast - don't wait for API
       toast.success('Added to cart')
 
+      // Cancel any outgoing refetches to prevent overwriting optimistic update
       await queryClient.cancelQueries({ queryKey: cartQueryKey })
+
+      // Snapshot the previous cart
       const previousCart = queryClient.getQueryData<Cart>(cartQueryKey)
 
+      // Optimistically update cart count immediately
       if (previousCart) {
         const existingItem = previousCart.items.find(
           (item: CartItem) =>
@@ -67,7 +103,7 @@ export function useCart() {
           : [
               ...previousCart.items,
               {
-                id: `temp-${Date.now()}`,
+                id: `temp-${Date.now()}`, // Temporary ID until server responds
                 cartId: previousCart.id,
                 productId: newItem.productId,
                 variantId: newItem.variantId,
@@ -85,12 +121,15 @@ export function useCart() {
               } as CartItem,
             ]
 
+        // Calculate new item count
+        const newItemCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0)
+
         queryClient.setQueryData<Cart>(cartQueryKey, {
           ...previousCart,
           items: updatedItems,
           summary: {
             ...previousCart.summary,
-            itemCount: (previousCart.summary?.itemCount || 0) + newItem.quantity,
+            itemCount: newItemCount,
           },
         })
       }
@@ -98,10 +137,11 @@ export function useCart() {
       return { previousCart }
     },
     onSuccess: () => {
-      // Sync with server in background (no toast here - already shown)
+      // Server returns CartItem, not full Cart - invalidate to fetch updated cart
       queryClient.invalidateQueries({ queryKey: cartQueryKey })
     },
     onError: (_err, _vars, context) => {
+      // Rollback to previous cart on error
       if (context?.previousCart) {
         queryClient.setQueryData(cartQueryKey, context.previousCart)
       }
@@ -109,128 +149,135 @@ export function useCart() {
     },
   })
 
-  // Debounced quantity update - batches rapid +/- clicks
-  const debouncedApiCall = useCallback((itemId: string, quantity: number) => {
-    // Store pending update
-    pendingUpdatesRef.current.set(itemId, quantity)
-
-    // Clear existing timer
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-
-    // Set new debounced timer
-    debounceTimerRef.current = setTimeout(async () => {
-      // Process all pending updates
-      const updates = Array.from(pendingUpdatesRef.current.entries())
-      pendingUpdatesRef.current.clear()
-
-      for (const [id, qty] of updates) {
-        try {
-          await apiClient.patch(`${cartEndpoint}/items/${id}`, { quantity: qty })
-        } catch (error) {
-          console.error('Failed to sync cart item:', error)
-        }
-      }
-
-      // Single invalidation after all updates
-      queryClient.invalidateQueries({ queryKey: cartQueryKey })
-    }, DEBOUNCE_MS)
-  }, [cartEndpoint, queryClient, cartQueryKey])
-
-  // Optimistic update for quantity changes (instant UI, debounced API)
+  // Optimistic update for quantity changes (legacy - for components still using this)
   const updateQuantity = useMutation({
-    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
-      // Don't call API here - it's debounced
-      debouncedApiCall(itemId, quantity)
-      return { itemId, quantity }
-    },
+    mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
+      apiClient.patch<Cart>(`${cartEndpoint}/items/${itemId}`, { quantity }),
     onMutate: async ({ itemId, quantity }) => {
+      // Instant toast
+      toast.success('Cart updated')
+
+      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: cartQueryKey })
+
+      // Snapshot previous value
       const previousCart = queryClient.getQueryData<Cart>(cartQueryKey)
 
-      // Instant UI update
+      // Optimistically update the cache with items and itemCount
       if (previousCart) {
+        const updatedItems = previousCart.items.map((item: CartItem) =>
+          item.id === itemId ? { ...item, quantity } : item
+        )
+        const newItemCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0)
+
         queryClient.setQueryData<Cart>(cartQueryKey, {
           ...previousCart,
-          items: previousCart.items.map((item: CartItem) =>
-            item.id === itemId ? { ...item, quantity } : item
-          ),
+          items: updatedItems,
+          summary: {
+            ...previousCart.summary,
+            itemCount: newItemCount,
+          },
         })
       }
 
       return { previousCart }
     },
     onError: (_err, _vars, context) => {
+      // Rollback on error
       if (context?.previousCart) {
         queryClient.setQueryData(cartQueryKey, context.previousCart)
       }
       toast.error('Failed to update cart')
     },
-    // No onSettled - debounced API handles sync
+    onSettled: () => {
+      // Sync with server
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
+    },
   })
 
-  // updateCartItem uses same debounced logic as updateQuantity
+  // Optimistic update with debounced batch sync
   const updateCartItem = useMutation({
     mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
-      debouncedApiCall(itemId, quantity)
+      // Queue for batch sync instead of immediate API call
+      pendingUpdatesRef.current.set(itemId, quantity)
+      debouncedSync()
       return { itemId, quantity }
     },
     onMutate: async ({ itemId, quantity }) => {
+      // Instant toast
+      toast.success('Cart updated')
+
       await queryClient.cancelQueries({ queryKey: cartQueryKey })
       const previousCart = queryClient.getQueryData<Cart>(cartQueryKey)
 
       if (previousCart) {
+        const updatedItems = previousCart.items.map((item: CartItem) =>
+          item.id === itemId ? { ...item, quantity } : item
+        )
+        const newItemCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0)
+
         queryClient.setQueryData<Cart>(cartQueryKey, {
           ...previousCart,
-          items: previousCart.items.map((item: CartItem) =>
-            item.id === itemId ? { ...item, quantity } : item
-          ),
+          items: updatedItems,
+          summary: {
+            ...previousCart.summary,
+            itemCount: newItemCount,
+          },
         })
       }
 
       return { previousCart }
     },
-    onError: (error: any, _vars, context) => {
+    onError: (error: unknown, _vars, context) => {
       if (context?.previousCart) {
         queryClient.setQueryData(cartQueryKey, context.previousCart)
       }
-      toast.error(error?.response?.data?.message || 'Failed to update cart')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update cart'
+      toast.error(errorMessage)
     },
-    // No onSettled - debounced API handles sync
   })
 
-  // Optimistic remove - instant UI + instant toast
+  // Optimistic update for remove with debounced sync
   const removeFromCart = useMutation({
-    mutationFn: (itemId: string) => apiClient.delete(`${cartEndpoint}/items/${itemId}`),
+    mutationFn: async (itemId: string) => {
+      // Queue removal (quantity 0) for batch sync
+      pendingUpdatesRef.current.set(itemId, 0)
+      debouncedSync()
+      return { itemId }
+    },
     onMutate: async (itemId) => {
-      // Show toast immediately
+      // Instant toast
       toast.success('Removed from cart')
 
       await queryClient.cancelQueries({ queryKey: cartQueryKey })
       const previousCart = queryClient.getQueryData<Cart>(cartQueryKey)
 
+      // Optimistically remove the item and update count
       if (previousCart) {
+        const updatedItems = previousCart.items.filter((item: CartItem) => item.id !== itemId)
+        const newItemCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0)
+
         queryClient.setQueryData<Cart>(cartQueryKey, {
           ...previousCart,
-          items: previousCart.items.filter((item: CartItem) => item.id !== itemId),
+          items: updatedItems,
+          summary: {
+            ...previousCart.summary,
+            itemCount: newItemCount,
+          },
         })
       }
 
       return { previousCart }
     },
-    onSuccess: () => {
-      // Sync with server (no toast - already shown)
-      queryClient.invalidateQueries({ queryKey: cartQueryKey })
-    },
-    onError: (error: any, _itemId, context) => {
+    onError: (error: unknown, _itemId, context) => {
+      // Rollback on error
       if (context?.previousCart) {
         queryClient.setQueryData(cartQueryKey, context.previousCart)
       }
       console.error('Remove from cart error:', error)
-      toast.error(error?.response?.data?.message || 'Failed to remove item')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to remove item'
+      toast.error(errorMessage)
     },
-    // Removed onSettled - onSuccess handles sync
   })
 
   const clearCart = useMutation({
@@ -257,6 +304,13 @@ export function useCart() {
       // Set empty cart for both user and guest to ensure UI updates
       queryClient.setQueryData<Cart>(['cart', 'user'], emptyCart)
       queryClient.setQueryData<Cart>(['cart', 'guest'], emptyCart)
+
+      // Clear any pending sync updates
+      pendingUpdatesRef.current.clear()
+      if (syncTimerRef.current) {
+        clearTimeout(syncTimerRef.current)
+        syncTimerRef.current = null
+      }
 
       return { previousCart }
     },
@@ -286,6 +340,14 @@ export function useCart() {
         coinsEarnable: 0,
       },
     }
+
+    // Clear any pending sync updates
+    pendingUpdatesRef.current.clear()
+    if (syncTimerRef.current) {
+      clearTimeout(syncTimerRef.current)
+      syncTimerRef.current = null
+    }
+
     // Clear both user and guest carts immediately
     queryClient.setQueryData<Cart>(['cart', 'user'], emptyCart)
     queryClient.setQueryData<Cart>(['cart', 'guest'], emptyCart)

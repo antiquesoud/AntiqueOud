@@ -14,6 +14,7 @@ import { GuestCartService } from './guest-cart.service';
 import { SessionService } from '../session/session.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateQuantityDto } from './dto/update-quantity.dto';
+import { SyncCartDto } from './dto/sync-cart.dto';
 
 @Controller('guest-cart')
 export class GuestCartController {
@@ -89,6 +90,28 @@ export class GuestCartController {
     const cart = await this.guestCartService.getCartWithTotals(sessionToken);
 
     // Always return session token so frontend can store it
+    return {
+      ...cart,
+      guest_session: sessionToken,
+    };
+  }
+
+  /**
+   * Sync cart items (batch update)
+   * Processes multiple item updates in a single request
+   */
+  @Patch('sync')
+  async syncCart(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() syncCartDto: SyncCartDto,
+  ) {
+    const { sessionToken } = this.sessionService.getOrCreateGuestSessionFromRequest(req, res);
+
+    await this.guestCartService.syncCart(sessionToken, syncCartDto);
+
+    const cart = await this.guestCartService.getCartWithTotals(sessionToken);
+
     return {
       ...cart,
       guest_session: sessionToken,

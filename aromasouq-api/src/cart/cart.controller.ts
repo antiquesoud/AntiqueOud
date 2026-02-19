@@ -13,6 +13,7 @@ import type { Request } from 'express';
 import { CartService } from './cart.service';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import { SyncCartDto } from './dto/sync-cart.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('cart')
@@ -40,6 +41,12 @@ export class CartController {
   ) {
     const userId = req.user!['sub'];
     return this.cartService.updateItem(userId, id, updateCartItemDto);
+  }
+
+  @Patch('sync')
+  syncCart(@Req() req: Request, @Body() syncCartDto: SyncCartDto) {
+    const userId = req.user!['sub'];
+    return this.cartService.syncCart(userId, syncCartDto);
   }
 
   @Delete('items/:id')

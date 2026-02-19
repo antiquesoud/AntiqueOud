@@ -156,7 +156,7 @@ export class OrdersService {
       throw new BadRequestException('Address does not belong to user');
     }
 
-    // Get user's cart
+    // Get user's cart with fresh product data
     const cart = await this.prisma.cart.findUnique({
       where: { userId },
       include: {
@@ -173,45 +173,60 @@ export class OrdersService {
       throw new BadRequestException('Cart is empty');
     }
 
-    // Validate stock availability for all cart items
+    // Validate and filter cart items - auto-remove unavailable items
+    const removedItems: string[] = [];
+    const validItems: typeof cart.items = [];
+
     for (const item of cart.items) {
       const product = item.product;
+      let isValid = true;
+      let reason = '';
 
-      // Check variant stock if variant exists, otherwise check product stock
-      if (item.variant) {
-        if (item.variant.stock < item.quantity) {
-          throw new BadRequestException(
-            `Insufficient stock for "${product.name}" (${item.variant.size}). Available: ${item.variant.stock}, Requested: ${item.quantity}`,
-          );
-        }
-
+      // Check if product is active
+      if (!product.isActive) {
+        isValid = false;
+        reason = `"${product.name}" is no longer available`;
+      }
+      // Check variant stock and status if variant exists
+      else if (item.variant) {
         if (!item.variant.isActive) {
-          throw new BadRequestException(
-            `Product variant "${product.name}" (${item.variant.size}) is no longer available`,
-          );
-        }
-      } else {
-        if (product.stock < item.quantity) {
-          throw new BadRequestException(
-            `Insufficient stock for "${product.name}". Available: ${product.stock}, Requested: ${item.quantity}`,
-          );
+          isValid = false;
+          reason = `"${product.name}" (${item.variant.size}) is no longer available`;
+        } else if (item.variant.stock < item.quantity) {
+          isValid = false;
+          reason = `"${product.name}" (${item.variant.size}) - insufficient stock`;
         }
       }
+      // Check product stock (no variant)
+      else if (product.stock < item.quantity) {
+        isValid = false;
+        reason = `"${product.name}" - insufficient stock`;
+      }
 
-      // Also check if product is active
-      if (!product.isActive) {
-        throw new BadRequestException(
-          `Product "${product.name}" is no longer available`,
-        );
+      if (isValid) {
+        validItems.push(item);
+      } else {
+        removedItems.push(reason);
+        // Auto-remove from cart
+        await this.prisma.cartItem.delete({ where: { id: item.id } });
       }
     }
 
-    // Calculate totals
+    // If all items were removed, throw error with details
+    if (validItems.length === 0) {
+      throw new BadRequestException({
+        message: 'All items in your cart are unavailable',
+        removedItems,
+      });
+    }
+
+    // Calculate totals using valid items only (with fresh prices from DB)
     let subtotal = 0;
     const orderItems: { productId: string; variantId?: string; quantity: number; price: number }[] = [];
 
-    for (const item of cart.items) {
-      const price = item.variant?.price || item.product.price;
+    for (const item of validItems) {
+      // Use current price from DB (sale price if available, otherwise regular price)
+      const price = item.variant?.salePrice || item.variant?.price || item.product.salePrice || item.product.price;
       const itemTotal = price * item.quantity;
       subtotal += itemTotal;
 
@@ -238,7 +253,7 @@ export class OrdersService {
     }
 
     // Check if cart contains test product (exempt from tax and shipping)
-    const hasTestProduct = cart.items.some(
+    const hasTestProduct = validItems.some(
       (item) => item.product.slug?.includes('test')
     );
 
@@ -317,7 +332,7 @@ export class OrdersService {
       });
 
       // Decrement stock and increment sales for each product/variant
-      for (const item of cart.items) {
+      for (const item of validItems) {
         if (item.variantId) {
           // Decrement variant stock
           await tx.productVariant.update({
@@ -400,7 +415,11 @@ export class OrdersService {
       }
     }
 
-    return order;
+    // Return order with any removed items warning
+    return {
+      ...order,
+      removedItems: removedItems.length > 0 ? removedItems : undefined,
+    };
   }
 
   async updateStatus(

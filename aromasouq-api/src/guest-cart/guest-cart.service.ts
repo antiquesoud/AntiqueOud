@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SessionService } from '../session/session.service';
+import { SyncCartDto } from './dto/sync-cart.dto';
 
 @Injectable()
 export class GuestCartService {
@@ -86,6 +87,7 @@ export class GuestCartService {
 
   /**
    * Add item to guest cart
+   * Quick add - no validation (validation happens at checkout)
    */
   async addItem(
     sessionToken: string,
@@ -93,31 +95,14 @@ export class GuestCartService {
     quantity: number,
     variantId?: string,
   ) {
-    // Validate product exists and is active
-    const product = await this.prisma.product.findUnique({
+    // Quick check - only verify product exists (validation happens at checkout)
+    const productExists = await this.prisma.product.findUnique({
       where: { id: productId },
-      include: {
-        variants: variantId ? { where: { id: variantId } } : false,
-      },
+      select: { id: true },
     });
 
-    if (!product) {
+    if (!productExists) {
       throw new NotFoundException('Product not found');
-    }
-
-    if (!product.isActive) {
-      throw new BadRequestException('Product is not available');
-    }
-
-    // Validate stock
-    const availableStock = variantId
-      ? product.variants?.[0]?.stock || 0
-      : product.stock;
-
-    if (availableStock < quantity) {
-      throw new BadRequestException(
-        `Insufficient stock. Only ${availableStock} available`,
-      );
     }
 
     // Get or create cart
@@ -133,18 +118,10 @@ export class GuestCartService {
     });
 
     if (existingItem) {
-      // Update quantity
-      const newQuantity = existingItem.quantity + quantity;
-
-      if (newQuantity > availableStock) {
-        throw new BadRequestException(
-          `Cannot add more than ${availableStock} items`,
-        );
-      }
-
+      // Update quantity (no stock validation - done at checkout)
       return this.prisma.guestCartItem.update({
         where: { id: existingItem.id },
-        data: { quantity: newQuantity },
+        data: { quantity: existingItem.quantity + quantity },
         include: {
           product: true,
           variant: true,
@@ -237,6 +214,40 @@ export class GuestCartService {
     });
 
     return { message: 'Item removed from cart' };
+  }
+
+  /**
+   * Sync cart items (batch update)
+   * Processes multiple item updates in a single request
+   */
+  async syncCart(sessionToken: string, syncCartDto: SyncCartDto) {
+    const cart = await this.getOrCreateCart(sessionToken);
+
+    // Verify all items belong to this cart
+    const cartItemIds = new Set(cart.items.map((item) => item.id));
+    for (const update of syncCartDto.items) {
+      if (!cartItemIds.has(update.itemId)) {
+        throw new BadRequestException(`Cart item ${update.itemId} not found`);
+      }
+    }
+
+    // Process all updates in single transaction
+    await this.prisma.$transaction(async (tx) => {
+      for (const update of syncCartDto.items) {
+        if (update.quantity === 0) {
+          // Remove item
+          await tx.guestCartItem.delete({ where: { id: update.itemId } });
+        } else {
+          // Update quantity
+          await tx.guestCartItem.update({
+            where: { id: update.itemId },
+            data: { quantity: update.quantity },
+          });
+        }
+      }
+    });
+
+    return { message: 'Cart synced' };
   }
 
   /**
